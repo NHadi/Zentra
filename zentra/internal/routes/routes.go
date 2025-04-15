@@ -9,6 +9,14 @@ import (
 
 // SetupRoutes initializes all routes for the application
 func SetupRoutes(router *gin.RouterGroup, services *services.Services) {
+	// Health check endpoint
+	router.GET("/api/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "Service is healthy",
+		})
+	})
+
 	// Protected routes with tenant
 	protected := router.Group("")
 	protected.Use(middleware.AuthMiddleware(services.UserService))

@@ -4,8 +4,8 @@
   "description": "eStore E-commerce Website",
   "main": "index.html",
   "scripts": {
-    "start": "http-server ./ -p 3001 --index index.html -o -c-1",
-    "dev": "http-server ./ -p 3001 --index index.html -o -c-1"
+    "start": "http-server ./ -p $PORT --index index.html -o -c-1",
+    "dev": "http-server ./ -p $PORT --index index.html -o -c-1"
   },
   "dependencies": {
     "http-server": "^14.1.1"

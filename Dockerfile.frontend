@@ -25,11 +25,12 @@ RUN npm install
 COPY zentra-ui/ .
 
 # Expose port
-EXPOSE 8090
+EXPOSE 3000
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV API_URL=http://backend:8080/api
+ENV PORT=3000
 
 # Start the application directly with node
 CMD ["node", "server.js"] 

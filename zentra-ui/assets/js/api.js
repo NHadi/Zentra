@@ -8,6 +8,12 @@
 
         // Default configurations for each environment
         const configs = {
+            local: {
+                API_URL: 'http://localhost:8080',
+                ESHOP_URL: 'http://localhost:3001',
+                PGADMIN_URL: 'http://localhost:5050',
+                ENVIRONMENT: 'local'
+            },
             development: {
                 API_URL: 'https://dev.zentra.badamigroups.com',
                 ESHOP_URL: 'https://dev.eshop.badamigroups.com',
@@ -28,8 +34,8 @@
             }
         };
 
-        // Try to detect environment from URL
-        const currentEnv = detectEnvironment() || 'development';
+        // Try to detect environment from URL or use local
+        const currentEnv = detectEnvironment() || 'local';
         return configs[currentEnv];
     }
 
@@ -37,20 +43,31 @@
     function detectEnvironment() {
         const hostname = window.location.hostname;
         
+        // Check if running locally
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            return 'local';
+        }
+        
+        // Check environment based on subdomain
         if (hostname.startsWith('dev.')) {
             return 'development';
         } else if (hostname.startsWith('staging.')) {
             return 'staging';
-        } else if (hostname.match(/^(www\.)?(bisnisqu|eshop|zentra)\.badamigroups\.com$/)) {
+        } else if (hostname === 'bisnisqu.badamigroups.com' || 
+                   hostname === 'eshop.badamigroups.com' || 
+                   hostname === 'zentra.badamigroups.com') {
             return 'production';
         }
         
-        return 'development'; // Default to development
+        return 'local'; // Default to local if no match
     }
 
     // Get API URL from configuration
     function getApiUrl() {
         const config = getConfig();
+        const env = getEnvironment();
+        
+        // Add /api to the URL for all environments
         return `${config.API_URL}/api`;
     }
 

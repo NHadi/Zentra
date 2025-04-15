@@ -81,7 +81,11 @@
   <script src="./assets/js/api.js"></script>
   
   <script>
+    // Initialize API configuration
     $(document).ready(function() {
+      console.log('Current environment:', window.zentra.getEnvironment());
+      console.log('API URL:', window.zentra.getApiUrl());
+      
       $('#login-form').on('submit', function(e) {
         e.preventDefault();
         
@@ -110,6 +114,9 @@
           .catch(error => {
             console.error('Login failed:', error);
             alert('Login failed: ' + error.message);
+            // Reset button state
+            submitBtn.html(originalText);
+            submitBtn.prop('disabled', false);
           });
       });
     });

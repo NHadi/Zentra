@@ -7,10 +7,15 @@ const port = process.env.PORT || 3000;
 // Function to inject configuration into HTML
 function injectConfig(html) {
     // Determine environment from hostname or NODE_ENV
-    const environment = process.env.NODE_ENV || 'development';
+    const environment = process.env.NODE_ENV || 'local';
     
     // Get the appropriate configuration
     const envConfig = {
+        local: {
+            API_URL: 'http://localhost:8080/api',
+            ESHOP_URL: 'http://localhost:3001',
+            PGADMIN_URL: 'http://localhost:5050'
+        },
         development: {
             API_URL: 'https://dev.zentra.badamigroups.com',
             ESHOP_URL: 'https://dev.eshop.badamigroups.com',
