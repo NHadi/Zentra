@@ -87,6 +87,13 @@ func main() {
 
 	r := gin.New()
 	r.Use(gin.Recovery())
+	// Health check endpoint
+	r.GET("/api/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "Service is healthy",
+		})
+	})
 	r.Use(middleware.LoggingMiddleware(logger))
 
 	// Add gin context to request context
@@ -98,24 +105,20 @@ func main() {
 
 	// Setup CORS middleware
 	r.Use(func(c *gin.Context) {
-		// Allow requests from all frontend environment ports
-		allowedOrigins := []string{
-			"http://localhost:8090", // Development
-			"http://localhost:8091", // Staging
-			"http://localhost:8092", // Production
-		}
-
 		origin := c.Request.Header.Get("Origin")
-		for _, allowedOrigin := range allowedOrigins {
-			if origin == allowedOrigin {
-				c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
-				break
-			}
+		if origin == "" {
+			// Allow all origins if no Origin header is present
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		} else {
+			// Allow the specific origin
+			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		}
 
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Tenant-ID, X-Environment")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Tenant-ID, X-Environment, Accept, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
+		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
@@ -139,7 +142,14 @@ func main() {
 	// Setup middleware
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-
+	// health check endpoint
+	r.GET("/api/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "Service is healthy",
+			"auth":    "verified",
+		})
+	})
 	// Protected routes
 	protected := r.Group("/api")
 	protected.Use(middleware.AuthMiddleware(appServices.UserService))

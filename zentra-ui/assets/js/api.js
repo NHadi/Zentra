@@ -2,10 +2,18 @@
 (function() {
     // Get configuration from window object
     function getConfig() {
+        console.log('Getting API configuration...');
+        
+        // Check for server-injected configuration
         if (window.APP_CONFIG) {
+            console.log('[API] Using server-injected config:', window.APP_CONFIG);
             return window.APP_CONFIG;
         }
 
+        // If no server config, detect environment and use defaults
+        const environment = detectEnvironment();
+        console.log('[API] No server config found, using environment:', environment);
+        
         // Default configurations for each environment
         const configs = {
             local: {
@@ -34,14 +42,13 @@
             }
         };
 
-        // Try to detect environment from URL or use local
-        const currentEnv = detectEnvironment() || 'local';
-        return configs[currentEnv];
+        return configs[environment];
     }
 
     // Helper function to detect environment from URL
     function detectEnvironment() {
         const hostname = window.location.hostname;
+        console.log('[API] Detecting environment from hostname:', hostname);
         
         // Check if running locally
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -49,9 +56,9 @@
         }
         
         // Check environment based on subdomain
-        if (hostname.startsWith('dev.')) {
+        if (hostname.includes('dev.')) {
             return 'development';
-        } else if (hostname.startsWith('staging.')) {
+        } else if (hostname.includes('staging.')) {
             return 'staging';
         } else if (hostname === 'bisnisqu.badamigroups.com' || 
                    hostname === 'eshop.badamigroups.com' || 
@@ -59,23 +66,30 @@
             return 'production';
         }
         
+        // Default to local if running from file or unknown host
+        if (hostname === '' || hostname === 'file' || hostname.startsWith('192.168.')) {
+            return 'local';
+        }
+        
         return 'local'; // Default to local if no match
     }
 
+    // Initialize configuration
+    const config = getConfig();
+    console.log('[API] Using configuration:', config);
+
     // Get API URL from configuration
     function getApiUrl() {
-        const config = getConfig();
-        const env = getEnvironment();
-        
-        // Add /api to the URL for all environments
-        return `${config.API_URL}/api`;
+        const baseUrl = config.API_URL;
+        // Remove trailing slash if present
+        return `${baseUrl.replace(/\/$/, '')}/api`;
     }
 
     function getEnvironment() {
-        return getConfig().ENVIRONMENT;
+        return config.ENVIRONMENT;
     }
 
-    // Get headers for authenticated requests with environment info
+    // Get headers for authenticated requests
     function getHeaders() {
         const token = localStorage.getItem('token');
         return {
@@ -89,7 +103,10 @@
     // Authentication
     async function login(email, password) {
         try {
-            const response = await fetch(`${getApiUrl()}/auth/login`, {
+            const apiUrl = getApiUrl();
+            console.log('[API] Attempting login with API URL:', apiUrl);
+            
+            const response = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,16 +117,26 @@
             
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.error || 'Login failed');
+                throw new Error(error.message || error.error || 'Login failed');
             }
             
             const data = await response.json();
+            console.log('[API] Login response:', data);
+            
+            if (!data.token) {
+                throw new Error('No token received from server');
+            }
+            
             // Store token
             localStorage.setItem('token', data.token);
             
-            // Extract tenant_id from JWT token
-            const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
-            localStorage.setItem('tenant_id', tokenPayload.tenant_id);
+            try {
+                // Extract tenant_id from JWT token
+                const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
+                localStorage.setItem('tenant_id', tokenPayload.tenant_id);
+            } catch (e) {
+                console.warn('[API] Could not extract tenant_id from token:', e);
+            }
             
             // Store user and menu data
             localStorage.setItem('user', JSON.stringify(data.user));
@@ -117,7 +144,7 @@
             
             return data;
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('[API] Login error:', error);
             throw error;
         }
     }
@@ -246,27 +273,37 @@
 
     // Navigation helpers for multi-environment
     function navigateToEshop() {
-        window.location.href = getConfig().ESHOP_URL;
+        window.location.href = config.ESHOP_URL;
     }
 
     function navigateToPgAdmin() {
-        window.location.href = getConfig().PGADMIN_URL;
+        window.location.href = config.PGADMIN_URL;
     }
 
-    // Export the API functions
+    // Export the API functions to window.zentra
     window.zentra = {
-        getConfig,
+        login,
+        logout,
+        getConfig: () => config,
         getApiUrl,
         getEnvironment,
-        login,
+        config: {
+            environment: getEnvironment(),
+            baseUrl: config.API_URL
+        },
         getUsers,
         createUser,
         getMenusByRole,
         getAuditsByDateRange,
         getAuditsByEntity,
         getAuditsByTenant,
-        logout,
         navigateToEshop,
         navigateToPgAdmin
     };
+
+    // Log the API initialization
+    console.log('[API] zentra API initialized with config:', window.zentra.config);
+    
+    // Dispatch an event when initialization is complete
+    window.dispatchEvent(new Event('zentraApiReady'));
 })();

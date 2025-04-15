@@ -1,9 +1,12 @@
 // API Configuration
-export const getApiUrl = () => window.API_URL || 'http://localhost:8080/api';
+export const getApiUrl = () => {
+    const config = window.APP_CONFIG || {};
+    return config.API_URL ? `${config.API_URL}/api` : 'http://localhost:8080/api';
+};
 
 export const getBaseUrl = () => {
-    const apiUrl = window.API_URL || 'http://localhost:8080';
-    return apiUrl.split('/api')[0]; // Remove '/api' if present
+    const config = window.APP_CONFIG || {};
+    return config.API_URL || 'http://localhost:8080';
 };
 
 export const config = {

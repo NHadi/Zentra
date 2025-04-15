@@ -20,8 +20,8 @@ FROM alpine:3.19
 
 WORKDIR /app
 
-# Install required packages
-RUN apk add --no-cache ca-certificates tzdata
+# Install required packages and PostgreSQL client
+RUN apk add --no-cache ca-certificates tzdata postgresql-client
 
 # Copy the binary from builder
 COPY --from=builder /app/main .

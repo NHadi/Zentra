@@ -1,9 +1,51 @@
-# Build images
+# Build Frontend images
+docker build -t nurulhadii/zentra-ui:dev -f Dockerfile.frontend .
+docker build -t nurulhadii/zentra-ui:staging -f Dockerfile.frontend .
+docker build -t nurulhadii/zentra-ui:prod -f Dockerfile.frontend .
 docker build -t nurulhadii/zentra-ui:latest -f Dockerfile.frontend .
+
+# Build Backend images
+docker build -t nurulhadii/zentra-api:dev -f Dockerfile.backend .
+docker build -t nurulhadii/zentra-api:staging -f Dockerfile.backend .
+docker build -t nurulhadii/zentra-api:prod -f Dockerfile.backend .
 docker build -t nurulhadii/zentra-api:latest -f Dockerfile.backend .
+
+# Build E-shop images
+docker build -t nurulhadii/zentra-eshop:dev -f Dockerfile.eshop .
+docker build -t nurulhadii/zentra-eshop:staging -f Dockerfile.eshop .
+docker build -t nurulhadii/zentra-eshop:prod -f Dockerfile.eshop .
 docker build -t nurulhadii/zentra-eshop:latest -f Dockerfile.eshop .
 
-# Push images
+# Push Frontend images
+docker push nurulhadii/zentra-ui:dev
+docker push nurulhadii/zentra-ui:staging
+docker push nurulhadii/zentra-ui:prod
 docker push nurulhadii/zentra-ui:latest
+
+# Push Backend images
+docker push nurulhadii/zentra-api:dev
+docker push nurulhadii/zentra-api:staging
+docker push nurulhadii/zentra-api:prod
 docker push nurulhadii/zentra-api:latest
+
+# Push E-shop images
+docker push nurulhadii/zentra-eshop:dev
+docker push nurulhadii/zentra-eshop:staging
+docker push nurulhadii/zentra-eshop:prod
 docker push nurulhadii/zentra-eshop:latest
+
+# Quick commands for specific environments
+# Development
+docker build -t nurulhadii/zentra-ui:dev -f Dockerfile.frontend . && docker push nurulhadii/zentra-ui:dev
+docker build -t nurulhadii/zentra-api:dev -f Dockerfile.backend . && docker push nurulhadii/zentra-api:dev
+docker build -t nurulhadii/zentra-eshop:dev -f Dockerfile.eshop . && docker push nurulhadii/zentra-eshop:dev
+
+# Staging
+docker build -t nurulhadii/zentra-ui:staging -f Dockerfile.frontend . && docker push nurulhadii/zentra-ui:staging
+docker build -t nurulhadii/zentra-api:staging -f Dockerfile.backend . && docker push nurulhadii/zentra-api:staging
+docker build -t nurulhadii/zentra-eshop:staging -f Dockerfile.eshop . && docker push nurulhadii/zentra-eshop:staging
+
+# Production
+docker build -t nurulhadii/zentra-ui:prod -f Dockerfile.frontend . && docker push nurulhadii/zentra-ui:prod
+docker build -t nurulhadii/zentra-api:prod -f Dockerfile.backend . && docker push nurulhadii/zentra-api:prod
+docker build -t nurulhadii/zentra-eshop:prod -f Dockerfile.eshop . && docker push nurulhadii/zentra-eshop:prod

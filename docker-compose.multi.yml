@@ -43,16 +43,19 @@ services:
     environment:
       - POSTGRES_HOST=postgres_dev
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB_DEV}
-      - POSTGRES_USER=${POSTGRES_USER_DEV}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_DEV}
+      - POSTGRES_DB=zentra_api_development
+      - POSTGRES_USER=zentra_admin
+      - POSTGRES_PASSWORD=zentra_admin_123@#$
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - GIN_MODE=debug
       - JWT_SECRET=${JWT_SECRET_DEV}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_DEV}
       - SERVER_PORT=8080
+      - BACKUP_PATH=/backups
     volumes:
       - ./zentra/uploads:/app/uploads
+      - ./backups/dev:/backups
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - postgres_dev
     networks:
@@ -66,10 +69,12 @@ services:
     container_name: zentra-eshop-dev
     restart: always
     ports:
-      - "3001:3001"
+      - "3001:3000"
     environment:
       - NODE_ENV=development
-      - API_URL=http://backend_dev:8080/api
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=true
     depends_on:
       - backend_dev
     networks:
@@ -83,10 +88,12 @@ services:
     container_name: zentra-ui-dev
     restart: always
     ports:
-      - "8090:8090"
+      - "8090:3000"
     environment:
       - NODE_ENV=development
-      - API_URL=http://backend_dev:8080/api
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=true
     depends_on:
       - backend_dev
     networks:
@@ -142,8 +149,11 @@ services:
       - JWT_SECRET=${JWT_SECRET_STAGING}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_STAGING}
       - SERVER_PORT=8080
+      - BACKUP_PATH=/backups
     volumes:
       - ./zentra/uploads:/app/uploads
+      - ./backups/staging:/backups
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - postgres_staging
     networks:
@@ -233,8 +243,11 @@ services:
       - JWT_SECRET=${JWT_SECRET_PROD}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_PROD}
       - SERVER_PORT=8080
+      - BACKUP_PATH=/backups
     volumes:
       - ./zentra/uploads:/app/uploads
+      - ./backups/prod:/backups
+      - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - postgres_prod
     networks:
