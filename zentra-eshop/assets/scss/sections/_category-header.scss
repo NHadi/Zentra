@@ -1,0 +1,233 @@
+// main: ../main.scss
+/*--------------------------------------------------------------
+# Category Header Section
+--------------------------------------------------------------*/
+.category-header {
+  padding-bottom: 0;
+
+  .filter-container {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+
+    .filter-item {
+      margin-bottom: 0.75rem;
+
+      .form-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+        color: var(--heading-color);
+        letter-spacing: 0.01em;
+      }
+
+      // Search form styles
+      &.search-form {
+        .input-group {
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+          overflow: hidden;
+
+          .form-control {
+            border-right: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            height: 44px;
+            color: var(--default-color);
+            background-color: var(--surface-color);
+            border-color: color-mix(in srgb, var(--default-color), transparent 85%);
+            border-radius: 8px 0 0 8px;
+
+            &:focus {
+              border-color: var(--accent-color);
+              box-shadow: none;
+            }
+
+            &::placeholder {
+              color: color-mix(in srgb, var(--default-color), transparent 60%);
+              font-size: 0.9rem;
+            }
+          }
+
+          .search-btn {
+            background-color: var(--accent-color);
+            color: var(--contrast-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background-color: color-mix(in srgb, var(--accent-color), var(--heading-color) 15%);
+            }
+
+            i {
+              font-size: 1rem;
+            }
+          }
+        }
+      }
+
+      // Select styles
+      .form-select {
+        color: var(--default-color);
+        background-color: var(--surface-color);
+        font-size: 0.95rem;
+        border-color: color-mix(in srgb, var(--default-color), transparent 85%);
+        padding: 0.625rem 2.25rem 0.625rem 1rem;
+        height: 46px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%233690e7' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+
+        &:focus {
+          border-color: var(--accent-color);
+          box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 85%);
+        }
+
+        &.form-select-sm {
+          height: 38px;
+          font-size: 0.85rem;
+          padding: 0.4rem 2rem 0.4rem 0.75rem;
+        }
+      }
+
+      .view-options {
+        display: flex;
+        gap: 0.5rem;
+
+        .view-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 42px;
+          height: 42px;
+          border-radius: 6px;
+          background-color: var(--surface-color);
+          border: 1px solid color-mix(in srgb, var(--default-color), transparent 85%);
+          color: var(--default-color);
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+
+          &:hover {
+            background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+          }
+
+          &.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: var(--contrast-color);
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-color), transparent 60%);
+          }
+
+          i {
+            font-size: 1.1rem;
+          }
+        }
+      }
+
+      .items-per-page {
+        min-width: 110px;
+      }
+    }
+
+    .active-filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+
+      .active-filter-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--heading-color);
+        letter-spacing: 0.01em;
+      }
+
+      .filter-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        flex: 1;
+      }
+
+      .filter-tag {
+        display: inline-flex;
+        align-items: center;
+        background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+        color: var(--accent-color);
+        font-size: 0.875rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 50px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        font-weight: 500;
+
+        .filter-remove {
+          background: none;
+          border: none;
+          color: var(--accent-color);
+          margin-left: 0.35rem;
+          padding: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+
+          &:hover {
+            color: color-mix(in srgb, var(--accent-color), var(--heading-color) 30%);
+            background-color: color-mix(in srgb, var(--accent-color), transparent 80%);
+            transform: scale(1.1);
+          }
+        }
+      }
+
+      .clear-all-btn {
+        background: none;
+        border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%);
+        color: var(--accent-color);
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.35rem 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-left: auto;
+        border-radius: 50px;
+
+        &:hover {
+          background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+          color: color-mix(in srgb, var(--accent-color), var(--heading-color) 15%);
+          border-color: var(--accent-color);
+        }
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      padding: 1rem;
+
+      .active-filters {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .filter-tags {
+          width: 100%;
+        }
+
+        .clear-all-btn {
+          margin-left: 0;
+          margin-top: 0.5rem;
+        }
+      }
+    }
+  }
+}

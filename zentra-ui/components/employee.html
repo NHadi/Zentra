@@ -1,0 +1,468 @@
+# Employee Management Page
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Employee Management</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="employeeGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Information Modal -->
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center">
+                    <i class="ni ni-single-02 mr-2"></i>
+                    Employee Information
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Search and Filter Section -->
+                <div class="bg-secondary py-3 px-4">
+                    <div class="input-group input-group-merge">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                        <input type="text" id="employeeSearchBox" class="form-control" placeholder="Search employees...">
+                    </div>
+                </div>
+
+                <!-- Employee Form -->
+                <div class="employee-form px-4 py-3">
+                    <form id="employeeForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Full Name</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Email Address</label>
+                                    <input type="email" class="form-control" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phone" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Division</label>
+                                    <select class="form-control" name="division">
+                                        <option value="">Select Division</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEmployee">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Grid Styles */
+.dx-datagrid {
+    background-color: transparent;
+}
+
+.dx-datagrid-headers {
+    border-bottom: 2px solid #e9ecef;
+}
+
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+    border-bottom: none;
+    background-color: #f8f9fa;
+    padding: 16px 14px;
+}
+
+.dx-datagrid-rowsview .dx-row {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dx-datagrid-rowsview .dx-row:hover {
+    background-color: #f8f9fa;
+}
+
+.dx-datagrid-rowsview .dx-row > td {
+    padding: 16px 14px;
+}
+
+/* Button Styles */
+.btn-icon-only {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-icon-only i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-icon-only:hover {
+    transform: translateY(-1px);
+}
+
+.btn-icon-only.btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+}
+
+.btn-icon-only.btn-primary:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+}
+
+.btn-icon-only.btn-info {
+    background-color: #11cdef;
+    border-color: #11cdef;
+    box-shadow: 0 2px 4px rgba(17, 205, 239, 0.2);
+}
+
+.btn-icon-only.btn-info:hover {
+    background-color: #0fb5d3;
+    border-color: #0fb5d3;
+    box-shadow: 0 4px 6px rgba(17, 205, 239, 0.25);
+}
+
+.btn-icon-only.btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    box-shadow: 0 2px 4px rgba(245, 54, 92, 0.2);
+}
+
+.btn-icon-only.btn-danger:hover {
+    background-color: #f01d48;
+    border-color: #f01d48;
+    box-shadow: 0 4px 6px rgba(245, 54, 92, 0.25);
+}
+
+/* Modal Styles */
+.modal .modal-content {
+    border: 0;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal .modal-header {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+    border-bottom: 0;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+    position: relative;
+    min-height: 3.5rem;
+}
+
+.modal .modal-title {
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.modal .modal-title i {
+    font-size: 1rem;
+}
+
+.modal .close {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    opacity: 0.9;
+    text-shadow: none;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.modal .close span {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1;
+    position: relative;
+    top: -1px;
+}
+
+.modal .close:hover {
+    color: white;
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.modal .modal-body {
+    padding: 0;
+    background-color: white;
+}
+
+.modal .modal-footer {
+    padding: 0.75rem 1.5rem;
+    background-color: #f8f9fe;
+    border-top: 1px solid #e9ecef;
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.modal .btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+}
+
+.modal .btn-secondary {
+    color: #8898aa;
+    background-color: white;
+    border: 1px solid #e9ecef;
+    min-width: 70px;
+}
+
+.modal .btn-secondary:hover {
+    color: #525f7f;
+    background-color: #f6f9fc;
+    transform: translateY(-1px);
+}
+
+.modal .btn-primary {
+    color: white;
+    background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+    border: 0;
+    min-width: 90px;
+}
+
+.modal .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgba(50, 50, 93, 0.18);
+}
+
+/* Search Box Styles */
+.modal .input-group-merge {
+    position: relative;
+}
+
+.modal .input-group-merge .input-group-prepend {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 4;
+}
+
+.modal .input-group-merge .input-group-text {
+    border: 0;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    color: #adb5bd;
+}
+
+.modal .input-group-merge .form-control {
+    padding-left: 3rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+}
+
+.modal .input-group-merge .form-control:focus {
+    box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(94, 114, 228, 0.1);
+    border-color: #5e72e4;
+}
+
+.modal .bg-secondary {
+    background-color: #f7fafc !important;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Form Styles */
+.employee-form {
+    background-color: white;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-control-label {
+    color: #8898aa;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    font-size: 0.875rem;
+    height: calc(1.5em + 1.25rem + 2px);
+    padding: 0.625rem 0.75rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #525f7f;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    color: #525f7f;
+    background-color: #fff;
+    border-color: #5e72e4;
+    outline: 0;
+    box-shadow: 0 3px 9px rgba(50, 50, 9, 0), 3px 4px 8px rgba(94, 114, 228, 0.1);
+}
+
+select.form-control {
+    padding-right: 1.75rem;
+    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3e%3cpath fill='%2332325d' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Animation */
+@keyframes formFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.employee-form {
+    animation: formFadeIn 0.3s ease-out forwards;
+}
+
+/* Add subtle animation for buttons */
+@keyframes buttonPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+.modal .btn:active {
+    animation: buttonPop 0.15s ease-out;
+}
+
+/* Add a subtle glow effect to the close button */
+@keyframes closeButtonGlow {
+    0% { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+    50% { box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2); }
+    100% { box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+}
+
+.modal .close:hover {
+    animation: closeButtonGlow 1.5s infinite;
+}
+
+/* Add Employee Button specific styles */
+.dx-button.dx-button-has-icon.dx-button-has-text {
+    border-radius: 6px;
+    background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);
+    border: 0;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.15);
+    transition: all 0.2s ease;
+    height: 36px;
+    min-width: 120px;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+    background: linear-gradient(87deg, #525fe4 0, #7654e4 100%);
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-button-content {
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-icon {
+    margin-right: 8px;
+    font-size: 16px;
+    color: white;
+    opacity: 0.9;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-button-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    text-transform: none;
+    letter-spacing: 0.025em;
+}
+
+/* Update the toolbar button container */
+.dx-toolbar-before {
+    padding-left: 1rem;
+}
+
+/* Remove the old add-employee-btn styles that had negative margin */
+</style> 

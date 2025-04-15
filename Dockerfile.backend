@@ -1,0 +1,44 @@
+# Build stage
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY zentra/go.mod zentra/go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY zentra .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o main ./cmd/api
+
+# Final stage
+FROM alpine:3.19
+
+WORKDIR /app
+
+# Install required packages
+RUN apk add --no-cache ca-certificates tzdata
+
+# Copy the binary from builder
+COPY --from=builder /app/main .
+
+# Create necessary directories
+RUN mkdir -p uploads/products && \
+    chmod -R 755 uploads
+
+# Set timezone
+ENV TZ=Asia/Jakarta
+
+# Expose port
+EXPOSE 8080
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/api/health || exit 1
+
+# Run the application
+CMD ["./main"] 

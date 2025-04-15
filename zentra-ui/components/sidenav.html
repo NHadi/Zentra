@@ -1,0 +1,168 @@
+<!-- Sidenav component -->
+<nav class="sidenav navbar navbar-vertical fixed-left navbar-expand-xs navbar-light bg-white" id="sidenav-main">
+  <div class="scrollbar-inner">
+    <!-- Brand -->
+    <div class="sidenav-header">
+      <a class="navbar-brand" href="javascript:void(0)">
+        <img src="assets/img/brand/zentra.png" class="navbar-brand-img" alt="...">
+      </a>
+    </div>
+    <div class="navbar-inner">
+      <!-- Collapse -->
+      <div class="collapse navbar-collapse" id="sidenav-collapse-main">
+        <!-- Nav items -->
+        <ul class="navbar-nav" id="menu-container">
+          <!-- Menu items will be dynamically inserted here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // Only define renderMenus if it hasn't been defined yet
+  if (typeof window.renderMenus === 'undefined') {
+    window.renderMenus = function(menus) {
+      const menuContainer = $('#menu-container');
+      if (!menuContainer.length) {
+        console.error('Menu container not found');
+        return;
+      }
+
+      // Clear existing menus
+      menuContainer.empty();
+
+      if (!menus || !menus.length) {
+        console.warn('No menus to render');
+        return;
+      }
+
+      // Get current path and clean it
+      const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '');
+
+      // Function to get exact path without any trailing slashes
+      const getExactPath = (url) => (url || '#').replace(/^\/+|\/+$/g, '').toLowerCase();
+
+      menus.forEach(menu => {
+        if (menu.children && menu.children.length > 0) {
+          // Check if any child is active using exact match
+          const hasActiveChild = menu.children.some(child => 
+            getExactPath(child.url) === currentPath.toLowerCase()
+          );
+
+          // Parent menu with dropdown
+          const menuItem = `
+            <li class="nav-item">
+              <a class="nav-link ${!hasActiveChild ? 'collapsed' : ''}" 
+                 href="#" 
+                 data-toggle="collapse" 
+                 data-target="#menu-${menu.id}" 
+                 aria-expanded="${hasActiveChild ? 'true' : 'false'}">
+                <i class="${menu.icon || 'ni ni-app'}"></i>
+                <span class="nav-link-text">${menu.name}</span>
+              </a>
+              <div class="collapse ${hasActiveChild ? 'show' : ''}" id="menu-${menu.id}">
+                <ul class="nav nav-sm flex-column pl-4">
+                  ${menu.children.map(child => {
+                    const isActive = getExactPath(child.url) === currentPath.toLowerCase();
+                    return `
+                      <li class="nav-item">
+                        <a class="nav-link py-2 ${isActive ? 'active' : ''}" 
+                           href="${child.url || '#'}"
+                           data-path="${getExactPath(child.url)}">
+                          <i class="${child.icon || 'ni ni-app'}"></i>
+                          <span class="nav-link-text">${child.name}</span>
+                        </a>
+                      </li>
+                    `;
+                  }).join('')}
+                </ul>
+              </div>
+            </li>
+          `;
+          menuContainer.append(menuItem);
+
+          // Initialize collapse behavior
+          const collapseElement = $(`#menu-${menu.id}`);
+          collapseElement.off('show.bs.collapse hide.bs.collapse');
+          
+          collapseElement.on('show.bs.collapse', function() {
+            $(this).siblings('.nav-link').removeClass('collapsed');
+            $(this).siblings('.nav-link').attr('aria-expanded', 'true');
+          });
+
+          collapseElement.on('hide.bs.collapse', function() {
+            $(this).siblings('.nav-link').addClass('collapsed');
+            $(this).siblings('.nav-link').attr('aria-expanded', 'false');
+          });
+        } else {
+          // Regular menu item with exact path matching
+          const isActive = getExactPath(menu.url) === currentPath.toLowerCase();
+          const menuItem = `
+            <li class="nav-item">
+              <a class="nav-link ${isActive ? 'active' : ''}" 
+                 href="${menu.url || '#'}"
+                 data-path="${getExactPath(menu.url)}">
+                <i class="${menu.icon || 'ni ni-app'}"></i>
+                <span class="nav-link-text">${menu.name}</span>
+              </a>
+            </li>
+          `;
+          menuContainer.append(menuItem);
+        }
+      });
+
+      // Add click handler for menu items
+      $('.nav-link').on('click', function(e) {
+        const href = $(this).attr('href');
+        if (href && href !== '#') {
+          // Remove active class from all links
+          $('.nav-link').removeClass('active');
+          
+          // Add active class only to clicked link
+          $(this).addClass('active');
+          
+          const parentCollapse = $(this).closest('.collapse');
+          if (parentCollapse.length) {
+            parentCollapse.addClass('show');
+            parentCollapse.siblings('.nav-link').removeClass('collapsed');
+            parentCollapse.siblings('.nav-link').attr('aria-expanded', 'true');
+          }
+        }
+      });
+    };
+  }
+
+  // Function to update active menu state
+  window.updateActiveMenu = function() {
+    const currentPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+    
+    // Remove all active states
+    $('.nav-link').removeClass('active');
+    
+    // Find and activate only the exact matching menu item
+    $('.nav-link').each(function() {
+      const menuPath = $(this).data('path');
+      if (menuPath && menuPath.toLowerCase() === currentPath) {
+        $(this).addClass('active');
+        
+        const parentCollapse = $(this).closest('.collapse');
+        if (parentCollapse.length) {
+          parentCollapse.addClass('show');
+          parentCollapse.siblings('.nav-link').removeClass('collapsed');
+          parentCollapse.siblings('.nav-link').attr('aria-expanded', 'true');
+        }
+      }
+    });
+  };
+
+  // Only render menus if they exist
+  const menus = JSON.parse(localStorage.getItem('menus') || '[]');
+  if (menus && menus.length) {
+    window.renderMenus(menus);
+    window.updateActiveMenu();
+  }
+
+  // Update active menu state when the URL changes
+  window.addEventListener('popstate', window.updateActiveMenu);
+</script>

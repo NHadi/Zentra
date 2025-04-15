@@ -1,0 +1,133 @@
+.color-filter-widget {
+  .color-filter-content {
+    .color-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      .color-option {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        flex: 0 0 auto;
+
+        // Hide the default checkbox
+        .form-check-input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0;
+
+          // When checkbox is checked, style the color swatch
+          &:checked~.form-check-label .color-swatch {
+            transform: scale(1.15);
+            border: 2px solid var(--accent-color);
+
+            // Add checkmark using pseudo-element
+            &::after {
+              content: "";
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 0.6rem;
+              height: 0.6rem;
+              border-radius: 50%;
+              background-color: #fff;
+              opacity: 0.9;
+              box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+            }
+          }
+
+          // Special case for white color
+          &:checked~.form-check-label .color-swatch[style*="background-color: #ffffff"]::after {
+            background-color: var(--accent-color);
+          }
+
+          // Special case for light colors
+          &:checked~.form-check-label .color-swatch[style*="background-color: #f1c40f"]::after,
+          &:checked~.form-check-label .color-swatch[style*="background-color: #2ecc71"]::after {
+            background-color: rgba(0, 0, 0, 0.5);
+          }
+        }
+
+        .form-check-label {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          padding: 0;
+          margin: 0;
+        }
+
+        .color-swatch {
+          display: inline-block;
+          width: 2rem;
+          height: 2rem;
+          border-radius: 50%;
+          border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          position: relative;
+          transition: all 0.2s ease;
+
+          &:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+          }
+
+          // Special case for white swatch to make it visible
+          &[style*="background-color: #ffffff"] {
+            border: 1px solid #e0e0e0;
+          }
+        }
+      }
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+
+      .btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+
+        &.btn-primary {
+          background-color: var(--accent-color);
+          border-color: var(--accent-color);
+
+          &:hover {
+            background-color: color-mix(in srgb, var(--accent-color), #000 10%);
+            border-color: color-mix(in srgb, var(--accent-color), #000 10%);
+          }
+
+          &:focus {
+            box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 70%);
+          }
+        }
+
+        &.btn-outline-secondary {
+          color: var(--default-color);
+          border-color: color-mix(in srgb, var(--default-color), transparent 70%);
+
+          &:hover {
+            background-color: color-mix(in srgb, var(--default-color), transparent 90%);
+            color: var(--default-color);
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive styles
+  @media (max-width: 575.98px) {
+    .color-filter-content {
+      .color-options {
+        justify-content: center;
+      }
+    }
+  }
+}

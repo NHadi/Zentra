@@ -1,0 +1,82 @@
+// main: ../main.scss
+/*--------------------------------------------------------------
+# Category Pagination Section
+--------------------------------------------------------------*/
+.category-pagination {
+  padding-top: 0;
+
+  nav {
+    position: relative;
+  }
+
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  li {
+    margin: 0;
+    transition: all 0.3s ease-in-out;
+
+    &.ellipsis {
+      color: color-mix(in srgb, var(--default-color), transparent 40%);
+      padding: 8px 16px;
+      user-select: none;
+    }
+
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      padding: 8px 16px;
+      color: var(--default-color);
+      background-color: var(--surface-color);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 2px 4px color-mix(in srgb, var(--default-color), transparent 90%);
+
+      &.active {
+        background-color: var(--accent-color);
+        color: var(--contrast-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px color-mix(in srgb, var(--accent-color), transparent 70%);
+      }
+
+      &:hover:not(.active) {
+        background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 6px color-mix(in srgb, var(--default-color), transparent 85%);
+      }
+
+      i {
+        font-size: 14px;
+      }
+
+      span {
+        margin: 0 4px;
+      }
+    }
+  }
+
+  @media (max-width: 575px) {
+    ul {
+      gap: 4px;
+    }
+
+    li a {
+      min-width: 36px;
+      height: 36px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+}

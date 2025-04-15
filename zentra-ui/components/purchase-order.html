@@ -1,0 +1,286 @@
+<!-- Statistics Row -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Orders</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalOrders">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-cart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Amount</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalAmount">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow">
+                            <i class="ni ni-money-coins"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Pending Orders</h5>
+                        <span class="h2 font-weight-bold mb-0" id="pendingOrders">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-warning text-white rounded-circle shadow">
+                            <i class="ni ni-time-alarm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Last Order</h5>
+                        <span class="h4 font-weight-bold mb-0" id="lastOrder">-</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                            <i class="ni ni-calendar-grid-58"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grid Section -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Purchase Lists</h3>
+                    </div>
+                    <!-- <div class="col text-right">
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addOrderModal">
+                            <i class="fas fa-plus"></i> New Order
+                        </button>
+                    </div> -->
+                </div>
+            </div>
+            <!-- Grid container -->
+            <div id="purchaseOrderGrid" class="px-3 pb-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="orderInfo" role="tab">
+                            <i class="ni ni-cart mr-2"></i>Order Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="items" role="tab">
+                            <i class="ni ni-box-2 mr-2"></i>Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="timeline" role="tab">
+                            <i class="ni ni-time-alarm mr-2"></i>History
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content p-4">
+                    <!-- Order Info Tab -->
+                    <div class="tab-pane fade show active" id="orderInfo" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Order Number</label>
+                                    <p id="orderNumber" class="h4 mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Order Date</label>
+                                    <p id="orderDate" class="h4 mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Status</label>
+                                    <p id="orderStatus" class="mb-3"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Supplier</label>
+                                    <p id="orderSupplier" class="mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Total Amount</label>
+                                    <p id="orderTotal" class="h4 mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Notes</label>
+                                    <p id="orderNotes" class="mb-3"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Tab -->
+                    <div class="tab-pane fade" id="items" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">Item</th>
+                                        <th scope="col">Quantity</th>
+                                        <th scope="col">Unit Price</th>
+                                        <th scope="col">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderItems">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Tab -->
+                    <div class="tab-pane fade" id="timeline" role="tabpanel">
+                        <div class="order-timeline"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="editOrderBtn">Edit Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Order Modal -->
+<div class="modal fade" id="addOrderModal" tabindex="-1" role="dialog" aria-labelledby="addOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOrderModalLabel">New Purchase Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addOrderForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-supplier">Supplier <span class="text-danger">*</span></label>
+                                <select id="input-supplier" class="form-control" required>
+                                    <option value="">Select supplier</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-date">Order Date <span class="text-danger">*</span></label>
+                                <input type="date" id="input-date" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-status">Status <span class="text-danger">*</span></label>
+                                <select id="input-status" class="form-control" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-notes">Notes</label>
+                                <textarea id="input-notes" class="form-control" rows="3" placeholder="Enter notes"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5>Order Items</h5>
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">Item</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Unit Price</th>
+                                            <th scope="col">Total</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="orderItemsForm">
+                                        <tr>
+                                            <td>
+                                                <select class="form-control item-select" required>
+                                                    <option value="">Select item</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control quantity" min="1" required>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control unit-price" min="0" step="0.01" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control total" readonly>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-danger remove-item">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" id="addItemBtn">
+                                <i class="fas fa-plus"></i> Add Item
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveOrderBtn">Save Order</button>
+            </div>
+        </div>
+    </div>
+</div> 

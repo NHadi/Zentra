@@ -1,0 +1,399 @@
+services:
+  # Traefik reverse proxy
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS
+    volumes:
+      - ${REMOTE_PATH}/traefik/traefik.toml:/etc/traefik/traefik.toml:ro
+      - ${REMOTE_PATH}/traefik/config:/etc/traefik/config:ro
+      - ${REMOTE_PATH}/traefik/acme.json:/etc/traefik/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.badamigroups.com`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.middlewares=secured@file"
+    networks:
+      - traefik-net
+
+  # Development Environment
+  frontend_dev:
+    image: nurulhadii/zentra-ui:dev
+    container_name: frontend_dev
+    restart: always
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=https://dev.zentra.badamigroups.com
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-dev.rule=Host(`dev.bisnisqu.badamigroups.com`)"
+      - "traefik.http.routers.frontend-dev.entrypoints=websecure"
+      - "traefik.http.routers.frontend-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend-dev.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+
+  eshop_dev:
+    image: nurulhadii/zentra-eshop:dev
+    container_name: eshop_dev
+    restart: always
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=https://dev.zentra.badamigroups.com
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.eshop-dev.rule=Host(`dev.eshop.badamigroups.com`)"
+      - "traefik.http.routers.eshop-dev.entrypoints=websecure"
+      - "traefik.http.routers.eshop-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.services.eshop-dev.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+
+  backend_dev:
+    image: nurulhadii/zentra-api:dev
+    container_name: backend_dev
+    restart: always
+    environment:
+      - GIN_MODE=debug
+      - POSTGRES_HOST=postgres_dev
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB_DEV}
+      - POSTGRES_USER=${POSTGRES_USER_DEV}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_DEV}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - JWT_SECRET=${JWT_SECRET_DEV}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_DEV}
+      - SERVER_PORT=8080
+    volumes:
+      - ${REMOTE_PATH}/uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-dev.rule=Host(`dev.zentra.badamigroups.com`)"
+      - "traefik.http.routers.backend-dev.entrypoints=websecure"
+      - "traefik.http.routers.backend-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend-dev.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.backend-dev-timeout.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.backend-dev-timeout.headers.customRequestHeaders.X-Forwarded-Proto=https"
+    networks:
+      - traefik-net
+      - backend-net
+    depends_on:
+      - postgres_dev
+      - elasticsearch
+
+  # Staging Environment
+  frontend_staging:
+    image: nurulhadii/zentra-ui:staging
+    container_name: frontend_staging
+    restart: always
+    environment:
+      - NODE_ENV=staging
+      - NEXT_PUBLIC_API_URL=https://staging.zentra.badamigroups.com
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-staging.rule=Host(`staging.bisnisqu.badamigroups.com`)"
+      - "traefik.http.routers.frontend-staging.entrypoints=websecure"
+      - "traefik.http.routers.frontend-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend-staging.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+
+  eshop_staging:
+    image: nurulhadii/zentra-eshop:staging
+    container_name: eshop_staging
+    restart: always
+    environment:
+      - NODE_ENV=staging
+      - NEXT_PUBLIC_API_URL=https://staging.zentra.badamigroups.com
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.eshop-staging.rule=Host(`staging.eshop.badamigroups.com`)"
+      - "traefik.http.routers.eshop-staging.entrypoints=websecure"
+      - "traefik.http.routers.eshop-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.services.eshop-staging.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+
+  backend_staging:
+    image: nurulhadii/zentra-api:staging
+    container_name: backend_staging
+    restart: always
+    environment:
+      - GIN_MODE=release
+      - POSTGRES_HOST=postgres_staging
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB_STAGING}
+      - POSTGRES_USER=${POSTGRES_USER_STAGING}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_STAGING}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - JWT_SECRET=${JWT_SECRET_STAGING}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_STAGING}
+      - SERVER_PORT=8080
+    volumes:
+      - ${REMOTE_PATH}/uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-staging.rule=Host(`staging.zentra.badamigroups.com`)"
+      - "traefik.http.routers.backend-staging.entrypoints=websecure"
+      - "traefik.http.routers.backend-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend-staging.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.backend-staging-timeout.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.backend-staging-timeout.headers.customRequestHeaders.X-Forwarded-Proto=https"
+    networks:
+      - traefik-net
+      - backend-net
+    depends_on:
+      - postgres_staging
+      - elasticsearch
+
+  # Production Environment
+  frontend_prod:
+    image: nurulhadii/zentra-ui:prod
+    container_name: frontend_prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://zentra.badamigroups.com
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-prod.rule=Host(`bisnisqu.badamigroups.com`)"
+      - "traefik.http.routers.frontend-prod.entrypoints=websecure"
+      - "traefik.http.routers.frontend-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend-prod.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+
+  eshop_prod:
+    image: nurulhadii/zentra-eshop:prod
+    container_name: eshop_prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://zentra.badamigroups.com
+      - NEXT_PUBLIC_API_MOCKING=false
+      - NEXT_PUBLIC_SHOW_LOGGER=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.eshop-prod.rule=Host(`eshop.badamigroups.com`)"
+      - "traefik.http.routers.eshop-prod.entrypoints=websecure"
+      - "traefik.http.routers.eshop-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.eshop-prod.loadbalancer.server.port=3000"
+    networks:
+      - traefik-net
+
+  backend_prod:
+    image: nurulhadii/zentra-api:prod
+    container_name: backend_prod
+    restart: always
+    environment:
+      - GIN_MODE=release
+      - POSTGRES_HOST=postgres_prod
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB_PROD}
+      - POSTGRES_USER=${POSTGRES_USER_PROD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_PROD}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - JWT_SECRET=${JWT_SECRET_PROD}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_PROD}
+      - SERVER_PORT=8080
+    volumes:
+      - ${REMOTE_PATH}/uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-prod.rule=Host(`zentra.badamigroups.com`)"
+      - "traefik.http.routers.backend-prod.entrypoints=websecure"
+      - "traefik.http.routers.backend-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend-prod.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.backend-prod-timeout.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.backend-prod-timeout.headers.customRequestHeaders.X-Forwarded-Proto=https"
+    networks:
+      - traefik-net
+      - backend-net
+    depends_on:
+      - postgres_prod
+      - elasticsearch
+
+  # Databases
+  postgres_dev:
+    image: postgres:15.4-alpine
+    container_name: postgres_dev
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_DEV}
+      POSTGRES_USER: ${POSTGRES_USER_DEV}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_DEV}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  pgadmin_dev:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin_dev
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_LISTEN_PORT=80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin-dev.rule=Host(`dev.pgadmin.badamigroups.com`)"
+      - "traefik.http.routers.pgadmin-dev.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pgadmin-dev.loadbalancer.server.port=80"
+    networks:
+      - traefik-net
+      - backend-net
+    depends_on:
+      - postgres_dev
+
+  postgres_staging:
+    image: postgres:15.4-alpine
+    container_name: postgres_staging
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_STAGING}
+      POSTGRES_USER: ${POSTGRES_USER_STAGING}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_STAGING}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  pgadmin_staging:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin_staging
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_LISTEN_PORT=80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin-staging.rule=Host(`staging.pgadmin.badamigroups.com`)"
+      - "traefik.http.routers.pgadmin-staging.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pgadmin-staging.loadbalancer.server.port=80"
+    networks:
+      - traefik-net
+      - backend-net
+    depends_on:
+      - postgres_staging
+
+  postgres_prod:
+    image: postgres:15.4-alpine
+    container_name: postgres_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_PROD}
+      POSTGRES_USER: ${POSTGRES_USER_PROD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PROD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  pgadmin_prod:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin_prod
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      - PGADMIN_LISTEN_PORT=80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin-prod.rule=Host(`pgadmin.badamigroups.com`)"
+      - "traefik.http.routers.pgadmin-prod.entrypoints=websecure"
+      - "traefik.http.routers.pgadmin-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.pgadmin-prod.loadbalancer.server.port=80"
+    networks:
+      - traefik-net
+      - backend-net
+    depends_on:
+      - postgres_prod
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.0
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=zentra-cluster
+      - network.host=0.0.0.0
+      - http.port=9200
+      - transport.port=9300
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - traefik-net
+      - backend-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.elasticsearch.rule=Host(`elasticsearch.badamigroups.com`)"
+      - "traefik.http.routers.elasticsearch.entrypoints=websecure"
+      - "traefik.http.routers.elasticsearch.tls.certresolver=letsencrypt"
+      - "traefik.http.services.elasticsearch.loadbalancer.server.port=9200"
+      - "traefik.http.middlewares.elasticsearch-timeout.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.elasticsearch-timeout.headers.customRequestHeaders.X-Forwarded-Proto=https"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.0
+    container_name: kibana
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_NAME=kibana.badamigroups.com
+      - SERVER_PUBLICBASEURL=https://kibana.badamigroups.com
+      - SERVER_HOST=0.0.0.0
+      - ELASTICSEARCH_REQUESTTIMEOUT=90000
+      - ELASTICSEARCH_PINGTIMEOUT=90000
+    depends_on:
+      - elasticsearch
+    networks:
+      - traefik-net
+      - backend-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kibana.rule=Host(`kibana.badamigroups.com`)"
+      - "traefik.http.routers.kibana.entrypoints=websecure"
+      - "traefik.http.routers.kibana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kibana.loadbalancer.server.port=5601"
+      - "traefik.http.middlewares.kibana-timeout.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.kibana-timeout.headers.customRequestHeaders.X-Forwarded-Proto=https"
+
+volumes:
+  postgres_dev_data:
+  postgres_staging_data:
+  postgres_prod_data:
+  elasticsearch_data:
+
+networks:
+  traefik-net:
+    external: true
+  backend-net:
+    external: true 

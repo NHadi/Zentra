@@ -1,0 +1,142 @@
+.pricing-range-widget {
+  .price-range-container {
+    .current-range {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--heading-color);
+    }
+
+    .range-slider {
+      position: relative;
+      height: 1.5rem;
+      margin: 1.5rem 0;
+
+      .slider-track {
+        position: absolute;
+        width: 100%;
+        height: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: color-mix(in srgb, var(--default-color), transparent 85%);
+        border-radius: 0.25rem;
+      }
+
+      .slider-progress {
+        position: absolute;
+        height: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--accent-color);
+        border-radius: 0.25rem;
+      }
+
+      input[type="range"] {
+        position: absolute;
+        width: 100%;
+        height: 0.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        pointer-events: none;
+        -webkit-appearance: none;
+        appearance: none;
+
+        &::-webkit-slider-thumb {
+          height: 1.25rem;
+          width: 1.25rem;
+          border-radius: 50%;
+          background-color: var(--accent-color);
+          cursor: pointer;
+          pointer-events: auto;
+          -webkit-appearance: none;
+          appearance: none;
+          box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+          transition: box-shadow 0.2s ease;
+
+          &:hover {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          }
+        }
+
+        &::-moz-range-thumb {
+          height: 1.25rem;
+          width: 1.25rem;
+          border: none;
+          border-radius: 50%;
+          background-color: var(--accent-color);
+          cursor: pointer;
+          pointer-events: auto;
+          box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+          transition: box-shadow 0.2s ease;
+
+          &:hover {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          }
+        }
+
+        &:focus {
+          outline: none;
+
+          &::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color), transparent 75%);
+          }
+
+          &::-moz-range-thumb {
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color), transparent 75%);
+          }
+        }
+      }
+
+      .min-range {
+        z-index: 1;
+      }
+
+      .max-range {
+        z-index: 2;
+      }
+    }
+
+    .price-inputs {
+      .input-group-text {
+        background-color: color-mix(in srgb, var(--accent-color), transparent 85%);
+        color: var(--heading-color);
+        border-color: color-mix(in srgb, var(--default-color), transparent 80%);
+      }
+
+      .form-control {
+        color: var(--default-color);
+        background-color: var(--surface-color);
+        border-color: color-mix(in srgb, var(--default-color), transparent 80%);
+
+        &:focus {
+          border-color: var(--accent-color);
+          box-shadow: none;
+        }
+
+        &::placeholder {
+          color: color-mix(in srgb, var(--default-color), transparent 70%);
+        }
+      }
+    }
+
+    .filter-actions {
+      .btn-primary {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        color: var(--contrast-color);
+        transition: all 0.3s ease;
+        font-size: 16px;
+        padding: 10px 20px;
+
+        &:hover {
+          background-color: color-mix(in srgb, var(--accent-color), #000 10%);
+          border-color: color-mix(in srgb, var(--accent-color), #000 10%);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 75%);
+        }
+      }
+    }
+  }
+}

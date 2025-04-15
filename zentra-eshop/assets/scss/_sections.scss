@@ -1,0 +1,74 @@
+/*--------------------------------------------------------------
+# Global Sections
+--------------------------------------------------------------*/
+section,
+.section {
+  color: var(--default-color);
+  background-color: var(--background-color);
+  padding: 60px 0;
+  scroll-margin-top: 90px;
+  overflow: clip;
+}
+
+@media (max-width: 1199px) {
+
+  section,
+  .section {
+    scroll-margin-top: 66px;
+  }
+}
+
+/*--------------------------------------------------------------
+# Global Section Titles
+--------------------------------------------------------------*/
+.section-title {
+  text-align: center;
+  padding-bottom: 60px;
+  position: relative;
+
+  h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+@import './sections/_hero.scss';
+@import './sections/_info-cards.scss';
+@import './sections/_category-cards.scss';
+@import './sections/_best-sellers.scss';
+@import './sections/_product-list.scss';
+@import './sections/_product-details.scss';
+@import './sections/_category-header.scss';
+@import './sections/_category-product-list.scss';
+@import './sections/_category-pagination.scss';
+@import './sections/_cart.scss';
+@import './sections/_checkout.scss';
+@import './sections/_order-confirmation.scss';
+@import './sections/_search-results-header.scss';
+@import './sections/_search-product-list.scss';
+@import './sections/_account.scss';
+@import './sections/_login-register.scss';
+@import './sections/_about-2.scss';
+@import './sections/_stats.scss';
+@import './sections/_testimonials.scss';
+@import './sections/_contact-2.scss';
+@import './sections/_support.scss';
+@import './sections/_faq.scss';
+@import './sections/_blog-hero.scss';
+@import './sections/_recent-posts.scss';
+@import './sections/_blog-pagination.scss';
+@import './sections/_blog-details.scss';
+@import './sections/_blog-comments.scss';
+@import './sections/_blog-comment-form.scss';
+@import './sections/_terms-of-service.scss';
+@import './sections/_privacy.scss';
+@import './sections/_retun-policy.scss';
+@import './sections/_paymnt-methods.scss';
+@import './sections/_shipping-info.scss';
+@import './sections/_error-404.scss';
+@import './sections/_starter-section.scss';

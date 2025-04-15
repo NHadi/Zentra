@@ -1,0 +1,104 @@
+.dx-datagrid {
+    background-color: white;
+    border-radius: 0.375rem;
+    box-shadow: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+}
+
+.dx-datagrid-headers {
+    color: #8898aa;
+    background-color: #f6f9fc;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+
+.dx-datagrid-rowsview {
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dx-datagrid-rowsview .dx-row > td {
+    padding: 1rem;
+    font-size: 0.8125rem;
+    border-color: #e9ecef;
+}
+
+.dx-datagrid-search-panel {
+    margin: 0 1rem 1rem;
+}
+
+.dx-datebox {
+    margin-bottom: 1rem;
+}
+
+.dx-datebox .dx-texteditor-input {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease;
+}
+
+.dx-datebox.dx-state-focused .dx-texteditor-input {
+    border-color: #5e72e4;
+}
+
+.dx-datebox-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #8898aa;
+    margin-bottom: 0.5rem;
+}
+
+.dx-overlay-content .dx-popup-content {
+    padding: 1rem;
+}
+
+.dx-overlay-content .dx-popup-title {
+    background-color: #f6f9fc;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dx-overlay-content .dx-button {
+    border-radius: 0.375rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    transition: all 0.15s ease;
+}
+
+.dx-overlay-content .dx-button-text {
+    font-weight: 600;
+}
+
+.dx-overlay-content .dx-button-default {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    color: white;
+}
+
+.dx-overlay-content .dx-button-default:hover {
+    background-color: #324cdd;
+    border-color: #324cdd;
+}
+
+.dx-overlay-content .dx-button-normal {
+    background-color: white;
+    border-color: #e9ecef;
+    color: #8898aa;
+}
+
+.dx-overlay-content .dx-button-normal:hover {
+    background-color: #f6f9fc;
+    border-color: #e9ecef;
+    color: #525f7f;
+} 

@@ -1,0 +1,414 @@
+# Division Management Page
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Division Management</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="divisionGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Employee Management Modal -->
+<div class="modal fade" id="employeeModal" tabindex="-1" role="dialog" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="employeeModalLabel">Manage Division Employees</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Search Box -->
+                <div class="form-group mb-4">
+                    <div class="input-group input-group-merge">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="ni ni-zoom-split-in"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="employeeSearchBox" placeholder="Search employees...">
+                    </div>
+                </div>
+
+                <!-- Employee List Container -->
+                <div class="employee-list-container">
+                    <div class="employee-list">
+                        <!-- Employees will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveEmployees">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Grid Styles */
+.dx-datagrid {
+    background-color: transparent;
+}
+
+.dx-datagrid-headers {
+    border-bottom: 2px solid #e9ecef;
+}
+
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+    border-bottom: none;
+    background-color: #f8f9fa;
+    padding: 16px 14px;
+}
+
+.dx-datagrid-rowsview .dx-row {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dx-datagrid-rowsview .dx-row:hover {
+    background-color: #f8f9fa;
+}
+
+.dx-datagrid-rowsview .dx-row > td {
+    padding: 16px 14px;
+}
+
+/* Button Styles */
+.btn-icon-only {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-icon-only i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-icon-only:hover {
+    transform: translateY(-1px);
+}
+
+.btn-icon-only.btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+}
+
+.btn-icon-only.btn-primary:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+}
+
+.btn-icon-only.btn-info {
+    background-color: #11cdef;
+    border-color: #11cdef;
+    box-shadow: 0 2px 4px rgba(17, 205, 239, 0.2);
+}
+
+.btn-icon-only.btn-info:hover {
+    background-color: #0fb5d3;
+    border-color: #0fb5d3;
+    box-shadow: 0 4px 6px rgba(17, 205, 239, 0.25);
+}
+
+.btn-icon-only.btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    box-shadow: 0 2px 4px rgba(245, 54, 92, 0.2);
+}
+
+.btn-icon-only.btn-danger:hover {
+    background-color: #f01d48;
+    border-color: #f01d48;
+    box-shadow: 0 4px 6px rgba(245, 54, 92, 0.25);
+}
+
+/* Add Division Button */
+.dx-button.dx-button-has-icon.dx-button-has-text {
+    border-radius: 6px;
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+    transition: all 0.2s ease;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+    transform: translateY(-1px);
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-button-content {
+    padding: 8px 16px;
+    color: white;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-icon {
+    margin-right: 8px;
+    font-size: 14px;
+    color: white;
+}
+
+/* Employee Modal Styles */
+.employee-list-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.employee-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.employee-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.employee-item:hover {
+    background-color: #f8f9fa;
+}
+
+.employee-item.selected {
+    background-color: #e9f5ff;
+    border-color: #5e72e4;
+}
+
+.employee-info {
+    flex: 1;
+    margin-left: 16px;
+}
+
+.employee-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.employee-name {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.employee-details {
+    font-size: 12px;
+    color: #8898aa;
+}
+
+.employee-phone {
+    margin-top: 4px;
+}
+
+.no-employees {
+    text-align: center;
+    padding: 32px;
+    color: #8898aa;
+}
+
+.no-employees i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    border-color: #5e72e4;
+    background-color: #5e72e4;
+}
+
+/* Employee Count Badge */
+.employee-count {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    background: rgba(94, 114, 228, 0.1);
+    border-radius: 4px;
+    font-size: 12px;
+    color: #5e72e4;
+    font-weight: 600;
+}
+
+.employee-count i {
+    margin-right: 4px;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Description Text */
+.description-text {
+    color: #8898aa;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+/* Modal Loading State */
+.modal-loading {
+    text-align: center;
+    padding: 2rem;
+}
+
+.modal-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: #5e72e4;
+}
+
+.modal-loading .loading-text {
+    margin-top: 1rem;
+    color: #8898aa;
+}
+
+/* Employee Chips */
+.employee-chip {
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.employee-chip i {
+    font-size: 1rem;
+}
+
+.employee-chip.more-chip {
+    cursor: pointer;
+    background: linear-gradient(to right, #5e72e4, #825ee4);
+    border: none;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+}
+
+.employee-chip.more-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+}
+
+/* Custom Tooltip */
+.tooltip {
+    font-family: inherit;
+}
+
+.tooltip-inner {
+    max-width: 300px;
+    padding: 8px 12px;
+    background-color: #2d3748;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.tooltip.bs-tooltip-top .arrow::before {
+    border-top-color: #2d3748;
+}
+
+/* Employee List Modal */
+.modal-dialog-scrollable .modal-content {
+    max-height: 80vh;
+}
+
+.list-group-item {
+    transition: all 0.2s ease;
+    border-left: 0;
+    border-right: 0;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item:first-child {
+    border-top: 0;
+}
+
+.list-group-item:last-child {
+    border-bottom: 0;
+}
+
+.list-group-item .employee-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(94, 114, 228, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-group-item .employee-avatar i {
+    font-size: 1rem;
+}
+
+.list-group-item h6 {
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    color: #2d3748;
+}
+
+.list-group-item .text-muted {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+}
+
+.list-group-item .text-muted i {
+    font-size: 0.875rem;
+    position: relative;
+    top: 1px;
+}
+
+/* Modal Header */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-header .modal-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Scrollbar Styling */
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0;
+    border-radius: 3px;
+}
+
+.modal-dialog-scrollable .modal-body::-webkit-scrollbar-thumb:hover {
+    background-color: #a0aec0;
+}
+</style> 

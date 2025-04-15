@@ -1,0 +1,433 @@
+# Region Management Page
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Region Management</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="regionGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Zone Management Modal -->
+<div class="modal fade" id="zoneModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title d-flex align-items-center">
+                    <i class="ni ni-map-big mr-2"></i>
+                    Manage Zones
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Search and Filter Section -->
+                <div class="bg-secondary py-3 px-4">
+                    <div class="input-group input-group-merge">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                        <input type="text" id="zoneSearchBox" class="form-control" placeholder="Search zones...">
+                    </div>
+                </div>
+
+                <!-- Zones List -->
+                <div class="zone-list px-4 py-3"></div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveZones">
+                    <i class="fas fa-save mr-1"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Zone Grid Styles */
+.zone-container {
+    max-height: 100px;
+    overflow-y: auto;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.zone-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    margin: 2px;
+    background-color: #5e72e4;
+    border-radius: 50rem;
+    font-size: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+}
+
+.zone-badge i {
+    font-size: 14px;
+    margin-right: 6px;
+}
+
+.zone-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+}
+
+/* Zone Modal Styles */
+.zone-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.zone-item:hover {
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.1);
+}
+
+.zone-info {
+    margin-left: 12px;
+    flex: 1;
+}
+
+.zone-name {
+    font-weight: 600;
+    color: #2c7be5;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.zone-details {
+    font-size: 12px;
+    color: #8898aa;
+    line-height: 1.4;
+}
+
+/* Grid Action Buttons */
+.btn-icon-only {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-icon-only i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-icon-only:hover {
+    transform: translateY(-1px);
+}
+
+.btn-icon-only.btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+}
+
+.btn-icon-only.btn-primary:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+}
+
+.btn-icon-only.btn-info {
+    background-color: #11cdef;
+    border-color: #11cdef;
+    box-shadow: 0 2px 4px rgba(17, 205, 239, 0.2);
+}
+
+.btn-icon-only.btn-info:hover {
+    background-color: #0fb5d3;
+    border-color: #0fb5d3;
+    box-shadow: 0 4px 6px rgba(17, 205, 239, 0.25);
+}
+
+.btn-icon-only.btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    box-shadow: 0 2px 4px rgba(245, 54, 92, 0.2);
+}
+
+.btn-icon-only.btn-danger:hover {
+    background-color: #f01d48;
+    border-color: #f01d48;
+    box-shadow: 0 4px 6px rgba(245, 54, 92, 0.25);
+}
+
+/* Grid Add Region Button */
+.dx-button.dx-button-has-icon.dx-button-has-text {
+    border-radius: 6px;
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+    transition: all 0.2s ease;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+    transform: translateY(-1px);
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-button-content {
+    padding: 8px 16px;
+    color: white;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-icon {
+    margin-right: 8px;
+    font-size: 14px;
+    color: white;
+}
+
+/* Tooltip Styles */
+[title] {
+    position: relative;
+}
+
+[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 4px;
+}
+
+/* Grid Row Hover */
+.dx-data-row:hover .btn-icon-only {
+    opacity: 1;
+}
+
+.dx-data-row .btn-icon-only {
+    opacity: 0.85;
+}
+
+/* Action Button Container */
+.d-flex.justify-content-end {
+    gap: 6px;
+}
+
+/* DevExtreme Grid Customization */
+.dx-datagrid {
+    background-color: transparent;
+}
+
+.dx-datagrid-headers {
+    border-bottom: 2px solid #e9ecef;
+}
+
+.dx-datagrid-headers .dx-datagrid-table .dx-row > td {
+    border-bottom: none;
+    background-color: #f8f9fa;
+    padding: 16px 14px;
+}
+
+.dx-datagrid-rowsview .dx-row {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.dx-datagrid-rowsview .dx-row:hover {
+    background-color: #f8f9fa;
+}
+
+.dx-datagrid-rowsview .dx-row > td {
+    padding: 16px 14px;
+}
+
+/* Search Panel Customization */
+.dx-searchbox {
+    border-radius: 6px;
+}
+
+.dx-searchbox .dx-icon-search {
+    color: #8898aa;
+}
+
+/* Column Chooser Button */
+.dx-button.dx-button-normal.dx-button-mode-contained {
+    border-radius: 6px;
+}
+
+/* Zone Container Styles */
+.zone-container {
+    max-height: none !important;
+    background: transparent !important;
+    padding: 8px !important;
+}
+
+.zone-category {
+    position: relative;
+    margin-bottom: 12px;
+    padding-left: 24px;
+}
+
+.zone-category::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 22px;
+    bottom: 0;
+    width: 2px;
+    background: rgba(94, 114, 228, 0.1);
+}
+
+.zone-category:last-child::before {
+    display: none;
+}
+
+.zone-category-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.zone-category-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #8898aa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.zone-category-title::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #5e72e4;
+    border-radius: 50%;
+    margin-right: 8px;
+    margin-left: -28px;
+}
+
+.zone-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    margin: 2px 4px;
+    background: linear-gradient(45deg, #5e72e4, #825ee4);
+    border-radius: 6px;
+    font-size: 12px;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.1);
+}
+
+.zone-badge i {
+    font-size: 14px;
+    margin-right: 6px;
+    opacity: 0.9;
+}
+
+.zone-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(94, 114, 228, 0.2);
+}
+
+.zone-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding-left: 4px;
+}
+
+/* Zone Badge Counter */
+.zone-category-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+/* Empty State */
+.no-zones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    color: #8898aa;
+    font-size: 13px;
+}
+
+.no-zones i {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+/* Animation for zone badges */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.zone-badge {
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+.zone-badge:nth-child(2) { animation-delay: 0.1s; }
+.zone-badge:nth-child(3) { animation-delay: 0.2s; }
+.zone-badge:nth-child(4) { animation-delay: 0.3s; }
+
+/* Hover effect for zone category */
+.zone-category:hover .zone-category-title::before {
+    transform: scale(1.2);
+    transition: transform 0.2s ease;
+}
+</style> 

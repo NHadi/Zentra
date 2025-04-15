@@ -1,0 +1,227 @@
+<!-- Statistics Row -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Income</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalIncome">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow">
+                            <i class="ni ni-money-coins"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Expenses</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalExpenses">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-danger text-white rounded-circle shadow">
+                            <i class="ni ni-cart"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Net Balance</h5>
+                        <span class="h2 font-weight-bold mb-0" id="netBalance">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                            <i class="ni ni-chart-bar-32"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Last Transaction</h5>
+                        <span class="h4 font-weight-bold mb-0" id="lastTransaction">-</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-warning text-white rounded-circle shadow">
+                            <i class="ni ni-calendar-grid-58"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grid Section -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Cash Flow Transactions</h3>
+                    </div>
+                    <div class="col text-right">
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addTransactionModal">
+                            <i class="fas fa-plus"></i> Add Transaction
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Grid container -->
+            <div id="cashFlowGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Details Modal -->
+<div class="modal fade" id="transactionDetailsModal" tabindex="-1" role="dialog" aria-labelledby="transactionDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionDetailsModalLabel">Transaction Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="transactionInfo" role="tab">
+                            <i class="ni ni-money-coins mr-2"></i>Transaction Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="timeline" role="tab">
+                            <i class="ni ni-time-alarm mr-2"></i>History
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content p-4">
+                    <!-- Transaction Info Tab -->
+                    <div class="tab-pane fade show active" id="transactionInfo" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Transaction Date</label>
+                                    <p id="transactionDate" class="h4 mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Amount</label>
+                                    <p id="transactionAmount" class="h4 mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Type</label>
+                                    <p id="transactionType" class="mb-3"></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Description</label>
+                                    <p id="transactionDescription" class="mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Reference Number</label>
+                                    <p id="transactionReference" class="mb-3"></p>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-control-label text-muted">Category</label>
+                                    <p id="transactionCategory" class="mb-3"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Tab -->
+                    <div class="tab-pane fade" id="timeline" role="tabpanel">
+                        <div class="transaction-timeline"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="editTransactionBtn">Edit Transaction</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Transaction Modal -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1" role="dialog" aria-labelledby="addTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTransactionModalLabel">Add New Transaction</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addTransactionForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-date">Transaction Date <span class="text-danger">*</span></label>
+                                <input type="date" id="input-date" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-amount">Amount <span class="text-danger">*</span></label>
+                                <input type="number" id="input-amount" class="form-control" placeholder="Enter amount" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-type">Type <span class="text-danger">*</span></label>
+                                <select id="input-type" class="form-control" required>
+                                    <option value="">Select type</option>
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-description">Description <span class="text-danger">*</span></label>
+                                <textarea id="input-description" class="form-control" rows="3" placeholder="Enter description" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-reference">Reference Number</label>
+                                <input type="text" id="input-reference" class="form-control" placeholder="Enter reference number">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-control-label" for="input-category">Category</label>
+                                <select id="input-category" class="form-control">
+                                    <option value="">Select category</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveTransactionBtn">Save Transaction</button>
+            </div>
+        </div>
+    </div>
+</div> 

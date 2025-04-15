@@ -1,0 +1,237 @@
+# Backup Management Page
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">
+                            <i class="ni ni-archive-2 mr-2"></i>
+                            Backup Management
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="backupGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Confirmation Modal -->
+<div class="modal fade" id="restoreModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="ni ni-single-copy-04 mr-2"></i>
+                    Restore Backup
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="ni ni-notification-70 mr-2"></i>
+                    <strong>Warning!</strong> This action will overwrite the current database with the selected backup.
+                </div>
+                <p><strong>Are you sure you want to restore the following backup?</strong></p>
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <strong>File Name:</strong>
+                            <span id="restoreFileName" class="ml-2"></span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Created At:</strong>
+                            <span id="restoreCreatedAt" class="ml-2"></span>
+                        </div>
+                        <div>
+                            <strong>Created By:</strong>
+                            <span id="restoreCreatedBy" class="ml-2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmRestore">
+                    <i class="ni ni-single-copy-04 mr-1"></i>
+                    Restore Backup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Grid Styles */
+#backupGrid {
+    position: relative;
+}
+
+#backupGrid.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#backupGrid.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 2px solid #5e72e4;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spinner 0.6s linear infinite;
+    z-index: 1001;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Badge Styles */
+.badge-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.badge-circle i {
+    font-size: 14px;
+}
+
+/* Button Styles */
+.btn-icon-only {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-icon-only i {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.btn-icon-only:hover {
+    transform: translateY(-1px);
+}
+
+.btn-icon-only.btn-primary {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+}
+
+.btn-icon-only.btn-primary:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+}
+
+.btn-icon-only.btn-danger {
+    background-color: #f5365c;
+    border-color: #f5365c;
+    box-shadow: 0 2px 4px rgba(245, 54, 92, 0.2);
+}
+
+.btn-icon-only.btn-danger:hover {
+    background-color: #f01d48;
+    border-color: #f01d48;
+    box-shadow: 0 4px 6px rgba(245, 54, 92, 0.25);
+}
+
+/* Action Button Container */
+.d-flex.justify-content-end {
+    gap: 6px;
+}
+
+/* Grid Row Hover */
+.dx-data-row:hover .btn-icon-only {
+    opacity: 1;
+}
+
+.dx-data-row .btn-icon-only {
+    opacity: 0.85;
+}
+
+/* Grid Add Button */
+.dx-button.dx-button-has-icon.dx-button-has-text {
+    border-radius: 6px;
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    box-shadow: 0 2px 4px rgba(94, 114, 228, 0.2);
+    transition: all 0.2s ease;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text:hover {
+    background-color: #4d61d9;
+    border-color: #4d61d9;
+    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+    transform: translateY(-1px);
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-button-content {
+    padding: 8px 16px;
+    color: white;
+}
+
+.dx-button.dx-button-has-icon.dx-button-has-text .dx-icon {
+    margin-right: 8px;
+    font-size: 14px;
+    color: white;
+}
+
+/* Modal Styles */
+.modal-content {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #fff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #3a4858;
+}
+
+.modal-title i {
+    color: #5e72e4;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+</style> 

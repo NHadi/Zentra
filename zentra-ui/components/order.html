@@ -1,0 +1,607 @@
+<!-- Order Management Page -->
+<div class="row">
+    <div class="col">
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <!-- Total Orders Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Total Orders</h5>
+                                <span class="h2 font-weight-bold mb-0" id="totalOrders">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-success mr-2" id="ordersGrowth">
+                                <i class="fa fa-arrow-up"></i> 0%
+                            </span>
+                            <span class="text-muted">Since last month</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- In Production Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">In Production</h5>
+                                <span class="h2 font-weight-bold mb-0" id="inProduction">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                    <i class="fas fa-tshirt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-info" id="productionStatus">
+                                <i class="fas fa-clock"></i> On Track
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Revenue Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Revenue</h5>
+                                <span class="h2 font-weight-bold mb-0" id="totalRevenue">$0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-success mr-2" id="revenueGrowth">
+                                <i class="fa fa-arrow-up"></i> 0%
+                            </span>
+                            <span class="text-muted">Since last month</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Pending Orders Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title text-uppercase text-muted mb-0">Pending</h5>
+                                <span class="h2 font-weight-bold mb-0" id="pendingOrders">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-warning text-white rounded-circle shadow">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-warning" id="pendingStatus">
+                                <i class="fas fa-exclamation-circle"></i> Needs Attention
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Card -->
+        <div class="card">
+            <!-- Card Header -->
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Order Management</h3>
+                    </div>
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div id="orderGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    <span id="orderTitle">Order Details</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Order Info Tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="orderInfo" role="tab">
+                            <i class="fas fa-info-circle mr-2"></i>Order Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="itemsInfo" role="tab">
+                            <i class="fas fa-tshirt mr-2"></i>Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="productionStatus" role="tab">
+                            <i class="fas fa-tasks mr-2"></i>Production Status
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="paymentInfo" role="tab">
+                            <i class="fas fa-credit-card mr-2"></i>Payment
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content p-4">
+                    <!-- Order Info Tab -->
+                    <div class="tab-pane fade show active" id="orderInfo">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Customer Information</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Customer Name</label>
+                                                        <p class="font-weight-bold mb-0" id="customerName"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Email</label>
+                                                        <p class="font-weight-bold mb-0" id="customerEmail"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Phone</label>
+                                                        <p class="font-weight-bold mb-0" id="customerPhone"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Office</label>
+                                                        <p class="font-weight-bold mb-0" id="officeId"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr class="my-4">
+                                        <h6 class="heading-small text-muted mb-4">Delivery Information</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-control-label">Address</label>
+                                                <p class="font-weight-bold mb-0" id="deliveryAddress"></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-control-label">Expected Delivery</label>
+                                                <p class="font-weight-bold mb-0" id="expectedDelivery"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Order Summary</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Order Number</label>
+                                                        <p class="font-weight-bold mb-0" id="orderNumber"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Status</label>
+                                                        <p class="mb-0">
+                                                            <span class="badge badge-dot mr-4" id="orderStatus">
+                                                                <i class="bg-warning"></i>
+                                                                <span class="status"></span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Created Date</label>
+                                                        <p class="font-weight-bold mb-0" id="createdDate"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Last Updated</label>
+                                                        <p class="font-weight-bold mb-0" id="updatedDate"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr class="my-4">
+                                        <h6 class="heading-small text-muted mb-4">Payment Details</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Subtotal</label>
+                                                        <p class="font-weight-bold mb-0" id="subtotal"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Discount</label>
+                                                        <p class="font-weight-bold mb-0 text-success" id="discount"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Total Amount</label>
+                                                        <p class="h3 font-weight-bold mb-0 text-primary" id="totalAmount"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Payment Status</label>
+                                                        <p class="mb-0">
+                                                            <span class="badge badge-dot mr-4" id="paymentStatus">
+                                                                <i class="bg-warning"></i>
+                                                                <span class="status"></span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Info Tab -->
+                    <div class="tab-pane fade" id="itemsInfo">
+                        <div id="orderItemsGrid"></div>
+                    </div>
+
+                    <!-- Production Status Tab -->
+                    <div class="tab-pane fade" id="productionStatus">
+                        <div class="production-timeline"></div>
+                    </div>
+
+                    <!-- Payment Info Tab -->
+                    <div class="tab-pane fade" id="paymentInfo">
+                        <div class="payment-history"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#" id="editOrder">
+                            <i class="fas fa-edit mr-2"></i>Edit Order
+                        </a>
+                        <a class="dropdown-item" href="#" id="updateStatus">
+                            <i class="fas fa-sync-alt mr-2"></i>Update Status
+                        </a>
+                        <a class="dropdown-item" href="#" id="printOrder">
+                            <i class="fas fa-print mr-2"></i>Print Order
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#" id="cancelOrder">
+                            <i class="fas fa-times mr-2"></i>Cancel Order
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Card Stats */
+.card-stats .card-body {
+    padding: 1rem 1.5rem;
+}
+
+.card-stats .card-status-bullet {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+}
+
+.icon {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon i {
+    font-size: 1.25rem;
+}
+
+.icon-shape {
+    display: inline-flex;
+    padding: 12px;
+    text-align: center;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Order Grid Customization */
+.order-status {
+    padding: 0.5rem 1rem;
+    border-radius: 50rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.order-status i {
+    margin-right: 0.5rem;
+}
+
+.order-status.pending {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+}
+
+.order-status.in-production {
+    background: rgba(45, 206, 137, 0.1);
+    color: #2dce89;
+}
+
+.order-status.completed {
+    background: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+}
+
+.order-status.cancelled {
+    background: rgba(245, 54, 92, 0.1);
+    color: #f5365c;
+}
+
+/* Payment Status Badges */
+.payment-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.payment-badge.paid {
+    background: rgba(45, 206, 137, 0.1);
+    color: #2dce89;
+}
+
+.payment-badge.partial {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+}
+
+.payment-badge.unpaid {
+    background: rgba(245, 54, 92, 0.1);
+    color: #f5365c;
+}
+
+/* Modal Customization */
+.modal-header {
+    background: #5e72e4;
+    color: white;
+    border-bottom: none;
+}
+
+.modal-header .close {
+    color: white;
+    text-shadow: none;
+    opacity: 0.8;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+}
+
+.nav-tabs {
+    background: #f6f9fc;
+    padding: 1rem 1rem 0;
+    border-bottom: none;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: #8898aa;
+    padding: 1rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: #5e72e4;
+}
+
+.nav-tabs .nav-link.active {
+    background: white;
+    color: #5e72e4;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+}
+
+/* Production Timeline */
+.production-timeline {
+    position: relative;
+    padding: 2rem 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: -2rem;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item:last-child::before {
+    bottom: 0;
+}
+
+.timeline-badge {
+    position: absolute;
+    left: -0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #5e72e4;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #5e72e4;
+}
+
+.timeline-content {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(50, 50, 93, 0.1);
+}
+
+/* Payment History */
+.payment-history {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.payment-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.payment-item:last-child {
+    border-bottom: none;
+}
+
+.payment-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #f6f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.payment-details {
+    flex: 1;
+}
+
+.payment-amount {
+    font-weight: 600;
+    color: #2dce89;
+}
+
+/* Order Items Grid */
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.item-image {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    margin-right: 1rem;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-customization {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.customization-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #f6f9fc;
+    color: #8898aa;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .nav-tabs .nav-link {
+        white-space: nowrap;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+}
+</style> 

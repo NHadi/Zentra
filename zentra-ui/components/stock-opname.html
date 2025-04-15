@@ -1,0 +1,617 @@
+<!-- Stock Opname Management Page -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <!-- Statistics Row -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Opnames</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalOpnames">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                            <i class="ni ni-bullet-list-67"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Completed</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="completedOpnames">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="ni ni-check-bold"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">In Progress</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="inProgressOpnames">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-time-alarm"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Items</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalItems">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="ni ni-box-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div id="stockOpnameGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Opname Details Modal -->
+<div class="modal fade" id="stockOpnameDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-clipboard-list mr-2"></i>
+                    <span id="stockOpnameTitle">Stock Opname Details</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Stock Opname Info Tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="opnameInfo" role="tab">
+                            <i class="fas fa-info-circle mr-2"></i>Opname Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="items" role="tab">
+                            <i class="fas fa-boxes mr-2"></i>Items
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="timeline" role="tab">
+                            <i class="fas fa-history mr-2"></i>Timeline
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content p-4">
+                    <!-- Opname Info Tab -->
+                    <div class="tab-pane fade show active" id="opnameInfo">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Opname Details</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Opname Number</label>
+                                                        <p class="font-weight-bold mb-0" id="opnameNumber"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Status</label>
+                                                        <p class="mb-0">
+                                                            <span class="badge badge-dot mr-4" id="opnameStatus">
+                                                                <i class="bg-warning"></i>
+                                                                <span class="status"></span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Opname Date</label>
+                                                        <p class="mb-0" id="opnameDate"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Created By</label>
+                                                        <p class="mb-0" id="createdBy"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-0">
+                                                        <label class="form-control-label">Notes</label>
+                                                        <p class="mb-0" id="opnameNotes"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Summary</h6>
+                                        <div class="opname-summary"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Tab -->
+                    <div class="tab-pane fade" id="items">
+                        <div class="items-list"></div>
+                    </div>
+
+                    <!-- Timeline Tab -->
+                    <div class="tab-pane fade" id="timeline">
+                        <div class="opname-timeline"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#" id="printReport">
+                            <i class="fas fa-print mr-2"></i>Print Report
+                        </a>
+                        <a class="dropdown-item" href="#" id="updateStatus">
+                            <i class="fas fa-sync-alt mr-2"></i>Update Status
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#" id="cancelOpname">
+                            <i class="fas fa-times mr-2"></i>Cancel Opname
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced Badge Styles */
+.badge-opname {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.badge-opname i {
+    margin-right: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.badge-opname.completed {
+    background: rgba(45, 206, 137, 0.1);
+    color: #2dce89;
+    border: 1px solid rgba(45, 206, 137, 0.2);
+}
+
+.badge-opname.in-progress {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+    border: 1px solid rgba(251, 99, 64, 0.2);
+}
+
+.badge-opname.cancelled {
+    background: rgba(245, 54, 92, 0.1);
+    color: #f5365c;
+    border: 1px solid rgba(245, 54, 92, 0.2);
+}
+
+/* Item Status Badges */
+.badge-item-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+.badge-item-status.match {
+    background: rgba(45, 206, 137, 0.1);
+    color: #2dce89;
+    border: 1px solid rgba(45, 206, 137, 0.2);
+}
+
+.badge-item-status.minor {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+    border: 1px solid rgba(251, 99, 64, 0.2);
+}
+
+.badge-item-status.major {
+    background: rgba(245, 54, 92, 0.1);
+    color: #f5365c;
+    border: 1px solid rgba(245, 54, 92, 0.2);
+}
+
+/* Reference Number Badge */
+.opname-reference {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.875rem;
+    background: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+    border: 1px solid rgba(94, 114, 228, 0.2);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.opname-reference i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Count Display */
+.count-display {
+    display: inline-flex;
+    align-items: center;
+    font-family: "Monaco", "Courier New", monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.count-display.match {
+    color: #2dce89;
+}
+
+.count-display.discrepancy {
+    color: #f5365c;
+}
+
+/* Item Code Badge */
+.item-code {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    background: rgba(136, 152, 170, 0.1);
+    color: #8898aa;
+    border: 1px solid rgba(136, 152, 170, 0.2);
+    border-radius: 0.375rem;
+    font-family: "Monaco", "Courier New", monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+}
+
+.item-code i {
+    margin-right: 0.375rem;
+    font-size: 0.875rem;
+}
+
+/* Discrepancy Indicator */
+.discrepancy-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.discrepancy-indicator.minor {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+    border: 1px solid rgba(251, 99, 64, 0.2);
+}
+
+.discrepancy-indicator.major {
+    background: rgba(245, 54, 92, 0.1);
+    color: #f5365c;
+    border: 1px solid rgba(245, 54, 92, 0.2);
+}
+
+.discrepancy-indicator i {
+    margin-right: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* Timeline Status */
+.timeline-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.timeline-status.created {
+    background: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+    border: 1px solid rgba(94, 114, 228, 0.2);
+}
+
+.timeline-status.in-progress {
+    background: rgba(251, 99, 64, 0.1);
+    color: #fb6340;
+    border: 1px solid rgba(251, 99, 64, 0.2);
+}
+
+.timeline-status.completed {
+    background: rgba(45, 206, 137, 0.1);
+    color: #2dce89;
+    border: 1px solid rgba(45, 206, 137, 0.2);
+}
+
+.timeline-status.cancelled {
+    background: rgba(245, 54, 92, 0.1);
+    color: #f5365c;
+    border: 1px solid rgba(245, 54, 92, 0.2);
+}
+
+.timeline-status i {
+    margin-right: 0.375rem;
+    font-size: 0.875rem;
+}
+
+/* Hover Effects */
+.badge-opname:hover,
+.opname-reference:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.1);
+}
+
+/* Animation for Status Changes */
+@keyframes statusChange {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.status-changed {
+    animation: statusChange 0.3s ease-in-out;
+}
+
+/* Opname Status Badge */
+.opname-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.opname-status.completed {
+    color: #2dce89;
+    background-color: rgba(45, 206, 137, 0.1);
+}
+
+.opname-status.in_progress {
+    color: #fb6340;
+    background-color: rgba(251, 99, 64, 0.1);
+}
+
+.opname-status.cancelled {
+    color: #f5365c;
+    background-color: rgba(245, 54, 92, 0.1);
+}
+
+/* Opname Number Badge */
+.opname-number {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.5rem;
+    background: #5e72e4;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.opname-number i {
+    margin-right: 4px;
+    font-size: 0.875rem;
+}
+
+/* Date Display */
+.date-display {
+    font-size: 0.875rem;
+    color: #8898aa;
+}
+
+/* Notes Display */
+.notes-display {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+    color: #8898aa;
+}
+
+/* Timeline Styles */
+.opname-timeline {
+    position: relative;
+    padding: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: -2rem;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item:last-child::before {
+    bottom: 0;
+}
+
+.timeline-badge {
+    position: absolute;
+    left: -0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #5e72e4;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #5e72e4;
+}
+
+.timeline-content {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(50, 50, 93, 0.1);
+}
+
+/* Items List */
+.items-list {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.item-row:last-child {
+    border-bottom: none;
+}
+
+.item-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #f6f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-quantity {
+    font-weight: 600;
+    color: #2dce89;
+}
+
+.item-quantity.negative {
+    color: #f5365c;
+}
+
+/* Summary Styles */
+.opname-summary {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #f6f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.summary-details {
+    flex: 1;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #2dce89;
+}
+
+.summary-value.negative {
+    color: #f5365c;
+}
+</style> 

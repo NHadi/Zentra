@@ -1,0 +1,186 @@
+<!-- Task Management Page -->
+<div class="container-fluid p-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Task Management</h2>
+        <div class="actions">
+            <button id="filterTasks" class="btn btn-outline-primary mr-2">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <button id="viewOptions" class="btn btn-outline-secondary">
+                <i class="fas fa-cog"></i> View Options
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Total Tasks</h6>
+                    <h3 class="card-title mb-0" id="totalTasks">0</h3>
+                    <small class="text-success" id="tasksGrowth">
+                        <i class="fas fa-arrow-up"></i> 5% Since last week
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">In Progress</h6>
+                    <h3 class="card-title mb-0" id="inProgressTasks">0</h3>
+                    <small class="text-info">Active Tasks</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Completed</h6>
+                    <h3 class="card-title mb-0" id="completedTasks">0</h3>
+                    <small class="text-success" id="completionRate">
+                        <i class="fas fa-arrow-up"></i> 0% Completion Rate
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Pending</h6>
+                    <h3 class="card-title mb-0" id="pendingTasks">0</h3>
+                    <small class="text-warning">Needs Attention</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <!-- Task divisions will be rendered here -->
+    </div>
+</div>
+
+<!-- Task Details Modal -->
+<div class="modal fade" id="taskDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="task-info mb-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Type:</strong> <span id="taskType"></span></p>
+                            <p><strong>Status:</strong> <span id="taskStatus"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Assigned To:</strong> <span id="assignedTo"></span></p>
+                            <p><strong>Order:</strong> <span id="orderNumber"></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="task-timeline mb-4">
+                    <h6 class="mb-3">Timeline</h6>
+                    <div class="timeline"></div>
+                </div>
+                
+                <div class="task-notes">
+                    <h6 class="mb-3">Notes</h6>
+                    <div id="taskNotes"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="startTask">Start Task</button>
+                <button type="button" class="btn btn-success" id="completeTask">Complete Task</button>
+                <button type="button" class="btn btn-info" id="addNote">Add Note</button>
+                <button type="button" class="btn btn-primary" id="reassignTask">Reassign</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .task-timeline .timeline {
+        position: relative;
+        padding: 1rem 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .timeline-badge {
+        position: absolute;
+        left: 0;
+        top: 0.25rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: #007bff;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px #007bff;
+    }
+
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 0.25rem;
+    }
+
+    .timeline-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-time {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    .timeline-action {
+        font-weight: 600;
+    }
+
+    .timeline-description {
+        margin: 0;
+        color: #495057;
+    }
+
+    .note-item {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 0.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .note-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .note-author {
+        font-weight: 600;
+    }
+
+    .note-time {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    .note-content {
+        color: #495057;
+    }
+</style> 

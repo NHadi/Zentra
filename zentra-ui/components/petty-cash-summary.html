@@ -1,0 +1,183 @@
+<!-- Statistics Row -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Balance</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalBalance">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-money-coins"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Expenditure</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalExpenditure">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-danger text-white rounded-circle shadow">
+                            <i class="ni ni-chart-bar-32"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Pending Requests</h5>
+                        <span class="h2 font-weight-bold mb-0" id="pendingRequests">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-warning text-white rounded-circle shadow">
+                            <i class="ni ni-active-40"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Days Until Refresh</h5>
+                        <span class="h2 font-weight-bold mb-0" id="daysUntilRefresh">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                            <i class="ni ni-calendar-grid-58"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Budget Utilization -->
+<div class="row mt-4">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Budget Utilization</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-control-label text-muted">Total Budget</label>
+                            <p id="totalBudget" class="h4 mb-3"></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label text-muted">Used Budget</label>
+                            <p id="usedBudget" class="h4 mb-3"></p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-control-label text-muted">Remaining Budget</label>
+                            <p id="remainingBudget" class="h4 mb-3"></p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-control-label text-muted">Utilization Rate</label>
+                            <p id="utilizationRate" class="h4 mb-3"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress-wrapper">
+                    <div class="progress-info">
+                        <div class="progress-label">
+                            <span>Budget Usage</span>
+                        </div>
+                        <div class="progress-percentage">
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-gradient-danger" role="progressbar" id="budgetProgress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Trend Analysis</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-control-label text-muted">Daily Average</label>
+                    <p id="dailyAverage" class="h4 mb-3"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label text-muted">Weekly Average</label>
+                    <p id="weeklyAverage" class="h4 mb-3"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label text-muted">Monthly Average</label>
+                    <p id="monthlyAverage" class="h4 mb-3"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label text-muted">Growth Rate</label>
+                    <p id="growthRate" class="h4 mb-3"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Recent Transactions</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-items-center table-flush">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Request Number</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Employee</th>
+                            <th scope="col">Purpose</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTransactions">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 

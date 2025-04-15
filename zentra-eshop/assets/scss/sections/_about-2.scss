@@ -1,0 +1,99 @@
+// main: ../main.scss
+/*--------------------------------------------------------------
+# About 2 Section
+--------------------------------------------------------------*/
+.about-2 {
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    color: var(--accent-color);
+    background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
+    margin-bottom: 1rem;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+
+  .about-title {
+    font-size: 2.2rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  .about-description,
+  .section-text {
+    color: color-mix(in srgb, var(--default-color) 80%, transparent);
+    line-height: 1.6;
+  }
+
+  .features-boxes {
+    .feature-box {
+      height: 100%;
+      position: relative;
+
+      .icon-box {
+        width: 60px;
+        height: 60px;
+        margin: 0 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background-color: color-mix(in srgb, var(--accent-color) 15%, transparent);
+        color: var(--accent-color);
+        font-size: 1.75rem;
+        transition: all 0.3s ease;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+
+        a {
+          color: var(--heading-color);
+        }
+      }
+
+      p {
+        color: color-mix(in srgb, var(--default-color) 80%, transparent);
+        margin-bottom: 0;
+        line-height: 1.6;
+      }
+
+      &:hover {
+        .icon-box {
+          background-color: var(--accent-color);
+          color: var(--contrast-color);
+        }
+
+        h3 a {
+          color: var(--accent-color);
+        }
+      }
+    }
+  }
+
+  .video-box {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      border-radius: 20px;
+    }
+  }
+
+  .pulsating-play-btn {
+    position: absolute;
+    left: calc(50% - 47px);
+    top: calc(50% - 47px);
+  }
+}

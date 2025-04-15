@@ -1,0 +1,243 @@
+version: '3.8'
+
+services:
+  # Infrastructure services
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # Optimize PostgreSQL for 8GB total system memory
+      POSTGRES_SHARED_BUFFERS: 2GB
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 6GB
+      POSTGRES_MAINTENANCE_WORK_MEM: 512MB
+      POSTGRES_WORK_MEM: 32MB
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backup:/app/backup
+    deploy:
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 2.5G
+        reservations:
+          cpus: '0.4'
+          memory: 2G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: postgres -c max_connections=100 -c shared_buffers=2GB -c effective_cache_size=6GB -c maintenance_work_mem=512MB -c checkpoint_completion_target=0.9 -c wal_buffers=16MB -c default_statistics_target=100 -c random_page_cost=1.1 -c effective_io_concurrency=200 -c work_mem=32MB -c min_wal_size=1GB -c max_wal_size=4GB
+    networks:
+      - app-network
+
+  pgadmin:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      # Reduced memory settings for small server
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      # Disk settings
+      - "cluster.routing.allocation.disk.threshold_enabled=true"
+      - "cluster.routing.allocation.disk.watermark.low=85%"
+      - "cluster.routing.allocation.disk.watermark.high=90%"
+      - "cluster.routing.allocation.disk.watermark.flood_stage=95%"
+      # Other optimizations
+      - "indices.memory.index_buffer_size=10%"
+      - "indices.queries.cache.size=10%"
+      - "indices.fielddata.cache.size=10%"
+      - "thread_pool.write.queue_size=200"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.2'
+          memory: 768M
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - app-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.9.0
+    container_name: kibana
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - SERVER_PUBLICBASEURL=${KIBANA_SERVER_PUBLICBASEURL}
+      # Add memory limit for Kibana
+      - "NODE_OPTIONS=--max-old-space-size=256"
+    ports:
+      - "5601:5601"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - app-network
+
+  eshop:
+    build:
+      context: .
+      dockerfile: Dockerfile.eshop
+    image: nurulhadii/zentra-eshop:latest
+    container_name: zentra-eshop
+    restart: always
+    ports:
+      - "3001:3001"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+
+  # Backend service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: nurulhadii/zentra-api:latest
+    container_name: zentra-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GIN_MODE=release
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - SERVER_PORT=8080
+    volumes:
+      - ./Backend/uploads:/app/uploads
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 512M
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: nurulhadii/zentra-ui:latest
+    container_name: zentra-ui
+    restart: always
+    ports:
+      - "8090:8090"
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://backend:8080/api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

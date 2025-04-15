@@ -1,0 +1,232 @@
+<!-- Stock Movement Management Page -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <!-- Statistics Row -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Movements</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalMovements">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                            <i class="ni ni-bullet-list-67"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total In</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalIn">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="ni ni-bold-down"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Out</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalOut">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="ni ni-bold-up"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Adjustments</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalAdjustments">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-bold-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div id="stockMovementGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Movement Details Modal -->
+<div class="modal fade" id="stockMovementDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exchange-alt mr-2"></i>
+                    <span id="stockMovementTitle">Stock Movement Details</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Stock Movement Info Tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="movementInfo" role="tab">
+                            <i class="fas fa-info-circle mr-2"></i>Movement Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="timeline" role="tab">
+                            <i class="fas fa-history mr-2"></i>Timeline
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content p-4">
+                    <!-- Movement Info Tab -->
+                    <div class="tab-pane fade show active" id="movementInfo">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Movement Details</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Movement Type</label>
+                                                        <p class="font-weight-bold mb-0" id="movementType"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Date</label>
+                                                        <p class="mb-0" id="movementDate"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Created By</label>
+                                                        <p class="mb-0" id="createdBy"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Quantity</label>
+                                                        <p class="mb-0" id="movementQuantity"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-0">
+                                                        <label class="form-control-label">Notes</label>
+                                                        <p class="mb-0" id="movementNotes"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Item Details</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Item Name</label>
+                                                        <p class="font-weight-bold mb-0" id="itemName"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Item Code</label>
+                                                        <p class="mb-0" id="itemCode"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Unit</label>
+                                                        <p class="mb-0" id="itemUnit"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card shadow-none border mt-4">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Reference</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Reference Type</label>
+                                                        <p class="mb-0" id="referenceType"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Reference ID</label>
+                                                        <p class="mb-0" id="referenceId"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Tab -->
+                    <div class="tab-pane fade" id="timeline">
+                        <div class="movement-timeline"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="printReport">
+                    <i class="fas fa-print mr-2"></i>Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div> 

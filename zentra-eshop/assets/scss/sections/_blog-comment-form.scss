@@ -1,0 +1,131 @@
+// main: ../main.scss
+/*--------------------------------------------------------------
+# Blog Comment Form Section
+--------------------------------------------------------------*/
+.blog-comment-form {
+  max-width: 900px;
+  margin: 30px auto 0 auto;
+
+  form {
+    padding: 2rem;
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h3 {
+      color: var(--heading-color);
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: color-mix(in srgb, var(--default-color), transparent 30%);
+      font-size: 0.9375rem;
+    }
+  }
+
+  .input-group {
+    margin-bottom: 1rem;
+    position: relative;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--heading-color);
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid color-mix(in srgb, var(--default-color), transparent 85%);
+      border-radius: 8px;
+      background-color: var(--surface-color);
+      color: var(--default-color);
+      font-size: 0.9375rem;
+      transition: all 0.2s ease;
+
+      &::placeholder {
+        color: color-mix(in srgb, var(--default-color), transparent 60%);
+      }
+
+      &:hover {
+        border-color: color-mix(in srgb, var(--default-color), transparent 70%);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-color), transparent 90%);
+      }
+
+      &:invalid:not(:placeholder-shown) {
+        border-color: #dc3545;
+
+        &+.error-text {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .error-text {
+      position: absolute;
+      bottom: -20px;
+      left: 0;
+      color: #dc3545;
+      font-size: 0.75rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+    }
+  }
+
+  button[type="submit"] {
+    background: var(--accent-color);
+    color: var(--contrast-color);
+    padding: 0.875rem 2.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: color-mix(in srgb, var(--accent-color), transparent 15%);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+
+    .form-header {
+      h3 {
+        font-size: 1.5rem;
+      }
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 0.875rem 1rem;
+    }
+  }
+}

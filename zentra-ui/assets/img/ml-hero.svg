@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800px" height="600px" viewBox="0 0 800 600" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="600" fill="#f8f9fe"/>
+    
+    <!-- Abstract shapes -->
+    <circle cx="400" cy="300" r="200" fill="url(#gradient1)" opacity="0.1"/>
+    <circle cx="600" cy="200" r="150" fill="url(#gradient2)" opacity="0.1"/>
+    <circle cx="200" cy="400" r="100" fill="url(#gradient3)" opacity="0.1"/>
+    
+    <!-- Data visualization elements -->
+    <g transform="translate(200, 200)">
+        <!-- Bar chart -->
+        <rect x="0" y="0" width="20" height="100" fill="#5e72e4"/>
+        <rect x="30" y="20" width="20" height="80" fill="#11cdef"/>
+        <rect x="60" y="40" width="20" height="60" fill="#2dce89"/>
+        <rect x="90" y="60" width="20" height="40" fill="#fb6340"/>
+        
+        <!-- Line chart -->
+        <path d="M150,100 L180,80 L210,90 L240,70 L270,85" 
+              stroke="#5e72e4" 
+              stroke-width="3" 
+              fill="none"/>
+        
+        <!-- Doughnut chart -->
+        <circle cx="350" cy="50" r="40" fill="none" stroke="#5e72e4" stroke-width="20"/>
+        <circle cx="350" cy="50" r="40" fill="none" stroke="#11cdef" stroke-width="20" stroke-dasharray="60 40"/>
+    </g>
+    
+    <!-- ML/AI elements -->
+    <g transform="translate(400, 300)">
+        <!-- Neural network nodes -->
+        <circle cx="-100" cy="-50" r="15" fill="#5e72e4"/>
+        <circle cx="-50" cy="-50" r="15" fill="#11cdef"/>
+        <circle cx="0" cy="-50" r="15" fill="#2dce89"/>
+        <circle cx="50" cy="-50" r="15" fill="#fb6340"/>
+        <circle cx="100" cy="-50" r="15" fill="#5e72e4"/>
+        
+        <!-- Connections -->
+        <line x1="-100" y1="-50" x2="-50" y2="-50" stroke="#5e72e4" stroke-width="2"/>
+        <line x1="-50" y1="-50" x2="0" y2="-50" stroke="#11cdef" stroke-width="2"/>
+        <line x1="0" y1="-50" x2="50" y2="-50" stroke="#2dce89" stroke-width="2"/>
+        <line x1="50" y1="-50" x2="100" y2="-50" stroke="#fb6340" stroke-width="2"/>
+    </g>
+    
+    <!-- Gradients -->
+    <defs>
+        <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#5e72e4"/>
+            <stop offset="100%" stop-color="#825ee4"/>
+        </linearGradient>
+        <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#11cdef"/>
+            <stop offset="100%" stop-color="#1171ef"/>
+        </linearGradient>
+        <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2dce89"/>
+            <stop offset="100%" stop-color="#2dcecc"/>
+        </linearGradient>
+    </defs>
+</svg> 

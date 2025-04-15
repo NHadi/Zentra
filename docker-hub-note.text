@@ -1,0 +1,9 @@
+# Build images
+docker build -t nurulhadii/zentra-ui:latest -f Dockerfile.frontend .
+docker build -t nurulhadii/zentra-api:latest -f Dockerfile.backend .
+docker build -t nurulhadii/zentra-eshop:latest -f Dockerfile.eshop .
+
+# Push images
+docker push nurulhadii/zentra-ui:latest
+docker push nurulhadii/zentra-api:latest
+docker push nurulhadii/zentra-eshop:latest

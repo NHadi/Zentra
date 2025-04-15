@@ -1,0 +1,363 @@
+// main: ../main.scss
+/*--------------------------------------------------------------
+# Shipping Info Section
+--------------------------------------------------------------*/
+.shipping-info {
+  .shipping-info-header {
+    text-align: center;
+    margin-bottom: 60px;
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      position: relative;
+      display: inline-block;
+
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -10px;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background-color: var(--accent-color);
+        border-radius: 2px;
+      }
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: color-mix(in srgb, var(--default-color), transparent 30%);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+  }
+
+  .delivery-options {
+    margin-bottom: 80px;
+
+    .delivery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      padding: 20px 0;
+      position: relative;
+
+      @media (max-width: 991px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (max-width: 767px) {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  .delivery-option {
+    position: relative;
+
+    .option-content {
+      background-color: var(--surface-color);
+      border-radius: 15px;
+      padding: 40px 30px;
+      height: 100%;
+      transition: all 0.4s;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 0;
+        background: linear-gradient(180deg,
+            color-mix(in srgb, var(--accent-color), transparent 97%) 0%,
+            var(--surface-color) 100%);
+        transition: height 0.4s ease-out;
+        z-index: -1;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+
+        &::before {
+          height: 100%;
+        }
+      }
+    }
+
+    &.featured .option-content {
+      border: 2px solid var(--accent-color);
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        transform: scale(1.05) translateY(-5px);
+      }
+    }
+
+    .icon-wrapper {
+      width: 70px;
+      height: 70px;
+      background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      transition: transform 0.3s;
+
+      i {
+        font-size: 2rem;
+        color: var(--accent-color);
+      }
+    }
+
+    &:hover .icon-wrapper {
+      transform: rotateY(180deg);
+    }
+
+    .option-details {
+      h4 {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+      }
+
+      .time {
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        margin-bottom: 15px;
+
+        i {
+          font-size: 1.1rem;
+        }
+      }
+
+      .description {
+        color: color-mix(in srgb, var(--default-color), transparent 30%);
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .price-tag {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+        color: var(--accent-color);
+        border-radius: 30px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .shipping-features {
+    margin-bottom: 80px;
+
+    .feature-item {
+      text-align: center;
+      background-color: var(--surface-color);
+      padding: 40px 30px;
+      border-radius: 15px;
+      transition: all 0.3s;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 3px;
+        background-color: var(--accent-color);
+        transition: width 0.3s;
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+        &::after {
+          width: 80%;
+        }
+
+        i {
+          transform: scale(1.2);
+        }
+      }
+
+      i {
+        font-size: 2.5rem;
+        color: var(--accent-color);
+        margin-bottom: 20px;
+        transition: transform 0.3s;
+        display: inline-block;
+      }
+
+      h5 {
+        font-size: 1.25rem;
+        margin-bottom: 15px;
+      }
+
+      p {
+        color: color-mix(in srgb, var(--default-color), transparent 30%);
+        margin: 0;
+      }
+    }
+  }
+
+  .international-shipping {
+    background-color: var(--surface-color);
+    border-radius: 20px;
+    padding: 60px;
+    margin-bottom: 80px;
+
+    @media (max-width: 767px) {
+      padding: 40px 20px;
+    }
+
+    .content-box {
+      h3 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+      }
+
+      .lead {
+        color: color-mix(in srgb, var(--default-color), transparent 30%);
+        margin-bottom: 30px;
+      }
+
+      .shipping-benefits {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          margin-bottom: 20px;
+          font-size: 1.1rem;
+
+          i {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+
+    .info-cards {
+      display: grid;
+      gap: 20px;
+
+      .info-card {
+        background-color: var(--background-color);
+        padding: 30px;
+        border-radius: 15px;
+        transition: transform 0.3s;
+
+        &:hover {
+          transform: translateX(-10px);
+        }
+
+        i {
+          font-size: 2rem;
+          color: var(--accent-color);
+          margin-bottom: 15px;
+        }
+
+        h5 {
+          margin-bottom: 10px;
+        }
+
+        p {
+          color: color-mix(in srgb, var(--default-color), transparent 30%);
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .faq-section {
+    h3 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 40px;
+    }
+
+    .faq-grid {
+      display: grid;
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+
+      .faq-item {
+        background-color: var(--surface-color);
+        border-radius: 15px;
+        overflow: hidden;
+
+        h3 {
+          margin: 0;
+          padding: 25px 30px;
+          font-size: 1.1rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          transition: all 0.3s;
+          text-align: left;
+
+          i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            transition: transform 0.3s;
+          }
+        }
+
+        .faq-answer {
+          display: none;
+          padding: 30px 25px;
+
+          p {
+            color: color-mix(in srgb, var(--default-color), transparent 30%);
+            margin: 0;
+          }
+        }
+
+        &.faq-active {
+          h3 {
+            color: var(--accent-color);
+            background-color: color-mix(in srgb, var(--accent-color), transparent 95%);
+
+            i {
+              transform: rotate(45deg);
+            }
+          }
+
+          .faq-answer {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 991px) {
+    .international-shipping {
+      .row>div:first-child {
+        margin-bottom: 40px;
+      }
+    }
+  }
+}

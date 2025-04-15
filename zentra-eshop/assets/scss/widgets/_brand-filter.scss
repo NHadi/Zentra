@@ -1,0 +1,147 @@
+.brand-filter-widget {
+  .brand-filter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .brand-search {
+    position: relative;
+    margin-bottom: 5px;
+
+    input {
+      color: var(--default-color);
+      background-color: var(--surface-color);
+      font-size: 14px;
+      border-color: color-mix(in srgb, var(--default-color), transparent 80%);
+      padding: 10px 35px 10px 15px;
+
+      &:focus {
+        border-color: var(--accent-color);
+        box-shadow: none
+      }
+
+      &::placeholder {
+        color: color-mix(in srgb, var(--default-color), transparent 70%);
+      }
+    }
+
+    .bi-search {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: color-mix(in srgb, var(--default-color), transparent 50%);
+      font-size: 14px;
+    }
+  }
+
+  .brand-list {
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 5px;
+
+    /* Custom scrollbar */
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: color-mix(in srgb, var(--default-color), transparent 95%);
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--default-color), transparent 70%);
+      border-radius: 10px;
+
+      &:hover {
+        background: color-mix(in srgb, var(--default-color), transparent 60%);
+      }
+    }
+  }
+
+  .brand-item {
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      margin: 0;
+    }
+
+    .form-check-input {
+      margin-top: 0;
+      margin-right: 10px;
+      cursor: pointer;
+
+      &:checked {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        box-shadow: none;
+      }
+
+      &:focus {
+        border-color: var(--accent-color);
+        box-shadow: none;
+      }
+    }
+
+    .form-check-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--default-color);
+    }
+
+    .brand-count {
+      font-size: 12px;
+      color: color-mix(in srgb, var(--default-color), transparent 40%);
+      margin-left: auto;
+    }
+  }
+
+  .brand-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5px;
+    padding-top: 15px;
+    border-top: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+
+    .btn-outline-primary {
+      color: var(--accent-color);
+      border-color: var(--accent-color);
+
+      &:hover {
+        background-color: var(--accent-color);
+        color: var(--contrast-color);
+      }
+    }
+
+    .btn-link {
+      color: color-mix(in srgb, var(--default-color), transparent 30%);
+      text-decoration: none;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+
+      &:hover {
+        color: var(--default-color);
+        text-decoration: underline;
+      }
+    }
+  }
+
+  @media (max-width: 767.98px) {
+    .brand-list {
+      max-height: 200px;
+    }
+  }
+}

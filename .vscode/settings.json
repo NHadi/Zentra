@@ -1,0 +1,16 @@
+{
+    "editor.tabCompletion": "on",
+    "editor.suggestSelection": "first",
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": true,
+        "strings": true
+    },
+    "editor.suggest.showWords": true,
+    "editor.suggest.preview": true,
+    "editor.suggest.shareSuggestSelections": true,
+    "files.exclude": {
+        "**/.git": false
+    }
+}

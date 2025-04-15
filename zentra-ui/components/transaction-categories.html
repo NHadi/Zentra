@@ -1,0 +1,142 @@
+<!-- Statistics Row -->
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Total Categories</h5>
+                        <span class="h2 font-weight-bold mb-0" id="totalCategories">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-primary text-white rounded-circle shadow">
+                            <i class="ni ni-tag"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Income Categories</h5>
+                        <span class="h2 font-weight-bold mb-0" id="incomeCategories">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow">
+                            <i class="ni ni-money-coins"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Expense Categories</h5>
+                        <span class="h2 font-weight-bold mb-0" id="expenseCategories">0</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-warning text-white rounded-circle shadow">
+                            <i class="ni ni-credit-card"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stats">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title text-uppercase text-muted mb-0">Last Update</h5>
+                        <span class="h4 font-weight-bold mb-0" id="lastUpdate">-</span>
+                    </div>
+                    <div class="col-auto">
+                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                            <i class="ni ni-calendar-grid-58"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grid Section -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card">
+            <!-- Card header -->
+            <div class="card-header border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Transaction Categories</h3>
+                    </div>
+                    <div class="col text-right">
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addCategoryModal">
+                            <i class="fas fa-plus"></i> New Category
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Grid container -->
+            <div id="transactionCategoryGrid" class="px-3 pb-3"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">New Transaction Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label class="form-control-label" for="input-code">Code <span class="text-danger">*</span></label>
+                        <input type="text" id="input-code" class="form-control" placeholder="Enter category code" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-control-label" for="input-name">Name <span class="text-danger">*</span></label>
+                        <input type="text" id="input-name" class="form-control" placeholder="Enter category name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-control-label" for="input-type">Type <span class="text-danger">*</span></label>
+                        <select id="input-type" class="form-control" required>
+                            <option value="">Select type</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-control-label" for="input-description">Description</label>
+                        <textarea id="input-description" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="input-active" checked>
+                            <label class="custom-control-label" for="input-active">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save Category</button>
+            </div>
+        </div>
+    </div>
+</div> 

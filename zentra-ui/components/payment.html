@@ -1,0 +1,405 @@
+<!-- Payment Management Page -->
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <!-- Statistics Row -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Payments</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalPayments">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow">
+                                            <i class="ni ni-money-coins"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Completed</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="completedPayments">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-green text-white rounded-circle shadow">
+                                            <i class="ni ni-check-bold"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Pending</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="pendingPayments">0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-orange text-white rounded-circle shadow">
+                                            <i class="ni ni-time-alarm"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col">
+                                        <h5 class="card-title text-uppercase text-muted mb-0">Total Amount</h5>
+                                        <span class="h2 font-weight-bold mb-0" id="totalAmount">$0</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="icon icon-shape bg-gradient-red text-white rounded-circle shadow">
+                                            <i class="ni ni-chart-bar-32"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div id="paymentGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Details Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-money-bill mr-2"></i>
+                    <span id="paymentTitle">Payment Details</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Payment Info Tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-tab="paymentInfo" role="tab">
+                            <i class="fas fa-info-circle mr-2"></i>Payment Info
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="timeline" role="tab">
+                            <i class="fas fa-history mr-2"></i>Timeline
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-tab="orderInfo" role="tab">
+                            <i class="fas fa-shopping-cart mr-2"></i>Order Info
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content p-4">
+                    <!-- Payment Info Tab -->
+                    <div class="tab-pane fade show active" id="paymentInfo">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Payment Details</h6>
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Reference Number</label>
+                                                        <p class="font-weight-bold mb-0" id="referenceNumber"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Status</label>
+                                                        <p class="mb-0">
+                                                            <span class="badge badge-dot mr-4" id="paymentStatus">
+                                                                <i class="bg-warning"></i>
+                                                                <span class="status"></span>
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Payment Method</label>
+                                                        <p class="mb-0" id="paymentMethod"></p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Payment Date</label>
+                                                        <p class="mb-0" id="paymentDate"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label class="form-control-label">Amount</label>
+                                                        <p class="h3 font-weight-bold mb-0 text-primary" id="paymentAmount"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group mb-0">
+                                                        <label class="form-control-label">Notes</label>
+                                                        <p class="mb-0" id="paymentNotes"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">Transaction Summary</h6>
+                                        <div class="transaction-summary"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Tab -->
+                    <div class="tab-pane fade" id="timeline">
+                        <div class="payment-timeline"></div>
+                    </div>
+
+                    <!-- Order Info Tab -->
+                    <div class="tab-pane fade" id="orderInfo">
+                        <div class="order-info"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="#" id="printReceipt">
+                            <i class="fas fa-print mr-2"></i>Print Receipt
+                        </a>
+                        <a class="dropdown-item" href="#" id="updateStatus">
+                            <i class="fas fa-sync-alt mr-2"></i>Update Status
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#" id="voidPayment">
+                            <i class="fas fa-times mr-2"></i>Void Payment
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Payment Status Badge */
+.payment-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.payment-status.completed {
+    color: #2dce89;
+    background-color: rgba(45, 206, 137, 0.1);
+}
+
+.payment-status.pending {
+    color: #fb6340;
+    background-color: rgba(251, 99, 64, 0.1);
+}
+
+.payment-status.failed {
+    color: #f5365c;
+    background-color: rgba(245, 54, 92, 0.1);
+}
+
+/* Reference Number Badge */
+.reference-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.5rem;
+    background: #5e72e4;
+    border-radius: 4px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.reference-badge i {
+    margin-right: 4px;
+    font-size: 0.875rem;
+}
+
+/* Payment Method Badge */
+.payment-method {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+}
+
+.payment-method i {
+    margin-right: 4px;
+    font-size: 0.875rem;
+}
+
+/* Amount Display */
+.amount-display {
+    font-weight: 600;
+    color: #2dce89;
+}
+
+.amount-display.negative {
+    color: #f5365c;
+}
+
+/* Notes Display */
+.notes-display {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+    color: #8898aa;
+}
+
+/* Date Display */
+.date-display {
+    font-size: 0.875rem;
+    color: #8898aa;
+}
+
+/* Timeline Styles */
+.payment-timeline {
+    position: relative;
+    padding: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: -2rem;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item:last-child::before {
+    bottom: 0;
+}
+
+.timeline-badge {
+    position: absolute;
+    left: -0.5rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: #5e72e4;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #5e72e4;
+}
+
+.timeline-content {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(50, 50, 93, 0.1);
+}
+
+/* Transaction Summary */
+.transaction-summary {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #f6f9fc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.transaction-details {
+    flex: 1;
+}
+
+.transaction-amount {
+    font-weight: 600;
+    color: #2dce89;
+}
+
+.transaction-amount.refund {
+    color: #f5365c;
+}
+
+/* Order Info */
+.order-info {
+    background: white;
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+</style> 

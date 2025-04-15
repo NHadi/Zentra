@@ -1,0 +1,319 @@
+version: '3.8'
+
+services:
+  # Development Environment
+  postgres_dev:
+    image: postgres:15-alpine
+    container_name: postgres_dev
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_DEV}
+      POSTGRES_USER: ${POSTGRES_USER_DEV}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_DEV}
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin_dev:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin_dev
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres_dev
+    networks:
+      - app-network
+
+  backend_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: nurulhadii/zentra-api:dev
+    container_name: zentra-api-dev
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_HOST=postgres_dev
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB_DEV}
+      - POSTGRES_USER=${POSTGRES_USER_DEV}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_DEV}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GIN_MODE=debug
+      - JWT_SECRET=${JWT_SECRET_DEV}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_DEV}
+      - SERVER_PORT=8080
+    volumes:
+      - ./zentra/uploads:/app/uploads
+    depends_on:
+      - postgres_dev
+    networks:
+      - app-network
+
+  eshop_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.eshop
+    image: nurulhadii/zentra-eshop:dev
+    container_name: zentra-eshop-dev
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://backend_dev:8080/api
+    depends_on:
+      - backend_dev
+    networks:
+      - app-network
+
+  frontend_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: nurulhadii/zentra-ui:dev
+    container_name: zentra-ui-dev
+    restart: always
+    ports:
+      - "8090:8090"
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://backend_dev:8080/api
+    depends_on:
+      - backend_dev
+    networks:
+      - app-network
+
+  # Staging Environment
+  postgres_staging:
+    image: postgres:15-alpine
+    container_name: postgres_staging
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_STAGING}
+      POSTGRES_USER: ${POSTGRES_USER_STAGING}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_STAGING}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin_staging:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin_staging
+    restart: always
+    ports:
+      - "5051:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres_staging
+    networks:
+      - app-network
+
+  backend_staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: nurulhadii/zentra-api:staging
+    container_name: zentra-api-staging
+    restart: always
+    ports:
+      - "8081:8080"
+    environment:
+      - POSTGRES_HOST=postgres_staging
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB_STAGING}
+      - POSTGRES_USER=${POSTGRES_USER_STAGING}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_STAGING}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GIN_MODE=release
+      - JWT_SECRET=${JWT_SECRET_STAGING}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_STAGING}
+      - SERVER_PORT=8080
+    volumes:
+      - ./zentra/uploads:/app/uploads
+    depends_on:
+      - postgres_staging
+    networks:
+      - app-network
+
+  eshop_staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.eshop
+    image: nurulhadii/zentra-eshop:staging
+    container_name: zentra-eshop-staging
+    restart: always
+    ports:
+      - "3002:3001"
+    environment:
+      - NODE_ENV=staging
+      - API_URL=http://backend_staging:8080/api
+    depends_on:
+      - backend_staging
+    networks:
+      - app-network
+
+  frontend_staging:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: nurulhadii/zentra-ui:staging
+    container_name: zentra-ui-staging
+    restart: always
+    ports:
+      - "8091:8090"
+    environment:
+      - NODE_ENV=staging
+      - API_URL=http://backend_staging:8080/api
+    depends_on:
+      - backend_staging
+    networks:
+      - app-network
+
+  # Production Environment
+  postgres_prod:
+    image: postgres:15-alpine
+    container_name: postgres_prod
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_PROD}
+      POSTGRES_USER: ${POSTGRES_USER_PROD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_PROD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  pgadmin_prod:
+    image: dpage/pgadmin4:7.1
+    container_name: pgadmin_prod
+    restart: always
+    ports:
+      - "5052:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres_prod
+    networks:
+      - app-network
+
+  backend_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: nurulhadii/zentra-api:prod
+    container_name: zentra-api-prod
+    restart: always
+    ports:
+      - "8082:8080"
+    environment:
+      - POSTGRES_HOST=postgres_prod
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB_PROD}
+      - POSTGRES_USER=${POSTGRES_USER_PROD}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_PROD}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - GIN_MODE=release
+      - JWT_SECRET=${JWT_SECRET_PROD}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_PROD}
+      - SERVER_PORT=8080
+    volumes:
+      - ./zentra/uploads:/app/uploads
+    depends_on:
+      - postgres_prod
+    networks:
+      - app-network
+
+  eshop_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.eshop
+    image: nurulhadii/zentra-eshop:prod
+    container_name: zentra-eshop-prod
+    restart: always
+    ports:
+      - "3003:3001"
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://backend_prod:8080/api
+    depends_on:
+      - backend_prod
+    networks:
+      - app-network
+
+  frontend_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: nurulhadii/zentra-ui:prod
+    container_name: zentra-ui-prod
+    restart: always
+    ports:
+      - "8092:8090"
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://backend_prod:8080/api
+    depends_on:
+      - backend_prod
+    networks:
+      - app-network
+
+  # Shared Services
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - app-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.9.0
+    container_name: kibana
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - app-network
+
+volumes:
+  postgres_dev_data:
+  postgres_staging_data:
+  postgres_prod_data:
+  elasticsearch_data:
+
+networks:
+  app-network:
+    driver: bridge 

@@ -1,0 +1,74 @@
+// main: ../main.scss
+/*--------------------------------------------------------------
+# Info Cards Section
+--------------------------------------------------------------*/
+.info-cards {
+  padding: 30px 0;
+
+  .info-card {
+    padding: 20px 15px;
+    height: 100%;
+    transition: transform 0.3s ease;
+    text-align: center;
+
+    &:hover {
+      transform: translateY(-5px);
+
+      .icon-box {
+        i {
+          color: var(--accent-color);
+        }
+      }
+    }
+
+    .icon-box {
+      margin: 0 auto 15px;
+      transition: all 0.3s ease;
+
+      i {
+        font-size: 2.5rem;
+        color: var(--heading-color);
+        transition: color 0.3s ease;
+      }
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--heading-color);
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: color-mix(in srgb, var(--default-color), transparent 20%);
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 991px) {
+    .info-card {
+      .icon-box {
+        i {
+          font-size: 2.2rem;
+        }
+      }
+
+      h3 {
+        font-size: 1rem;
+      }
+
+      p {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  @media (max-width: 767px) {
+    .info-card {
+      margin-bottom: 15px;
+    }
+  }
+}

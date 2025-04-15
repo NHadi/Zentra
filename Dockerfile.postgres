@@ -1,0 +1,9 @@
+FROM postgres:15
+
+# Create backup directory with proper permissions
+RUN mkdir -p /app/backup && \
+    chown postgres:postgres /app/backup && \
+    chmod 755 /app/backup
+
+# Copy custom postgres configuration if needed
+COPY postgres.conf /etc/postgresql/postgresql.conf 

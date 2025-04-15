@@ -1,0 +1,108 @@
+.product-categories-widget {
+
+  // Styling for the category tree
+  .category-tree {
+    margin-top: 1rem;
+
+    // Category item styling
+    .category-item {
+      border-bottom: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+      padding: 0.75rem 0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      // Category header (clickable area)
+      .category-header {
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          .category-link {
+            color: var(--accent-color);
+          }
+
+          .category-toggle {
+            color: var(--accent-color);
+          }
+        }
+      }
+
+      // Main category link
+      .category-link {
+        color: var(--default-color);
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      // Toggle icon for expanding/collapsing
+      .category-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: color-mix(in srgb, var(--default-color), transparent 40%);
+        transition: color 0.3s;
+
+        // Show/hide appropriate chevron based on collapsed state
+        .bi-chevron-up {
+          display: none;
+        }
+      }
+
+      // When expanded, show up chevron instead of down
+      .category-header:not(.collapsed) {
+        .category-toggle {
+          .bi-chevron-down {
+            display: none;
+          }
+
+          .bi-chevron-up {
+            display: inline;
+          }
+        }
+      }
+
+      // Subcategory list
+      .subcategory-list {
+        li {
+          padding: 0.5rem 0;
+
+          &:first-child {
+            padding-top: 0.75rem;
+          }
+
+          &:last-child {
+            padding-bottom: 0;
+          }
+        }
+
+        // Subcategory links
+        .subcategory-link {
+          color: color-mix(in srgb, var(--default-color), transparent 20%);
+          text-decoration: none;
+          font-size: 0.95rem;
+          transition: color 0.3s;
+
+          &:hover {
+            color: var(--accent-color);
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 767.98px) {
+    .category-tree {
+      .category-item {
+        padding: 0.625rem 0;
+
+        .subcategory-list li {
+          padding: 0.4rem 0;
+        }
+      }
+    }
+  }
+}
