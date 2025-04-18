@@ -1,142 +1,87 @@
 version: '3.8'
 
 services:
+
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-      args:
-        - NODE_ENV=local
-    image: nurulhadii/zentra-ui:local
-    container_name: zentra-ui-local
-    restart: always
+    image: nurulhadii/zentra-ui:dev
+    container_name: frontend_local
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=local
+      - NODE_ENV=development
+      - PORT=3000
       - API_URL=http://localhost:8080/api
       - ESHOP_URL=http://localhost:3001
       - PGADMIN_URL=http://localhost:5050
-    depends_on:
-      - backend
-    networks:
-      - local-network
 
   eshop:
-    build:
-      context: .
-      dockerfile: Dockerfile.eshop
-      args:
-        - NODE_ENV=local
-    image: nurulhadii/zentra-eshop:local
-    container_name: zentra-eshop-local
-    restart: always
+    image: nurulhadii/zentra-eshop:dev
+    container_name: eshop_local
     ports:
-      - "3001:3000"
+      - "3001:3001"
     environment:
-      - NODE_ENV=local
+      - NODE_ENV=development
+      - PORT=3001
       - API_URL=http://localhost:8080/api
-    depends_on:
-      - backend
-    networks:
-      - local-network
-
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.backend
-    image: nurulhadii/zentra-api:local
-    container_name: zentra-api-local
-    restart: always
-    ports:
-      - "8080:8080"
-    environment:
-      - GIN_MODE=debug
-      - POSTGRES_HOST=postgres
-      - POSTGRES_PORT=5432
-      - POSTGRES_DB=zentra_local
-      - POSTGRES_USER=zentra_local_admin
-      - POSTGRES_PASSWORD=zentra_local_123@#$
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - JWT_SECRET=local-jwt-secret-key
-      - JWT_REFRESH_SECRET=local-jwt-refresh-secret-key
-      - SERVER_PORT=8080
-    volumes:
-      - ./uploads:/app/uploads
-    depends_on:
-      - postgres
-      - elasticsearch
-    networks:
-      - local-network
+      - ESHOP_URL=http://localhost:3001
+      - PGADMIN_URL=http://localhost:5050
 
   postgres:
-    image: postgres:15-alpine
-    container_name: postgres-local
-    restart: always
+    image: postgres:15.4-alpine
+    container_name: zentra_postgres_local
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: zentra_local
-      POSTGRES_USER: zentra_local_admin
-      POSTGRES_PASSWORD: zentra_local_123@#$
+      - POSTGRES_USER=zentra_dev
+      - POSTGRES_PASSWORD=zentra_dev
+      - POSTGRES_DB=zentra_dev
     volumes:
-      - postgres_local_data:/var/lib/postgresql/data
-    networks:
-      - local-network
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zentra_dev -d zentra_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   pgadmin:
-    image: dpage/pgadmin4:7.1
-    container_name: pgadmin-local
-    restart: always
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_local
     ports:
       - "5050:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@zentra-api.com
-      - PGADMIN_DEFAULT_PASSWORD=admin123
-      - PGADMIN_CONFIG_SERVER_MODE=True
-      - PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED=False
+      PGADMIN_DEFAULT_EMAIL: admin@local.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
     depends_on:
       - postgres
-    networks:
-      - local-network
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.7.0
-    container_name: elasticsearch-local
-    restart: always
+    container_name: zentra_elasticsearch_local
+    ports:
+      - "9200:9200"
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - cluster.name=zentra-local
       - network.host=0.0.0.0
-    ports:
-      - "9200:9200"
     volumes:
-      - elasticsearch_local_data:/usr/share/elasticsearch/data
-    networks:
-      - local-network
+      - elasticsearch_data:/usr/share/elasticsearch/data
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.7.0
-    container_name: kibana-local
-    restart: always
+    container_name: zentra_kibana_local
+    ports:
+      - "5601:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - SERVER_NAME=localhost
-      - SERVER_PUBLICBASEURL=http://localhost:5601
       - SERVER_HOST=0.0.0.0
-    ports:
-      - "5601:5601"
     depends_on:
       - elasticsearch
-    networks:
-      - local-network
 
 volumes:
-  postgres_local_data:
-  elasticsearch_local_data:
-
-networks:
-  local-network:
-    driver: bridge 
+  postgres_data:
+  elasticsearch_data: 

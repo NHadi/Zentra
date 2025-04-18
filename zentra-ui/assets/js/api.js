@@ -96,8 +96,21 @@
             'Content-Type': 'application/json',
             'Authorization': token ? `Bearer ${token}` : '',
             'X-Tenant-ID': localStorage.getItem('tenant_id') || '',
-            'X-Environment': getEnvironment()
+            'X-Environment': getEnvironment(),
+            'Origin': window.location.origin
         };
+    }
+
+    // Generic fetch wrapper with credentials
+    async function fetchWithCredentials(url, options = {}) {
+        return fetch(url, {
+            ...options,
+            credentials: 'include',
+            headers: {
+                ...getHeaders(),
+                ...(options.headers || {})
+            }
+        });
     }
 
     // Authentication
@@ -108,6 +121,7 @@
             
             const response = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Environment': getEnvironment()
@@ -152,9 +166,7 @@
     // Users
     async function getUsers(page = 1, size = 10) {
         try {
-            const response = await fetch(`${getApiUrl()}/users?page=${page}&size=${size}`, {
-                headers: getHeaders()
-            });
+            const response = await fetchWithCredentials(`${getApiUrl()}/users?page=${page}&size=${size}`);
             
             if (!response.ok) {
                 const error = await response.json();
@@ -170,9 +182,8 @@
 
     async function createUser(userData) {
         try {
-            const response = await fetch(`${getApiUrl()}/users`, {
+            const response = await fetchWithCredentials(`${getApiUrl()}/users`, {
                 method: 'POST',
-                headers: getHeaders(),
                 body: JSON.stringify(userData),
             });
             
@@ -191,9 +202,7 @@
     // Menus
     async function getMenusByRole(roleId) {
         try {
-            const response = await fetch(`${getApiUrl()}/menus/by-role?role_id=${roleId}`, {
-                headers: getHeaders()
-            });
+            const response = await fetchWithCredentials(`${getApiUrl()}/menus/by-role?role_id=${roleId}`);
             
             if (!response.ok) {
                 const error = await response.json();

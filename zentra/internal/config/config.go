@@ -10,13 +10,14 @@ import (
 )
 
 type Config struct {
-	DBHost           string
-	DBUser           string
-	DBPassword       string
-	DBName           string
-	DBPort           string
-	JWTSecret        string
-	JWTRefreshSecret string
+	DBHost             string
+	DBUser             string
+	DBPassword         string
+	DBName             string
+	DBPort             string
+	JWTSecret          string
+	JWTRefreshSecret   string
+	CorsAllowedOrigins string
 }
 
 var (
@@ -53,14 +54,21 @@ func LoadConfig() (*Config, error) {
 	log.Printf("POSTGRES_DB: %s", os.Getenv("POSTGRES_DB"))
 	log.Printf("POSTGRES_USER: %s", os.Getenv("POSTGRES_USER"))
 
+	// Default CORS origins include both production and local development URLs
+	defaultCorsOrigins := "http://localhost:3000,http://localhost:3001," +
+		"https://bisnisqu.badamigroups.com,https://eshop.badamigroups.com," +
+		"https://dev.bisnisqu.badamigroups.com,https://dev.eshop.badamigroups.com," +
+		"https://staging.bisnisqu.badamigroups.com,https://staging.eshop.badamigroups.com"
+
 	return &Config{
-		DBHost:           getEnv("POSTGRES_HOST", "localhost"),
-		DBUser:           getEnv("POSTGRES_USER", "zentra_admin"),
-		DBPassword:       getEnv("POSTGRES_PASSWORD", "zentra_admin_123@#$"),
-		DBName:           getEnv("POSTGRES_DB", "zentra_production_managament"),
-		DBPort:           getEnv("POSTGRES_PORT", "5432"),
-		JWTSecret:        getEnv("JWT_SECRET", "your-secret-key"),
-		JWTRefreshSecret: getEnv("JWT_REFRESH_SECRET", "your-refresh-secret-key"),
+		DBHost:             getEnv("POSTGRES_HOST", "localhost"),
+		DBUser:             getEnv("POSTGRES_USER", "zentra_admin"),
+		DBPassword:         getEnv("POSTGRES_PASSWORD", "zentra_admin_123@#$"),
+		DBName:             getEnv("POSTGRES_DB", "zentra_production_managament"),
+		DBPort:             getEnv("POSTGRES_PORT", "5432"),
+		JWTSecret:          getEnv("JWT_SECRET", "your-secret-key"),
+		JWTRefreshSecret:   getEnv("JWT_REFRESH_SECRET", "your-refresh-secret-key"),
+		CorsAllowedOrigins: getEnv("CORS_ALLOWED_ORIGINS", defaultCorsOrigins),
 	}, nil
 }
 

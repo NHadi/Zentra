@@ -12,6 +12,10 @@ export const getBaseUrl = () => {
 export const config = {
     baseUrl: getApiUrl(),
     defaultHeaders: {
-        'Content-Type': 'application/json'
-    }
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    },
+    credentials: 'include',
+    mode: 'cors'
 }; 

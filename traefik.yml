@@ -1,0 +1,60 @@
+# Global configuration
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+# API and dashboard configuration
+api:
+  dashboard: true
+  insecure: false
+
+# Entrypoints configuration
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+# Providers configuration
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: traefik-net
+    watch: true
+  file:
+    directory: "/etc/traefik/config"
+    watch: true
+
+# Certificates configuration
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@badamigroups.com
+      storage: "/etc/traefik/acme.json"
+      keyType: RSA4096
+      httpChallenge:
+        entryPoint: web
+
+# Logging configuration
+log:
+  level: DEBUG
+  format: json
+
+accessLog:
+  filePath: "/var/log/traefik/access.log"
+  format: json
+  bufferingSize: 100
+
+# Ping configuration
+ping:
+  entryPoint: web
+
+# Servers transport configuration
+serversTransport:
+  insecureSkipVerify: false
+  maxIdleConnsPerHost: 100
+  forwardingTimeouts:
+    dialTimeout: "30s"
+    responseHeaderTimeout: "30s"
+    idleConnTimeout: "30s" 

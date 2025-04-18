@@ -10,7 +10,7 @@
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:8080
+// @host      ${SWAGGER_HOST}
 // @BasePath  /api
 
 // @securityDefinitions.apikey BearerAuth
@@ -18,7 +18,7 @@
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 
-// @schemes http https
+// @schemes https
 // @produce application/json
 // @consumes application/json
 
@@ -28,6 +28,8 @@ import (
 	"context"
 	"log"
 	"os"
+	"strings"
+	"zentra/docs"
 	_ "zentra/docs"
 	"zentra/internal/config"
 	"zentra/internal/handlers"
@@ -44,6 +46,15 @@ import (
 )
 
 func main() {
+	// Read environment variables
+	swaggerHost := os.Getenv("SWAGGER_HOST")
+	if swaggerHost == "" {
+		swaggerHost = "localhost:8080" // Default value for local development
+	}
+
+	// Replace ${SWAGGER_HOST} placeholder in Swagger docs
+	docs.SwaggerInfo.Host = strings.ReplaceAll(docs.SwaggerInfo.Host, "${SWAGGER_HOST}", swaggerHost)
+
 	// Initialize logger
 	logger, err := logging.NewLogger(
 		[]string{"http://localhost:9200"},
@@ -87,13 +98,7 @@ func main() {
 
 	r := gin.New()
 	r.Use(gin.Recovery())
-	// Health check endpoint
-	r.GET("/api/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "ok",
-			"message": "Service is healthy",
-		})
-	})
+
 	r.Use(middleware.LoggingMiddleware(logger))
 
 	// Add gin context to request context
@@ -105,20 +110,22 @@ func main() {
 
 	// Setup CORS middleware
 	r.Use(func(c *gin.Context) {
+		allowedOrigins := strings.Split(cfg.CorsAllowedOrigins, ",")
 		origin := c.Request.Header.Get("Origin")
-		if origin == "" {
-			// Allow all origins if no Origin header is present
-			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		} else {
-			// Allow the specific origin
-			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+
+		// Check if the origin is allowed
+		for _, allowed := range allowedOrigins {
+			if allowed == "*" || allowed == origin {
+				c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+				break
+			}
 		}
 
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Tenant-ID, X-Environment, Accept, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-Requested-With, x-environment, x-tenant-id")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
-		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length, Authorization, x-environment, x-tenant-id")
+		c.Writer.Header().Set("Access-Control-Max-Age", "3600")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
