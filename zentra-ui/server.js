@@ -1,15 +1,44 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const config = require('./config');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Ensure NODE_ENV is set
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+// Function to detect environment from hostname
+function detectEnvironment() {
+    const hostname = process.env.HOSTNAME || 'localhost';
+    console.log('Detecting environment from hostname:', hostname);
+
+    if (hostname.includes('staging.')) {
+        return 'staging';
+    } else if (hostname.includes('dev.')) {
+        return 'development';
+    } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'local';
+    } else if (hostname === 'zentra.badamigroups.com' || 
+               hostname === 'eshop.badamigroups.com' || 
+               hostname === 'bisnisqu.badamigroups.com') {
+        return 'production';
+    }
+    
+    return process.env.NODE_ENV || 'development';
+}
+
+// Ensure NODE_ENV is set based on hostname
+process.env.NODE_ENV = detectEnvironment();
 console.log('Starting server with NODE_ENV:', process.env.NODE_ENV);
+console.log('Environment variables:', {
+    API_URL: process.env.API_URL,
+    ESHOP_URL: process.env.ESHOP_URL,
+    PGADMIN_URL: process.env.PGADMIN_URL,
+    HOSTNAME: process.env.HOSTNAME
+});
 
 // Function to inject configuration into HTML
 function injectConfig(html, env) {
+    console.log(`[Config] Injecting configuration for environment: ${env}`);
+    
     const config = {
         local: {
             API_URL: process.env.API_URL || 'http://localhost:8080',
@@ -38,41 +67,55 @@ function injectConfig(html, env) {
     };
 
     const currentConfig = config[env];
+    console.log(`[Config] Current configuration:`, currentConfig);
+    
     const configScript = `<script>window.APP_CONFIG = ${JSON.stringify(currentConfig)};</script>`;
-    return html.replace('</head>', `${configScript}</head>`);
+    console.log(`[Config] Generated config script:`, configScript);
+    
+    // Ensure the config script is injected before the closing head tag
+    if (html.includes('</head>')) {
+        console.log('[Config] Found </head> tag, injecting config before it');
+        return html.replace('</head>', `${configScript}</head>`);
+    } else {
+        console.log('[Config] No </head> tag found, injecting at body start');
+        return html.replace('<body', `<body>${configScript}`);
+    }
 }
 
 // Serve static files from the Frontend directory
 app.use(express.static(path.join(__dirname)));
 
-// Handle HTML files with configuration injection
-app.get('*.html', (req, res) => {
-    const filePath = path.join(__dirname, req.path);
-    if (!require('fs').existsSync(filePath)) {
-        return res.status(404).send('File not found');
+// Middleware to inject configuration into HTML responses
+app.use((req, res, next) => {
+    if (req.path.endsWith('.html')) {
+        console.log(`[Request] Processing HTML file: ${req.path}`);
+        const filePath = path.join(__dirname, req.path);
+        if (fs.existsSync(filePath)) {
+            console.log(`[Request] File exists: ${filePath}`);
+            let html = fs.readFileSync(filePath, 'utf8');
+            console.log(`[Request] File content length: ${html.length}`);
+            html = injectConfig(html, process.env.NODE_ENV);
+            console.log(`[Request] Injected config into HTML`);
+            res.send(html);
+        } else {
+            console.log(`[Request] File not found: ${filePath}`);
+            next();
+        }
+    } else {
+        next();
     }
-    let html = require('fs').readFileSync(filePath, 'utf8');
-    html = injectConfig(html, process.env.NODE_ENV);
-    res.send(html);
-});
-
-// Special handling for component requests to return 404 if not found
-app.get('/components/*', (req, res, next) => {
-    const filePath = path.join(__dirname, req.path);
-    if (!require('fs').existsSync(filePath)) {
-        return res.status(404).send('Component not found');
-    }
-    next();
 });
 
 // Handle all other routes by serving index.html with configuration
 app.get('*', (req, res) => {
     // Skip if the request is for a static file
     if (req.path.includes('.')) {
+        console.log(`[Request] Serving static file: ${req.path}`);
         return res.sendFile(path.join(__dirname, req.path));
     }
     // For all other routes, serve index.html with configuration
-    let html = require('fs').readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+    console.log(`[Request] Serving index.html for route: ${req.path}`);
+    let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
     html = injectConfig(html, process.env.NODE_ENV);
     res.send(html);
 });

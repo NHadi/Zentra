@@ -1,8 +1,30 @@
 // API client for zentra backend
 (function() {
+    let config = null;
+    let configReady = false;
+    let configListeners = [];
+
+    // Function to notify listeners when config is ready
+    function notifyConfigReady() {
+        configListeners.forEach(callback => callback(config));
+        configListeners = [];
+    }
+
+    // Function to wait for config to be ready
+    function waitForConfig() {
+        return new Promise((resolve) => {
+            if (configReady) {
+                resolve(config);
+            } else {
+                configListeners.push(resolve);
+            }
+        });
+    }
+
     // Get configuration from window object
     function getConfig() {
-        console.log('Getting API configuration...');
+        console.log('[API] Getting API configuration...');
+        console.log('[API] Window.APP_CONFIG:', window.APP_CONFIG);
         
         // Check for server-injected configuration
         if (window.APP_CONFIG) {
@@ -42,7 +64,18 @@
             }
         };
 
-        return configs[environment];
+        const selectedConfig = configs[environment];
+        console.log('[API] Selected configuration:', selectedConfig);
+        return selectedConfig;
+    }
+
+    // Initialize configuration
+    function initializeConfig() {
+        console.log('[API] Initializing configuration...');
+        config = getConfig();
+        configReady = true;
+        console.log('[API] Configuration initialized:', config);
+        notifyConfigReady();
     }
 
     // Helper function to detect environment from URL
@@ -50,73 +83,134 @@
         const hostname = window.location.hostname;
         console.log('[API] Detecting environment from hostname:', hostname);
         
+        // Check for staging environment first
+        if (hostname.includes('staging.')) {
+            console.log('[API] Detected staging environment');
+            return 'staging';
+        }
+        
+        // Check for development environment
+        if (hostname.includes('dev.')) {
+            console.log('[API] Detected development environment');
+            return 'development';
+        }
+        
         // Check if running locally
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            console.log('[API] Detected local environment');
             return 'local';
         }
         
-        // Check environment based on subdomain
-        if (hostname.includes('dev.')) {
-            return 'development';
-        } else if (hostname.includes('staging.')) {
-            return 'staging';
-        } else if (hostname === 'bisnisqu.badamigroups.com' || 
-                   hostname === 'eshop.badamigroups.com' || 
-                   hostname === 'zentra.badamigroups.com') {
+        // Check for production environment
+        if (hostname === 'bisnisqu.badamigroups.com' || 
+            hostname === 'eshop.badamigroups.com' || 
+            hostname === 'zentra.badamigroups.com') {
+            console.log('[API] Detected production environment');
             return 'production';
         }
         
         // Default to local if running from file or unknown host
         if (hostname === '' || hostname === 'file' || hostname.startsWith('192.168.')) {
+            console.log('[API] Defaulting to local environment');
             return 'local';
         }
         
-        return 'local'; // Default to local if no match
+        // If no match found, try to detect from window.APP_CONFIG
+        if (window.APP_CONFIG && window.APP_CONFIG.ENVIRONMENT) {
+            console.log('[API] Using environment from window.APP_CONFIG:', window.APP_CONFIG.ENVIRONMENT);
+            return window.APP_CONFIG.ENVIRONMENT;
+        }
+        
+        console.log('[API] No environment match found, defaulting to local');
+        return 'local';
     }
-
-    // Initialize configuration
-    const config = getConfig();
-    console.log('[API] Using configuration:', config);
 
     // Get API URL from configuration
-    function getApiUrl() {
+    async function getApiUrl() {
+        if (!configReady) {
+            console.log('[API] Waiting for configuration to be ready...');
+            await waitForConfig();
+        }
         const baseUrl = config.API_URL;
-        // Remove trailing slash if present
-        return `${baseUrl.replace(/\/$/, '')}/api`;
+        const apiUrl = `${baseUrl.replace(/\/$/, '')}/api`;
+        console.log('[API] Generated API URL:', apiUrl);
+        return apiUrl;
     }
 
-    function getEnvironment() {
-        return config.ENVIRONMENT;
+    async function getEnvironment() {
+        if (!configReady) {
+            console.log('[API] Waiting for configuration to be ready...');
+            await waitForConfig();
+        }
+        const env = config.ENVIRONMENT;
+        console.log('[API] Current environment:', env);
+        return env;
     }
 
     // Get headers for authenticated requests
-    function getHeaders() {
+    async function getHeaders() {
+        if (!configReady) {
+            console.log('[API] Waiting for configuration to be ready...');
+            await waitForConfig();
+        }
         const token = localStorage.getItem('token');
-        return {
+        const tenantId = localStorage.getItem('tenant_id');
+        const headers = {
             'Content-Type': 'application/json',
             'Authorization': token ? `Bearer ${token}` : '',
-            'X-Tenant-ID': localStorage.getItem('tenant_id') || '',
-            'X-Environment': getEnvironment(),
+            'X-Tenant-ID': tenantId || '',
+            'X-Environment': await getEnvironment(),
             'Origin': window.location.origin
         };
+        console.log('[API] Generated headers:', headers);
+        return headers;
     }
 
     // Generic fetch wrapper with credentials
     async function fetchWithCredentials(url, options = {}) {
-        return fetch(url, {
-            ...options,
-            credentials: 'include',
-            headers: {
-                ...getHeaders(),
-                ...(options.headers || {})
-            }
-        });
+        if (!configReady) {
+            console.log('[API] Waiting for configuration to be ready...');
+            await waitForConfig();
+        }
+        
+        const apiUrl = await getApiUrl();
+        const fullUrl = url.startsWith('http') ? url : `${apiUrl}${url.startsWith('/') ? url : `/${url}`}`;
+        
+        console.log('[API] Making request to:', fullUrl);
+        console.log('[API] Request options:', options);
+        console.log('[API] Request headers:', await getHeaders());
+        
+        try {
+            const response = await fetch(fullUrl, {
+                ...options,
+                credentials: 'include',
+                headers: {
+                    ...(await getHeaders()),
+                    ...(options.headers || {})
+                }
+            });
+            
+            console.log('[API] Response status:', response.status);
+            console.log('[API] Response headers:', Object.fromEntries(response.headers.entries()));
+            
+            return response;
+        } catch (error) {
+            console.error('[API] Request failed:', error);
+            throw error;
+        }
+    }
+
+    // Initialize configuration when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeConfig);
+    } else {
+        initializeConfig();
     }
 
     // Authentication
     async function login(email, password) {
         try {
-            const apiUrl = getApiUrl();
+            const apiUrl = await getApiUrl();
             console.log('[API] Attempting login with API URL:', apiUrl);
             
             const response = await fetch(`${apiUrl}/auth/login`, {
@@ -124,7 +218,7 @@
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Environment': getEnvironment()
+                    'X-Environment': await getEnvironment()
                 },
                 body: JSON.stringify({ email, password }),
             });
@@ -166,7 +260,7 @@
     // Users
     async function getUsers(page = 1, size = 10) {
         try {
-            const response = await fetchWithCredentials(`${getApiUrl()}/users?page=${page}&size=${size}`);
+            const response = await fetchWithCredentials(`${await getApiUrl()}/users?page=${page}&size=${size}`);
             
             if (!response.ok) {
                 const error = await response.json();
@@ -182,7 +276,7 @@
 
     async function createUser(userData) {
         try {
-            const response = await fetchWithCredentials(`${getApiUrl()}/users`, {
+            const response = await fetchWithCredentials(`${await getApiUrl()}/users`, {
                 method: 'POST',
                 body: JSON.stringify(userData),
             });
@@ -202,7 +296,7 @@
     // Menus
     async function getMenusByRole(roleId) {
         try {
-            const response = await fetchWithCredentials(`${getApiUrl()}/menus/by-role?role_id=${roleId}`);
+            const response = await fetchWithCredentials(`${await getApiUrl()}/menus/by-role?role_id=${roleId}`);
             
             if (!response.ok) {
                 const error = await response.json();
@@ -219,8 +313,8 @@
     // Audits
     async function getAuditsByDateRange(startDate, endDate) {
         try {
-            const response = await fetch(`${getApiUrl()}/audits/date-range?start_date=${startDate}&end_date=${endDate}`, {
-                headers: getHeaders()
+            const response = await fetch(`${await getApiUrl()}/audits/date-range?start_date=${startDate}&end_date=${endDate}`, {
+                headers: await getHeaders()
             });
             
             if (!response.ok) {
@@ -237,8 +331,8 @@
 
     async function getAuditsByEntity(entityType, entityId) {
         try {
-            const response = await fetch(`${getApiUrl()}/audits/entity/${entityType}/${entityId}`, {
-                headers: getHeaders()
+            const response = await fetch(`${await getApiUrl()}/audits/entity/${entityType}/${entityId}`, {
+                headers: await getHeaders()
             });
             
             if (!response.ok) {
@@ -255,8 +349,8 @@
 
     async function getAuditsByTenant(tenantId) {
         try {
-            const response = await fetch(`${getApiUrl()}/audits/tenant/${tenantId}`, {
-                headers: getHeaders()
+            const response = await fetch(`${await getApiUrl()}/audits/tenant/${tenantId}`, {
+                headers: await getHeaders()
             });
             
             if (!response.ok) {
@@ -298,7 +392,7 @@
         getEnvironment,
         config: {
             environment: getEnvironment(),
-            baseUrl: config.API_URL
+            baseUrl: config?.API_URL
         },
         getUsers,
         createUser,
@@ -311,7 +405,7 @@
     };
 
     // Log the API initialization
-    console.log('[API] zentra API initialized with config:', window.zentra.config);
+    console.log('[API] zentra API initialized');
     
     // Dispatch an event when initialization is complete
     window.dispatchEvent(new Event('zentraApiReady'));

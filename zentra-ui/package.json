@@ -5,9 +5,9 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "local": "cross-env NODE_ENV=local node server.js",
-        "dev": "cross-env NODE_ENV=development node server.js",
-        "prod": "cross-env NODE_ENV=production node server.js"
+        "local": "cross-env NODE_ENV=local PORT=3000 API_URL=http://localhost:8080 ESHOP_URL=http://localhost:3001 PGADMIN_URL=http://localhost:5050 node server.js",
+        "dev": "cross-env NODE_ENV=development PORT=3000 API_URL=https://dev.zentra.badamigroups.com ESHOP_URL=https://dev.eshop.badamigroups.com PGADMIN_URL=https://dev.pgadmin.badamigroups.com node server.js",
+        "prod": "cross-env NODE_ENV=production PORT=3000 API_URL=https://zentra.badamigroups.com ESHOP_URL=https://eshop.badamigroups.com PGADMIN_URL=https://pgadmin.badamigroups.com node server.js"
     },
     "dependencies": {
         "express": "^4.18.2",

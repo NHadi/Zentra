@@ -5,7 +5,7 @@ services:
     container_name: traefik
     restart: always
     ports:
-      - "80:80"      # HTTP
+      - "80:80"      # HTTP - Required for ACME challenge
       - "443:443"    # HTTPS
     command:
       - "--api.insecure=false"
@@ -14,15 +14,14 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-net"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-      - "--entrypoints.web.http.redirections.entryPoint.permanent=true"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.zerossl.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.zerossl.acme.storage=/etc/traefik/acme.json"
+      - "--certificatesresolvers.zerossl.acme.httpchallenge=true"
+      - "--certificatesresolvers.zerossl.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.zerossl.acme.caserver=https://acme.zerossl.com/v2/DV90"
+      - "--certificatesresolvers.zerossl.acme.eab.kid=2YsNtypbR2F8IYffYc6bdQ"
+      - "--certificatesresolvers.zerossl.acme.eab.hmacencoded=2x_i41U1jBIAwQ-tp1ghEDxR3tyqZMKj96PNgObPKlzK7k0eOW4_7vyc8ndj-iz4MIzcBY9jMMuvVvt7v2F0zQ"
       - "--log.level=DEBUG"
       - "--accesslog=true"
       - "--accesslog.filepath=/var/log/traefik/access.log"
@@ -36,7 +35,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.${DOMAIN}`)"
       - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.dashboard.tls.certresolver=zerossl"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
 
@@ -46,7 +45,7 @@ services:
     container_name: frontend_dev
     restart: always
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV_DEV}
       - PORT=3000
       - API_URL=https://dev.zentra.${DOMAIN}
       - ESHOP_URL=https://dev.eshop.${DOMAIN}
@@ -64,7 +63,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.frontend-dev.rule=Host(`dev.bisnisqu.${DOMAIN}`)"
       - "traefik.http.routers.frontend-dev.entrypoints=websecure"
-      - "traefik.http.routers.frontend-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend-dev.tls.certresolver=zerossl"
       - "traefik.http.services.frontend-dev.loadbalancer.server.port=3000"
       - "traefik.http.middlewares.frontend-dev-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.frontend-dev.middlewares=frontend-dev-headers"
@@ -80,7 +79,7 @@ services:
     container_name: eshop_dev
     restart: always
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV_DEV}
       - PORT=3001
       - API_URL=https://dev.zentra.${DOMAIN}
       - ESHOP_URL=https://dev.eshop.${DOMAIN}
@@ -98,7 +97,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.eshop-dev.rule=Host(`dev.eshop.${DOMAIN}`)"
       - "traefik.http.routers.eshop-dev.entrypoints=websecure"
-      - "traefik.http.routers.eshop-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.eshop-dev.tls.certresolver=zerossl"
       - "traefik.http.services.eshop-dev.loadbalancer.server.port=3001"
       - "traefik.http.middlewares.eshop-dev-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.eshop-dev.middlewares=eshop-dev-headers"
@@ -120,7 +119,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB_DEV}
       - POSTGRES_USER=${POSTGRES_USER_DEV}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_DEV}
-      - ELASTICSEARCH_HOSTS=http://zentra_elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_HOSTS}
       - JWT_SECRET=${JWT_SECRET_DEV}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_DEV}
       - SERVER_PORT=8080
@@ -134,7 +133,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.zentra-dev.rule=Host(`dev.zentra.${DOMAIN}`)"
       - "traefik.http.routers.zentra-dev.entrypoints=websecure"
-      - "traefik.http.routers.zentra-dev.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.zentra-dev.tls.certresolver=zerossl"
       - "traefik.http.services.zentra-dev.loadbalancer.server.port=8080"
       - "traefik.http.routers.zentra-dev.service=zentra-dev"
     networks:
@@ -155,7 +154,7 @@ services:
     container_name: frontend_staging
     restart: always
     environment:
-      - NODE_ENV=staging
+      - NODE_ENV=${NODE_ENV_STAGING}
       - PORT=3000
       - API_URL=https://staging.zentra.${DOMAIN}
       - ESHOP_URL=https://staging.eshop.${DOMAIN}
@@ -173,7 +172,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.frontend-staging.rule=Host(`staging.bisnisqu.${DOMAIN}`)"
       - "traefik.http.routers.frontend-staging.entrypoints=websecure"
-      - "traefik.http.routers.frontend-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend-staging.tls.certresolver=zerossl"
       - "traefik.http.services.frontend-staging.loadbalancer.server.port=3000"
       - "traefik.http.middlewares.frontend-staging-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.frontend-staging.middlewares=frontend-staging-headers"
@@ -188,7 +187,7 @@ services:
     container_name: eshop_staging
     restart: always
     environment:
-      - NODE_ENV=staging
+      - NODE_ENV=${NODE_ENV_STAGING}
       - PORT=3001
       - API_URL=https://staging.zentra.${DOMAIN}
       - ESHOP_URL=https://staging.eshop.${DOMAIN}
@@ -205,7 +204,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.eshop-staging.rule=Host(`staging.eshop.${DOMAIN}`)"
       - "traefik.http.routers.eshop-staging.entrypoints=websecure"
-      - "traefik.http.routers.eshop-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.eshop-staging.tls.certresolver=zerossl"
       - "traefik.http.services.eshop-staging.loadbalancer.server.port=3001"
       - "traefik.http.middlewares.eshop-staging-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.eshop-staging.middlewares=eshop-staging-headers"
@@ -227,7 +226,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB_STAGING}
       - POSTGRES_USER=${POSTGRES_USER_STAGING}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_STAGING}
-      - ELASTICSEARCH_HOSTS=http://zentra_elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_HOSTS}
       - JWT_SECRET=${JWT_SECRET_STAGING}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_STAGING}
       - SERVER_PORT=8080
@@ -241,7 +240,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.zentra-staging.rule=Host(`staging.zentra.${DOMAIN}`)"
       - "traefik.http.routers.zentra-staging.entrypoints=websecure"
-      - "traefik.http.routers.zentra-staging.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.zentra-staging.tls.certresolver=zerossl"
       - "traefik.http.services.zentra-staging.loadbalancer.server.port=8080"
       - "traefik.http.routers.zentra-staging.service=zentra-staging"
     networks:
@@ -262,7 +261,7 @@ services:
     container_name: frontend_prod
     restart: always
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV_PROD}
       - PORT=3000
       - API_URL=https://zentra.${DOMAIN}
       - ESHOP_URL=https://eshop.${DOMAIN}
@@ -280,7 +279,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.frontend-prod.rule=Host(`bisnisqu.${DOMAIN}`)"
       - "traefik.http.routers.frontend-prod.entrypoints=websecure"
-      - "traefik.http.routers.frontend-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend-prod.tls.certresolver=zerossl"
       - "traefik.http.services.frontend-prod.loadbalancer.server.port=3000"
       - "traefik.http.middlewares.frontend-prod-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.frontend-prod.middlewares=frontend-prod-headers"
@@ -296,7 +295,7 @@ services:
     container_name: eshop_prod
     restart: always
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV_PROD}
       - PORT=3001
       - API_URL=https://zentra.${DOMAIN}
       - ESHOP_URL=https://eshop.${DOMAIN}
@@ -313,7 +312,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.eshop.rule=Host(`eshop.${DOMAIN}`)"
       - "traefik.http.routers.eshop.entrypoints=websecure"
-      - "traefik.http.routers.eshop.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.eshop.tls.certresolver=zerossl"
       - "traefik.http.services.eshop.loadbalancer.server.port=3001"
       - "traefik.http.middlewares.eshop-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.eshop.middlewares=eshop-headers"
@@ -332,7 +331,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB_PROD}
       - POSTGRES_USER=${POSTGRES_USER_PROD}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD_PROD}
-      - ELASTICSEARCH_HOSTS=http://zentra_elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_HOSTS}
       - JWT_SECRET=${JWT_SECRET_PROD}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET_PROD}
       - SERVER_PORT=8080
@@ -346,7 +345,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.zentra-prod.rule=Host(`zentra.${DOMAIN}`)"
       - "traefik.http.routers.zentra-prod.entrypoints=websecure"
-      - "traefik.http.routers.zentra-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.zentra-prod.tls.certresolver=zerossl"
       - "traefik.http.services.zentra-prod.loadbalancer.server.port=8080"
       - "traefik.http.routers.zentra-prod.service=zentra-prod"
     networks:
@@ -404,9 +403,9 @@ services:
       - traefik-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.badamigroups.com`)"
+      - "traefik.http.routers.pgadmin.rule=Host(`pgadmin.${DOMAIN}`)"
       - "traefik.http.routers.pgadmin.entrypoints=websecure"
-      - "traefik.http.routers.pgadmin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.pgadmin.tls.certresolver=zerossl"
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
       - "traefik.http.middlewares.pgadmin-headers.headers.customRequestHeaders.X-Script-Name=/pgadmin"
       - "traefik.http.middlewares.pgadmin-headers.headers.customRequestHeaders.X-Scheme=https"
@@ -421,6 +420,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - cluster.name=zentra-cluster
       - network.host=0.0.0.0
@@ -434,7 +434,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.elasticsearch.rule=Host(`elasticsearch.${DOMAIN}`)"
       - "traefik.http.routers.elasticsearch.entrypoints=websecure"
-      - "traefik.http.routers.elasticsearch.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.elasticsearch.tls.certresolver=zerossl"
       - "traefik.http.services.elasticsearch.loadbalancer.server.port=9200"
 
   kibana:
@@ -443,8 +443,9 @@ services:
     restart: always
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
       - SERVER_NAME=kibana.${DOMAIN}
-      - SERVER_PUBLICBASEURL=https://kibana.${DOMAIN}
+      - SERVER_PUBLICBASEURL=${KIBANA_SERVER_PUBLICBASEURL}
       - SERVER_HOST=0.0.0.0
     depends_on:
       - elasticsearch
@@ -456,7 +457,7 @@ services:
       - "traefik.docker.network=traefik-net"
       - "traefik.http.routers.kibana.rule=Host(`kibana.${DOMAIN}`)"
       - "traefik.http.routers.kibana.entrypoints=websecure"
-      - "traefik.http.routers.kibana.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.kibana.tls.certresolver=zerossl"
       - "traefik.http.services.kibana.loadbalancer.server.port=5601"
 
 volumes:
