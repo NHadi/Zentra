@@ -56,11 +56,28 @@ func main() {
 	docs.SwaggerInfo.Host = strings.ReplaceAll(docs.SwaggerInfo.Host, "${SWAGGER_HOST}", swaggerHost)
 
 	// Initialize logger
+	elasticHosts := strings.Split(os.Getenv("ELASTICSEARCH_HOSTS"), ",")
+	if len(elasticHosts) == 0 || elasticHosts[0] == "" {
+		elasticHosts = []string{"http://elasticsearch:9200"} // Default to docker service name
+	}
+
+	// Get environment-specific index name
+	indexPrefix := os.Getenv("ELASTICSEARCH_INDEX_PREFIX")
+	if indexPrefix == "" {
+		indexPrefix = "zentra-logs-"
+	}
+
+	envMode := os.Getenv("ENV_MODE")
+	if envMode == "" {
+		envMode = "Local" // Default to Local if not set
+	}
+	indexName := indexPrefix + strings.ToLower(envMode) // Will result in: zentra-logs-production, zentra-logs-staging, etc.
+
 	logger, err := logging.NewLogger(
-		[]string{"http://localhost:9200"},
-		"",
-		"",
-		"zentra-logs",
+		elasticHosts,
+		"", // No username
+		"", // No password
+		indexName,
 	)
 	if err != nil {
 		log.Fatal("Failed to initialize logger:", err)
