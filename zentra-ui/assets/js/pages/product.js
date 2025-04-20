@@ -1341,10 +1341,14 @@ window.ProductPage = class {
             e.data.id = result.id;
 
             // Handle image uploads if any
-            if (e.data.pendingImages && e.data.pendingImages.length > 0) {
-                for (const file of e.data.pendingImages) {
+            const pendingImages = formData.pendingImages || [];
+            if (pendingImages.length > 0) {
+                console.log('Processing pending images:', pendingImages);
+                for (const file of pendingImages) {
                     try {
+                        console.log('Uploading image:', file);
                         const uploadedImage = await zentra.uploadProductImage(result.id, file);
+                        console.log('Image uploaded successfully:', uploadedImage);
                         if (!e.data.images) {
                             e.data.images = [];
                         }
@@ -1354,7 +1358,9 @@ window.ProductPage = class {
                         DevExpress.ui.notify(`Failed to upload image: ${file.name}`, 'error', 3000);
                     }
                 }
-                delete e.data.pendingImages;
+                delete formData.pendingImages;
+                // Update form data
+                form.option('formData', formData);
             }
 
             DevExpress.ui.notify('Product created successfully', 'success', 3000);
