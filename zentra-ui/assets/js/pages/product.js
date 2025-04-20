@@ -1358,6 +1358,8 @@ window.ProductPage = class {
             }
 
             DevExpress.ui.notify('Product created successfully', 'success', 3000);
+            // Refresh the grid data
+            await this.loadData();
         } catch (error) {
             console.error('Error creating product:', error);
             e.cancel = true;
@@ -1481,6 +1483,8 @@ window.ProductPage = class {
             }
 
             DevExpress.ui.notify('Product updated successfully', 'success', 3000);
+            // Refresh the grid data
+            await this.loadData();
         } catch (error) {
             console.error('Error updating product:', error);
             e.cancel = true;
@@ -1492,6 +1496,8 @@ window.ProductPage = class {
         try {
             await zentra.deleteProduct(e.key.id);
             DevExpress.ui.notify('Product deleted successfully', 'success', 3000);
+            // Refresh the grid data
+            await this.loadData();
         } catch (error) {
             console.error('Error deleting product:', error);
             e.cancel = true;
