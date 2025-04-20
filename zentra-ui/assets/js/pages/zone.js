@@ -34,17 +34,49 @@ window.ZonePage = class {
 
     bindEvents() {
         // Office modal events
-        $('#officeModal').on('shown.bs.modal', () => {
-            this.renderOffices();
-            // Clear search box when modal opens
-            $('#officeSearchBox').val('');
-            this.officeFilter = '';
+        $('#officeModal').on('shown.bs.modal', async () => {
+            try {
+                // Load all offices first
+                const offices = await zentra.getOffices();
+                this.allOffices = offices;
+                
+                // Initialize selected offices from current zone
+                if (this.currentZone && this.currentZone.offices) {
+                    this.selectedOffices = new Set(this.currentZone.offices.map(o => o.id));
+                }
+                
+                this.renderOffices();
+                // Clear search box when modal opens
+                $('#officeSearchBox').val('');
+                this.officeFilter = '';
+                // Update selected count
+                this.updateSelectedCount();
+            } catch (error) {
+                console.error('Error loading offices:', error);
+                DevExpress.ui.notify('Failed to load offices', 'error', 3000);
+            }
         });
 
         $('#officeModal').on('hidden.bs.modal', () => {
             this.selectedOffices.clear();
             this.currentZone = null;
             this.officeFilter = '';
+            // Reset select all checkbox
+            $('#selectAllOffices').prop('checked', false);
+        });
+
+        // Select all checkbox
+        $('#selectAllOffices').on('change', (e) => {
+            const checked = e.target.checked;
+            if (checked) {
+                this.allOffices.forEach(office => {
+                    this.selectedOffices.add(office.id);
+                });
+            } else {
+                this.selectedOffices.clear();
+            }
+            this.renderOffices();
+            this.updateSelectedCount();
         });
 
         $('#saveOffices').on('click', () => {
@@ -58,7 +90,12 @@ window.ZonePage = class {
         });
     }
 
-    initialize() {
+    updateSelectedCount() {
+        const count = this.selectedOffices.size;
+        $('.selected-count .badge').text(count);
+    }
+
+    async initialize() {
         const gridElement = $('#zoneGrid');
         if (!gridElement.length) {
             console.error('Zone grid element not found');
@@ -68,6 +105,9 @@ window.ZonePage = class {
         if (this.grid) {
             this.grid.dispose();
         }
+
+        // Load regions first before initializing grid
+        await this.loadRegions();
 
         this.grid = $('#zoneGrid').dxDataGrid({
             dataSource: {
@@ -82,19 +122,66 @@ window.ZonePage = class {
                 {
                     dataField: 'name',
                     caption: 'Zone Name',
-                    validationRules: [{ type: 'required' }]
+                    validationRules: [{ type: 'required' }],
+                    cellTemplate: (container, options) => {
+                        $('<div>')
+                            .addClass('d-flex align-items-center')
+                            .append(
+                                $('<i>').addClass('fas fa-map-marker-alt mr-2 text-primary')
+                            )
+                            .append(
+                                $('<div>').addClass('d-flex flex-column')
+                                    .append(
+                                        $('<span>').addClass('font-weight-bold').text(options.data.name || '')
+                                    )
+                                    .append(
+                                        $('<small>')
+                                            .addClass('text-muted mt-1')
+                                            .css({
+                                                'font-size': '0.875em',
+                                                'line-height': '1.4',
+                                                'display': 'block',
+                                                'max-width': '400px',
+                                                'white-space': 'normal',
+                                                'overflow': 'hidden',
+                                                'text-overflow': 'ellipsis',
+                                                '-webkit-line-clamp': '2',
+                                                '-webkit-box-orient': 'vertical',
+                                                'display': '-webkit-box'
+                                            })
+                                            .text(options.data.description || 'No description')
+                                    )
+                            )
+                            .appendTo(container);
+                    }
                 },
                 {
                     dataField: 'description',
-                    caption: 'Description'
+                    caption: 'Description',
+                    validationRules: [{ type: 'required' }],
+                    visible: false
                 },
                 {
                     dataField: 'region_id',
                     caption: 'Region',
                     lookup: {
-                        dataSource: () => this.regions,
+                        dataSource: this.regions,
                         valueExpr: 'id',
                         displayExpr: 'name'
+                    },
+                    cellTemplate: (container, options) => {
+                        const region = this.regions.find(r => r.id === options.value);
+                        if (region) {
+                            $('<div>')
+                                .addClass('d-flex align-items-center')
+                                .append(
+                                    $('<i>').addClass('ni ni-map-big mr-2 text-info')
+                                )
+                                .append(
+                                    $('<span>').text(region.name)
+                                )
+                                .appendTo(container);
+                        }
                     }
                 },
                 {
@@ -104,28 +191,26 @@ window.ZonePage = class {
                     cellTemplate: (container, options) => {
                         if (!options.value || options.value.length === 0) {
                             $('<div>')
-                                .addClass('no-offices')
-                                .append($('<i>').addClass('ni ni-building'))
-                                .append($('<span>').text('No offices assigned'))
+                                .addClass('text-muted d-flex align-items-center')
+                                .append(
+                                    $('<i>').addClass('ni ni-building mr-2')
+                                )
+                                .append(
+                                    $('<span>').addClass('font-italic').text('No offices assigned')
+                                )
                                 .appendTo(container);
                             return;
                         }
 
                         const $container = $('<div>').addClass('office-container');
-                        
-                        // Group offices by type (if you have office types)
                         const offices = options.value;
                         
-                        // Create office badges
                         const $badgesContainer = $('<div>').addClass('office-badges-container');
-                        offices.forEach((office, index) => {
+                        offices.forEach(office => {
                             const $badge = $('<span>')
                                 .addClass('office-badge')
-                                .css('animation-delay', `${index * 0.1}s`)
                                 .append(
-                                    $('<i>')
-                                        .addClass('ni ni-building')
-                                        .css('margin-right', '6px')
+                                    $('<i>').addClass('ni ni-building')
                                 )
                                 .append(
                                     $('<span>').text(office.name)
@@ -205,16 +290,15 @@ window.ZonePage = class {
             },
             editing: {
                 mode: 'popup',
-                allowUpdating: true,
-                allowDeleting: true,
-                allowAdding: true,
                 popup: {
                     title: 'Zone Information',
                     showTitle: true,
                     width: 700,
-                    height: 325
+                    height: 'auto',
+                    position: { my: 'center', at: 'center', of: window }
                 },
                 form: {
+                    focusStateEnabled: true,
                     items: [
                         {
                             itemType: 'group',
@@ -222,29 +306,103 @@ window.ZonePage = class {
                             items: [
                                 {
                                     dataField: 'name',
-                                    isRequired: true
-                                },
-                                {
-                                    dataField: 'description',
-                                    editorType: 'dxTextArea',
+                                    label: { 
+                                        text: 'Zone Name',
+                                        visible: true
+                                    },
                                     editorOptions: {
-                                        height: 100
-                                    }
+                                        placeholder: 'Enter zone name',
+                                        stylingMode: 'filled',
+                                        labelMode: 'floating',
+                                        maxLength: 100
+                                    },
+                                    validationRules: [{ type: 'required', message: 'Zone name is required' }]
                                 },
                                 {
                                     dataField: 'region_id',
-                                    label: { text: 'Region' },
                                     editorType: 'dxSelectBox',
+                                    label: { 
+                                        text: 'Region',
+                                        visible: true
+                                    },
                                     editorOptions: {
-                                        dataSource: () => this.regions,
+                                        dataSource: this.regions,
                                         valueExpr: 'id',
-                                        displayExpr: 'name'
+                                        displayExpr: 'name',
+                                        placeholder: 'Select a region',
+                                        searchEnabled: true,
+                                        showClearButton: true,
+                                        stylingMode: 'filled',
+                                        labelMode: 'floating',
+                                        onInitialized: (e) => {
+                                            this.regionEditor = e.component;
+                                        }
+                                    },
+                                    validationRules: [{ type: 'required', message: 'Region is required' }]
+                                },
+                                {
+                                    dataField: 'description',
+                                    label: { 
+                                        text: 'Description',
+                                        visible: true
+                                    },
+                                    editorType: 'dxTextArea',
+                                    editorOptions: {
+                                        placeholder: 'Enter zone description',
+                                        height: 100,
+                                        stylingMode: 'filled',
+                                        labelMode: 'floating',
+                                        maxLength: 500
                                     }
                                 }
                             ]
                         }
                     ]
+                },
+                allowUpdating: true,
+                allowDeleting: true,
+                allowAdding: true
+            },
+            onInitNewRow: (e) => {
+                // Initialize with default values
+                e.data = {
+                    name: '',
+                    description: '',
+                    region_id: null
+                };
+            },
+            onEditorPreparing: (e) => {
+                if (e.dataField === "description") {
+                    const originalValueChanged = e.editorOptions.onValueChanged;
+                    e.editorOptions.onValueChanged = (args) => {
+                        if (originalValueChanged) {
+                            originalValueChanged(args);
+                        }
+                        // Update the data immediately
+                        if (e.row && e.row.data) {
+                            e.row.data.description = args.value || '';
+                        }
+                    };
                 }
+            },
+            onRowValidating: (e) => {
+                if (e.newData) {
+                    // Ensure description is included
+                    e.newData.description = e.newData.description || '';
+                }
+            },
+            onRowInserting: (e) => {
+                // Ensure description is included
+                e.data.description = e.data.description || '';
+                return this.handleRowInserting(e);
+            },
+            onRowUpdating: (e) => {
+                // Merge the changes while preserving description
+                e.newData = {
+                    ...e.newData,
+                    description: e.newData.description !== undefined ? e.newData.description : e.oldData.description || ''
+                };
+                return this.handleRowUpdating(e);
             },
             onContentReady: (e) => {
                 // Add export buttons after grid is fully loaded
@@ -254,16 +412,53 @@ window.ZonePage = class {
                 }
             },
             onInitialized: () => this.loadData(),
-            onRowInserting: (e) => this.handleRowInserting(e),
-            onRowUpdating: (e) => this.handleRowUpdating(e),
             onRowRemoving: (e) => this.handleRowRemoving(e)
         }).dxDataGrid('instance');
     }
 
+    async loadRegions() {
+        try {
+            const regions = await zentra.getRegions();
+            this.regions = regions || [];
+            
+            // Update region editor if it exists
+            if (this.regionEditor) {
+                this.regionEditor.option('dataSource', this.regions);
+            }
+            
+            // Update the grid's lookup column
+            if (this.grid) {
+                const regionColumn = this.grid.columnOption('region_id');
+                if (regionColumn) {
+                    this.grid.columnOption('region_id', 'lookup', {
+                        dataSource: this.regions,
+                        valueExpr: 'id',
+                        displayExpr: 'name'
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error loading regions:', error);
+            DevExpress.ui.notify('Failed to load regions', 'error', 3000);
+            this.regions = [];
+        }
+    }
+
     renderOffices() {
-        this.allOffices = this.getAllOffices();
-        const $officeList = $('.office-list').empty();
-        
+        const $officeList = $('.office-list-content');
+        $officeList.empty();
+
+        // Show loading state
+        if (!this.allOffices) {
+            $officeList.html(`
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading offices...
+                </div>
+            `);
+            return;
+        }
+
         // Filter offices based on search
         const filteredOffices = this.allOffices.filter(office => {
             if (!this.officeFilter) return true;
@@ -273,11 +468,11 @@ window.ZonePage = class {
                 office.address.toLowerCase().includes(this.officeFilter)
             );
         });
-        
+
         if (filteredOffices.length === 0) {
-            $officeList.append(`
-                <div class="no-results">
-                    <i class="ni ni-fat-remove"></i>
+            $officeList.html(`
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
                     <div class="h4 mb-1">No Results Found</div>
                     <p class="text-muted">
                         No offices match your search criteria. Try adjusting your search terms.
@@ -287,101 +482,55 @@ window.ZonePage = class {
             return;
         }
 
-        filteredOffices.forEach((office, index) => {
-            const $item = this.createOfficeItem(office)
-                .css('animation', `fadeInUp 0.2s ease-out ${index * 0.05}s forwards`)
-                .css('opacity', '0');
-            $officeList.append($item);
+        filteredOffices.forEach(office => {
+            const isSelected = this.selectedOffices.has(office.id);
+            const $officeItem = this.createOfficeItem(office, isSelected);
+            $officeList.append($officeItem);
+        });
+    }
+
+    createOfficeItem(office, isSelected) {
+        const $officeItem = $(`
+            <div class="office-item ${isSelected ? 'selected' : ''}" data-office-id="${office.id}">
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="office-${office.id}"
+                           ${isSelected ? 'checked' : ''}>
+                    <label class="custom-control-label" for="office-${office.id}"></label>
+                </div>
+                <div class="office-info">
+                    <div class="office-name">
+                        <span class="office-code">${office.code}</span>
+                        ${office.name}
+                    </div>
+                    <div class="office-details">
+                        ${office.address || 'No address provided'}
+                    </div>
+                </div>
+            </div>
+        `);
+
+        // Handle click on the entire office item
+        $officeItem.on('click', function(e) {
+            // Don't trigger if clicking the checkbox directly
+            if (!$(e.target).is('input[type="checkbox"]')) {
+                const checkbox = $(this).find('input[type="checkbox"]');
+                checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+            }
         });
 
-        // Add animation keyframes if not already present
-        if (!document.getElementById('office-animations')) {
-            const style = document.createElement('style');
-            style.id = 'office-animations';
-            style.textContent = `
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(10px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-    }
+        // Handle checkbox change
+        $officeItem.find('input[type="checkbox"]').on('change', (e) => {
+            const checked = e.target.checked;
+            if (checked) {
+                this.selectedOffices.add(office.id);
+            } else {
+                this.selectedOffices.delete(office.id);
+            }
+            this.updateSelectedCount();
+            $officeItem.toggleClass('selected', checked);
+        });
 
-    createOfficeItem(office) {
-        const $item = $('<div>').addClass('office-item');
-        
-        const $checkbox = $('<div>').addClass('custom-control custom-checkbox');
-        const $input = $('<input>')
-            .addClass('custom-control-input')
-            .attr({
-                type: 'checkbox',
-                id: `office-${office.id}`,
-                checked: this.selectedOffices.has(office.id)
-            })
-            .on('change', (e) => {
-                const checked = e.target.checked;
-                if (checked) {
-                    this.selectedOffices.add(office.id);
-                    $item.addClass('office-selected');
-                } else {
-                    this.selectedOffices.delete(office.id);
-                    $item.removeClass('office-selected');
-                }
-                
-                // Add ripple effect
-                const $ripple = $('<div>').addClass('ripple');
-                $checkbox.append($ripple);
-                setTimeout(() => $ripple.remove(), 1000);
-            });
-        
-        const $label = $('<label>')
-            .addClass('custom-control-label')
-            .attr('for', `office-${office.id}`);
-        
-        $checkbox.append($input, $label);
-        
-        const $info = $('<div>').addClass('office-info');
-        const $name = $('<div>').addClass('office-name d-flex align-items-center');
-        const $details = $('<div>').addClass('office-details');
-
-        // Add office code badge
-        const $badge = $('<span>')
-            .addClass('badge badge-soft-primary badge-pill ml-2')
-            .css('font-size', '10px')
-            .text(office.code);
-
-        // Highlight matching text if there's a filter
-        if (this.officeFilter) {
-            $name.html(this.highlightText(office.name, this.officeFilter));
-            $details.html(this.highlightText(`${office.address} | ${office.phone}`, this.officeFilter));
-        } else {
-            $name.text(office.name);
-            $details.text(`${office.address} | ${office.phone}`);
-        }
-
-        $name.append($badge);
-        $info.append($name, $details);
-        $item.append($checkbox, $info);
-
-        // Add selected state if office is selected
-        if (this.selectedOffices.has(office.id)) {
-            $item.addClass('office-selected');
-        }
-
-        return $item;
-    }
-
-    highlightText(text, filter) {
-        if (!filter) return text;
-        const regex = new RegExp(`(${filter})`, 'gi');
-        return text.replace(regex, '<mark>$1</mark>');
+        return $officeItem;
     }
 
     getAllOffices() {
@@ -402,14 +551,17 @@ window.ZonePage = class {
         if (!this.currentZone) return;
 
         try {
-            const offices = this.allOffices
-                .filter(o => this.selectedOffices.has(o.id));
+            const $saveBtn = $('#saveOffices');
+            $saveBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...');
+
+            const selectedOfficeIds = Array.from(this.selectedOffices);
+            const offices = this.allOffices.filter(o => selectedOfficeIds.includes(o.id));
 
             const updatedZone = await zentra.updateZone(this.currentZone.id, {
                 name: this.currentZone.name,
                 description: this.currentZone.description,
                 region_id: this.currentZone.region_id,
-                office_ids: Array.from(this.selectedOffices)
+                office_ids: selectedOfficeIds
             });
 
             // Update grid data
@@ -426,6 +578,8 @@ window.ZonePage = class {
         } catch (error) {
             console.error('Error saving offices:', error);
             DevExpress.ui.notify('Failed to update offices', 'error', 3000);
+        } finally {
+            $('#saveOffices').prop('disabled', false).html('Save Changes');
         }
     }
 
@@ -443,9 +597,24 @@ window.ZonePage = class {
 
     async handleRowInserting(e) {
         try {
-            const result = await zentra.createZone(e.data);
+            // Ensure we have regions loaded
+            if (this.regions.length === 0) {
+                await this.loadRegions();
+            }
+
+            const zoneData = {
+                name: e.data.name,
+                description: e.data.description || '',
+                region_id: e.data.region_id
+            };
+
+            console.log('Creating zone with data:', zoneData);
+
+            const result = await zentra.createZone(zoneData);
             e.data.id = result.id;
             DevExpress.ui.notify('Zone created successfully', 'success', 3000);
+            // Refresh grid data after successful creation
+            await this.loadData();
         } catch (error) {
             console.error('Error creating zone:', error);
             e.cancel = true;
@@ -455,8 +624,18 @@ window.ZonePage = class {
 
     async handleRowUpdating(e) {
         try {
-            await zentra.updateZone(e.key.id, {...e.oldData, ...e.newData});
+            const updatedData = {
+                name: e.newData.name !== undefined ? e.newData.name : e.oldData.name,
+                description: e.newData.description !== undefined ? e.newData.description : e.oldData.description || '',
+                region_id: e.newData.region_id !== undefined ? e.newData.region_id : e.oldData.region_id
+            };
+
+            console.log('Updating zone with data:', updatedData);
+
+            await zentra.updateZone(e.key.id, updatedData);
             DevExpress.ui.notify('Zone updated successfully', 'success', 3000);
+            // Refresh grid data after successful update
+            await this.loadData();
         } catch (error) {
             console.error('Error updating zone:', error);
             e.cancel = true;
@@ -468,6 +647,8 @@ window.ZonePage = class {
         try {
             await zentra.deleteZone(e.key.id);
             DevExpress.ui.notify('Zone deleted successfully', 'success', 3000);
+            // Refresh grid data after successful deletion
+            await this.loadData();
         } catch (error) {
             console.error('Error deleting zone:', error);
             e.cancel = true;

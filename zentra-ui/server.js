@@ -8,7 +8,6 @@ const port = process.env.PORT || 3000;
 // Function to detect environment from hostname
 function detectEnvironment() {
     const hostname = process.env.HOSTNAME || 'localhost';
-    console.log('Detecting environment from hostname:', hostname);
 
     if (hostname.includes('staging.')) {
         return 'staging';
@@ -27,18 +26,10 @@ function detectEnvironment() {
 
 // Ensure NODE_ENV is set based on hostname
 process.env.NODE_ENV = detectEnvironment();
-console.log('Starting server with NODE_ENV:', process.env.NODE_ENV);
-console.log('Environment variables:', {
-    API_URL: process.env.API_URL,
-    ESHOP_URL: process.env.ESHOP_URL,
-    PGADMIN_URL: process.env.PGADMIN_URL,
-    HOSTNAME: process.env.HOSTNAME
-});
 
 // Function to inject configuration into HTML
 function injectConfig(html, env) {
-    console.log(`[Config] Injecting configuration for environment: ${env}`);
-    
+
     const config = {
         local: {
             API_URL: process.env.API_URL || 'http://localhost:8080',
@@ -67,17 +58,13 @@ function injectConfig(html, env) {
     };
 
     const currentConfig = config[env];
-    console.log(`[Config] Current configuration:`, currentConfig);
     
     const configScript = `<script>window.APP_CONFIG = ${JSON.stringify(currentConfig)};</script>`;
-    console.log(`[Config] Generated config script:`, configScript);
     
     // Ensure the config script is injected before the closing head tag
     if (html.includes('</head>')) {
-        console.log('[Config] Found </head> tag, injecting config before it');
         return html.replace('</head>', `${configScript}</head>`);
     } else {
-        console.log('[Config] No </head> tag found, injecting at body start');
         return html.replace('<body', `<body>${configScript}`);
     }
 }

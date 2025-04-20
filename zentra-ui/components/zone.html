@@ -43,7 +43,20 @@
                 </div>
 
                 <!-- Offices List -->
-                <div class="office-list px-4 py-3"></div>
+                <div class="office-list px-4 py-3">
+                    <div class="office-list-header d-flex justify-content-between align-items-center mb-3">
+                        <div class="selected-count">
+                            <span class="badge badge-primary">0</span> offices selected
+                        </div>
+                        <div class="select-all">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="selectAllOffices">
+                                <label class="custom-control-label" for="selectAllOffices">Select All</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-list-content"></div>
+                </div>
             </div>
             <div class="modal-footer bg-light">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -85,12 +98,91 @@
     margin-right: 6px;
 }
 
-.office-badge:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(94, 114, 228, 0.25);
+/* Office List Styles */
+.office-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.office-list-content {
+    margin: 0 -1rem;
+}
+
+.office-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.office-item:hover {
+    background-color: #f8f9fa;
+}
+
+.office-item.selected {
+    background-color: #eaecfb;
+}
+
+.office-item .custom-control {
+    margin-right: 1rem;
+}
+
+.office-info {
+    flex: 1;
+}
+
+.office-name {
+    font-weight: 600;
+    color: #32325d;
+    margin-bottom: 0.25rem;
+}
+
+.office-code {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: #f6f9fc;
+    border-radius: 4px;
+    color: #8898aa;
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
+}
+
+.office-details {
+    font-size: 0.875rem;
+    color: #8898aa;
+}
+
+/* Loading and Empty States */
+.loading-state,
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #8898aa;
+}
+
+.loading-state i,
+.empty-state i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-state .h4 {
+    color: #32325d;
 }
 
 /* Office Modal Styles */
+.office-list-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 8px 0;
+    z-index: 1;
+    border-bottom: 1px solid #e9ecef;
+}
+
 .office-item {
     display: flex;
     align-items: flex-start;
@@ -100,11 +192,18 @@
     margin-bottom: 8px;
     transition: all 0.2s ease;
     background-color: white;
+    cursor: pointer;
 }
 
 .office-item:hover {
     border-color: #5e72e4;
     box-shadow: 0 2px 4px rgba(94, 114, 228, 0.1);
+    transform: translateY(-1px);
+}
+
+.office-item.selected {
+    border-color: #5e72e4;
+    background-color: rgba(94, 114, 228, 0.05);
 }
 
 .office-info {
@@ -123,6 +222,45 @@
     font-size: 12px;
     color: #8898aa;
     line-height: 1.4;
+}
+
+.office-code {
+    display: inline-block;
+    padding: 2px 6px;
+    background: rgba(44, 123, 229, 0.1);
+    color: #2c7be5;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-right: 8px;
+}
+
+/* Custom Scrollbar */
+.office-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.office-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.office-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.office-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Selection Animation */
+@keyframes selectPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.office-item.selected {
+    animation: selectPulse 0.3s ease;
 }
 
 /* Grid Action Buttons */

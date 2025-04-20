@@ -36,6 +36,8 @@ packages/
 .env.staging
 .env.production
 .env.multi
+.env.local
+.env.vps
 *.ps1
 *.sh
 *.conf

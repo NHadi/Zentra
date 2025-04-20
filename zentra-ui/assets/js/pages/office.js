@@ -371,14 +371,18 @@ window.OfficePage = class {
                                     dataField: 'phone',
                                     label: { text: 'Phone Number', showColon: true },
                                     editorOptions: {
-                                        placeholder: 'Enter phone number',
+                                        placeholder: 'Enter phone number (e.g., +6281284093225)',
                                         stylingMode: 'filled',
                                         showClearButton: true,
-                                        mask: '+99 (999) 999-9999',
-                                        maskRules: { "9": /[0-9]/ },
-                                        maskInvalidMessage: 'Please enter a valid phone number',
+                                        mask: '+9999999999999',
+                                        maskRules: { 
+                                            "9": /[0-9]/,
+                                            "+": /[+]/,
+                                        },
+                                        maskInvalidMessage: 'Please enter a valid phone number (e.g., +6281284093225)',
                                         inputAttr: {
-                                            'aria-label': 'Phone Number'
+                                            'aria-label': 'Phone Number',
+                                            'pattern': '^\\+62[0-9]{9,13}$'
                                         }
                                     }
                                 }
@@ -589,6 +593,7 @@ window.OfficePage = class {
 
             const result = await zentra.createOffice(officeData);
             e.data.id = result.id;
+            await this.loadData();
             gridUtils.showSuccess('Office created successfully');
         } catch (error) {
             e.cancel = true;
@@ -617,6 +622,7 @@ window.OfficePage = class {
             };
 
             await zentra.updateOffice(e.key.id, updatedData);
+            await this.loadData();
             gridUtils.showSuccess('Office updated successfully');
         } catch (error) {
             e.cancel = true;
@@ -627,6 +633,7 @@ window.OfficePage = class {
     async handleRowRemoving(e) {
         try {
             await zentra.deleteOffice(e.key.id);
+            await this.loadData();
             gridUtils.showSuccess('Office deleted successfully');
         } catch (error) {
             e.cancel = true;

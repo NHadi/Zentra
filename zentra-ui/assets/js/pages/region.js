@@ -377,15 +377,30 @@ window.RegionPage = class {
 
     async saveZones() {
         try {
+            if (!this.currentRegion || !this.currentRegion.id) {
+                throw new Error('No region selected for zone assignment');
+            }
+
             // Show loading state
             const $saveBtn = $('#saveZones');
             $saveBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...');
 
             await zentra.assignZones(this.currentRegion.id, Array.from(this.selectedZones));
+            
+            // Close modal first
             $('#zoneModal').modal('hide');
+            
+            // Clear selection and filter
+            this.selectedZones.clear();
+            this.zoneFilter = '';
+            $('#zoneSearchBox').val('');
+            
+            // Refresh grid data
             await this.loadData();
+            
             gridUtils.showSuccess('Zones assigned successfully');
         } catch (error) {
+            console.error('Error saving zones:', error);
             gridUtils.handleGridError(error, 'assigning zones');
         } finally {
             $('#saveZones').prop('disabled', false).html('Save Changes');
@@ -397,6 +412,8 @@ window.RegionPage = class {
             const result = await zentra.createRegion(e.data);
             e.data.id = result.id;
             gridUtils.showSuccess('Region created successfully');
+            // Refresh grid data after successful creation
+            await this.loadData();
         } catch (error) {
             e.cancel = true;
             gridUtils.handleGridError(error, 'creating region');
@@ -406,6 +423,8 @@ window.RegionPage = class {
     async handleRowUpdating(e) {
         try {
             await zentra.updateRegion(e.key.id, {...e.oldData, ...e.newData});
+            // Refresh grid data after successful creation
+            await this.loadData();
             gridUtils.showSuccess('Region updated successfully');
         } catch (error) {
             e.cancel = true;
@@ -417,6 +436,8 @@ window.RegionPage = class {
         try {
             await zentra.deleteRegion(e.key.id);
             gridUtils.showSuccess('Region deleted successfully');
+            // Refresh grid data after successful creation
+            await this.loadData();
         } catch (error) {
             e.cancel = true;
             gridUtils.handleGridError(error, 'deleting region');
