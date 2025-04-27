@@ -328,6 +328,9 @@ export class OrderPage {
     }
 }
 
+// Add the class to window object for compatibility with content loader
+window.OrderPage = OrderPage;
+
 // Initialize only if DevExtreme is loaded
 if (typeof DevExpress !== 'undefined' && !window.orderPageInstance) {
     window.orderPageInstance = new OrderPage();
