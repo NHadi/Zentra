@@ -1,10 +1,66 @@
+import { orderAPI } from '../../../api/modules/orders.js';
 import { gridUtils } from '../../../utils/gridUtils.js';
 import { getBaseUrl } from '../../../api/config.js';
 
 export class OrderGrid {
-    constructor(orderPage) {
-        this.orderPage = orderPage;
+    constructor(page) {
+        this.page = page;
         this.grid = null;
+    }
+
+    // Helper method to format currency in IDR
+    formatIDR(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+
+    // Helper methods for status and payment classes
+    getStatusClass(status) {
+        const statusClasses = {
+            pending: 'pending',
+            confirmed: 'in-production',
+            in_production: 'in-production',
+            quality_check: 'in-production',
+            ready_for_delivery: 'completed',
+            delivered: 'completed',
+            cancelled: 'cancelled'
+        };
+        return statusClasses[status] || 'pending';
+    }
+
+    getStatusIcon(status) {
+        const statusIcons = {
+            pending: 'fa-clock',
+            confirmed: 'fa-check',
+            in_production: 'fa-cogs',
+            quality_check: 'fa-clipboard-check',
+            ready_for_delivery: 'fa-box',
+            delivered: 'fa-truck',
+            cancelled: 'fa-times'
+        };
+        return statusIcons[status] || 'fa-clock';
+    }
+
+    getPaymentClass(status) {
+        const paymentClasses = {
+            paid: 'paid',
+            partial: 'partial',
+            unpaid: 'unpaid'
+        };
+        return paymentClasses[status] || 'unpaid';
+    }
+
+    getPaymentIcon(status) {
+        const paymentIcons = {
+            paid: 'fa-check-circle',
+            partial: 'fa-clock',
+            unpaid: 'fa-times-circle'
+        };
+        return paymentIcons[status] || 'fa-times-circle';
     }
 
     initialize() {
@@ -19,14 +75,7 @@ export class OrderGrid {
         }
 
         this.grid = $('#orderGrid').dxDataGrid({
-            dataSource: {
-                store: {
-                    type: 'array',
-                    key: 'id',
-                    data: []
-                }
-            },
-            remoteOperations: false,
+            dataSource: [],
             columns: [
                 {
                     dataField: 'order_number',
@@ -43,7 +92,7 @@ export class OrderGrid {
                             .append(
                                 $('<small>')
                                     .addClass('text-muted')
-                                    .text(new Date(order.created_at).toLocaleDateString())
+                                    .text(new Date(order.created_at).toLocaleDateString('id-ID'))
                             )
                             .appendTo(container);
                     }
@@ -151,7 +200,7 @@ export class OrderGrid {
                             .append(
                                 $('<div>')
                                     .addClass('mt-1 font-weight-bold')
-                                    .text(`$${options.data.total_amount.toFixed(2)}`)
+                                    .text(this.formatIDR(options.data.total_amount))
                             )
                             .appendTo(container);
                     }
@@ -163,13 +212,13 @@ export class OrderGrid {
                         hint: 'View Details',
                         icon: 'fas fa-eye',
                         onClick: (e) => {
-                            this.orderPage.showOrderDetails(e.row.data);
+                            this.page.showOrderDetails(e.row.data);
                         }
                     }, {
                         hint: 'Print Order',
                         icon: 'fas fa-print',
                         onClick: (e) => {
-                            this.orderPage.printInvoice(e.row.data);
+                            this.page.printInvoice(e.row.data);
                         }
                     }]
                 }
@@ -192,8 +241,7 @@ export class OrderGrid {
             masterDetail: {
                 enabled: true,
                 template: (container, options) => {
-                    // Use the OrderDetails class to render the detail view
-                    this.orderPage.orderDetails.render(container, options.data);
+                    this.renderDetailTemplate(container, options);
                 }
             }
         }).dxDataGrid('instance');
@@ -202,47 +250,811 @@ export class OrderGrid {
         gridUtils.addExportButtons(this.grid, 'orders');
     }
 
-    getStatusClass(status) {
-        const statusClasses = {
-            pending: 'pending',
-            confirmed: 'in-production',
-            in_production: 'in-production',
-            quality_check: 'in-production',
-            ready_for_delivery: 'completed',
-            delivered: 'completed',
-            cancelled: 'cancelled'
-        };
-        return statusClasses[status] || 'pending';
+    renderDetailTemplate(container, options) {
+        // Create a container for the details
+        const $detailContent = $('<div>').addClass('order-detail-container p-4');
+        
+        // Customer Information Section
+        const $customerInfo = this.renderCustomerInfo(options.data);
+
+        // Order Items Section
+        const $itemsSection = this.renderItemsSection(options.data);
+
+        // Production Timeline Section
+        const $timelineSection = this.renderTimelineSection(options.data);
+
+        // Append all sections to the container
+        $detailContent
+            .append($customerInfo)
+            .append($itemsSection)
+            .append($timelineSection);
+
+        // Append the detail content to the container
+        container.append($detailContent);
     }
 
-    getStatusIcon(status) {
-        const statusIcons = {
-            pending: 'fa-clock',
-            confirmed: 'fa-check',
-            in_production: 'fa-cogs',
-            quality_check: 'fa-clipboard-check',
-            ready_for_delivery: 'fa-box',
-            delivered: 'fa-truck',
-            cancelled: 'fa-times'
-        };
-        return statusIcons[status] || 'fa-clock';
+    renderCustomerInfo(order) {
+        return $('<div>')
+            .addClass('mb-4')
+            .append(
+                $('<h6>')
+                    .addClass('heading-small text-muted mb-3')
+                    .text('Customer Information')
+            )
+            .append(
+                $('<div>')
+                    .addClass('row')
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-4')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('Name')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(order.customer_name)
+                                    )
+                            )
+                    )
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-4')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('Email')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(order.customer_email)
+                                    )
+                            )
+                    )
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-4')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('Phone')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(order.customer_phone)
+                                    )
+                            )
+                    )
+            );
     }
 
-    getPaymentClass(status) {
-        const paymentClasses = {
-            paid: 'paid',
-            partial: 'partial',
-            unpaid: 'unpaid'
-        };
-        return paymentClasses[status] || 'unpaid';
+    renderItemsSection(order) {
+        const $itemsSection = $('<div>')
+            .addClass('mt-4')
+            .append(
+                $('<h6>')
+                    .addClass('heading-small text-muted mb-3')
+                    .text('Order Items')
+            );
+
+        // Create items grid
+        const $itemsGrid = $('<div>').addClass('order-items-grid');
+        $itemsSection.append($itemsGrid);
+
+        // Initialize items grid
+        $itemsGrid.dxDataGrid({
+            dataSource: order.order_items,
+            showBorders: true,
+            columns: [
+                {
+                    dataField: 'customization',
+                    caption: 'Jersey Details',
+                    cellTemplate: (container, options) => {
+                        const item = options.data;
+                        const customization = item.customization || {};
+                        const productDetail = item.product_detail || {};
+                        const imageUrl = item.main_photo;
+                        const fullImageUrl = imageUrl.startsWith('http') || imageUrl.startsWith(getBaseUrl())
+                            ? imageUrl
+                            : `${getBaseUrl()}${imageUrl}`;
+
+                        $('<div>')
+                            .addClass('d-flex align-items-center')
+                            .append(
+                                $('<div>')
+                                    .addClass('item-image mr-3')
+                                    .append(
+                                        $('<img>')
+                                            .attr('src', fullImageUrl)
+                                            .attr('alt', productDetail.name)
+                                            .addClass('img-fluid rounded')
+                                    )
+                            )
+                            .append(
+                                $('<div>')
+                                    .addClass('item-details')
+                                    .append(
+                                        $('<div>')
+                                            .addClass('font-weight-bold mb-1')
+                                            .text(productDetail.name)
+                                    )
+                                    .append(
+                                        $('<div>')
+                                            .addClass('font-weight-bold mb-1')
+                                            .text(`${item.size} - ${item.color}`)
+                                    )
+                                    .append(
+                                        $('<div>')
+                                            .addClass('item-customization')
+                                            .append(
+                                                customization.name ? 
+                                                    $('<span>')
+                                                        .addClass('customization-badge')
+                                                        .append($('<i>').addClass('fas fa-user mr-1'))
+                                                        .append(`${customization.name} #${customization.number}`) : 
+                                                    null
+                                            )
+                                    )
+                            )
+                            .appendTo(container);
+                    }
+                },
+                {
+                    dataField: 'quantity',
+                    caption: 'Quantity',
+                    width: 100
+                },
+                {
+                    dataField: 'unit_price',
+                    caption: 'Unit Price',
+                    width: 120,
+                    cellTemplate: (container, options) => {
+                        $('<div>')
+                            .text(this.formatIDR(options.value))
+                            .appendTo(container);
+                    }
+                },
+                {
+                    dataField: 'final_subtotal',
+                    caption: 'Total',
+                    width: 120,
+                    cellTemplate: (container, options) => {
+                        $('<div>')
+                            .addClass('font-weight-bold text-primary')
+                            .text(this.formatIDR(options.value))
+                            .appendTo(container);
+                    }
+                }
+            ]
+        });
+
+        return $itemsSection;
     }
 
-    getPaymentIcon(status) {
-        const paymentIcons = {
-            paid: 'fa-check-circle',
-            partial: 'fa-clock',
-            unpaid: 'fa-times-circle'
-        };
-        return paymentIcons[status] || 'fa-times-circle';
+    renderTimelineSection(order) {
+        return $('<div>')
+            .addClass('mt-4')
+            .append(
+                $('<h6>')
+                    .addClass('heading-small text-muted mb-3')
+                    .text('Production Timeline')
+            )
+            .append(
+                $('<div>')
+                    .addClass('production-timeline')
+                    .append(this.renderProductionTimeline(order))
+            );
+    }
+
+    renderProductionTimeline(order) {
+        const $timeline = $('<div>').addClass('production-timeline-container');
+        
+        // Add timeline header with date/time
+        $timeline.append(
+            $('<div>').addClass('timeline-header')
+                .append(
+                    $('<div>').addClass('timeline-date')
+                        .append($('<i>').addClass('far fa-calendar'))
+                        .append(new Date(order.created_at).toLocaleDateString('id-ID'))
+                )
+                .append(
+                    $('<div>').addClass('timeline-time')
+                        .append($('<i>').addClass('far fa-clock'))
+                        .append(new Date(order.created_at).toLocaleTimeString('id-ID'))
+                )
+        );
+
+        // Add timeline title
+        $timeline.append(
+            $('<h4>').addClass('timeline-main-title')
+                .text('Production Timeline')
+        );
+
+        // Create timeline content
+        const $timelineContent = $('<div>').addClass('timeline-content');
+        
+        // Add timeline stages
+        const stages = this.createTimelineStages(order);
+        stages.forEach((stage, index) => {
+            $timelineContent.append(this.renderTimelineStage(stage, index === stages.length - 1));
+        });
+
+        $timeline.append($timelineContent);
+
+        // Add timeline styles
+        const styles = `
+            .production-timeline-container {
+                padding: 20px;
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            }
+            
+            .timeline-header {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 15px;
+                color: #8898aa;
+                font-size: 0.875rem;
+            }
+            
+            .timeline-date, .timeline-time {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .timeline-main-title {
+                font-size: 1.25rem;
+                color: #32325d;
+                margin-bottom: 25px;
+                font-weight: 600;
+            }
+            
+            .timeline-content {
+                position: relative;
+                padding-left: 30px;
+            }
+            
+            .timeline-stage {
+                position: relative;
+                padding-bottom: 30px;
+                padding-left: 30px;
+            }
+            
+            .timeline-stage:before {
+                content: '';
+                position: absolute;
+                left: -2px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: #e9ecef;
+            }
+            
+            .timeline-stage:last-child {
+                padding-bottom: 0;
+            }
+            
+            .timeline-stage:last-child:before {
+                display: none;
+            }
+            
+            .timeline-stage-dot {
+                position: absolute;
+                left: -7px;
+                top: 0;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background: #5e72e4;
+                border: 2px solid #fff;
+                box-shadow: 0 0 0 2px #5e72e4;
+            }
+            
+            .timeline-stage.completed .timeline-stage-dot {
+                background: #2dce89;
+                box-shadow: 0 0 0 2px #2dce89;
+            }
+            
+            .timeline-stage.in-progress .timeline-stage-dot {
+                background: #fb6340;
+                box-shadow: 0 0 0 2px #fb6340;
+            }
+            
+            .timeline-stage-header {
+                margin-bottom: 15px;
+            }
+            
+            .timeline-stage-title {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #32325d;
+                margin-bottom: 5px;
+            }
+            
+            .timeline-stage-subtitle {
+                font-size: 0.875rem;
+                color: #8898aa;
+            }
+            
+            .timeline-stage-date {
+                font-size: 0.75rem;
+                color: #adb5bd;
+                margin-bottom: 10px;
+            }
+            
+            .timeline-tasks {
+                margin-top: 15px;
+            }
+            
+            .timeline-task {
+                background: #f6f9fc;
+                border-radius: 6px;
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .timeline-task:last-child {
+                margin-bottom: 0;
+            }
+            
+            .task-header {
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                border-radius: 6px;
+                transition: background-color 0.2s;
+            }
+            
+            .task-header:hover {
+                background-color: #f8f9fa;
+            }
+            
+            .task-header-left {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .task-title-group {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .collapse-icon {
+                font-size: 12px;
+                color: #8898aa;
+                transition: transform 0.2s;
+            }
+            
+            .expanded .collapse-icon {
+                transform: rotate(90deg);
+            }
+            
+            .task-progress-text {
+                font-size: 0.75rem;
+                color: #8898aa;
+            }
+            
+            .task-status-group {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            
+            .task-completion {
+                font-size: 0.75rem;
+                color: #2dce89;
+                font-weight: 600;
+            }
+            
+            .task-content {
+                padding: 0 15px;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out, padding 0.3s ease;
+            }
+            
+            .task-content:not(.collapsed) {
+                max-height: 1000px;
+                padding: 15px;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .task-items-grid {
+                margin-top: 15px;
+                border: 1px solid #e9ecef;
+                border-radius: 6px;
+                overflow: hidden;
+            }
+            
+            .grid-header {
+                display: grid;
+                grid-template-columns: 2fr 2fr 2fr 1fr;
+                background: #f8f9fa;
+                font-weight: 600;
+                color: #8898aa;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+            }
+            
+            .grid-row {
+                display: grid;
+                grid-template-columns: 2fr 2fr 2fr 1fr;
+                border-top: 1px solid #e9ecef;
+            }
+            
+            .grid-cell {
+                padding: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.875rem;
+                color: #525f7f;
+            }
+            
+            .grid-cell i {
+                color: #8898aa;
+                font-size: 0.875rem;
+            }
+            
+            .status-badge {
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+            
+            .status-badge.completed {
+                background: rgba(45, 206, 137, 0.1);
+                color: #2dce89;
+            }
+            
+            .status-badge.in_progress {
+                background: rgba(251, 99, 64, 0.1);
+                color: #fb6340;
+            }
+            
+            .status-badge.pending {
+                background: rgba(136, 152, 170, 0.1);
+                color: #8898aa;
+            }
+            
+            .timeline-task {
+                background: #fff;
+                border: 1px solid #e9ecef;
+                border-radius: 6px;
+                margin-bottom: 10px;
+                transition: box-shadow 0.2s;
+            }
+            
+            .timeline-task:hover {
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .timeline-task.expanded {
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            }
+        `;
+
+        // Add styles to document if not already present
+        if (!document.querySelector('#timeline-styles')) {
+            const styleSheet = document.createElement('style');
+            styleSheet.id = 'timeline-styles';
+            styleSheet.textContent = styles;
+            document.head.appendChild(styleSheet);
+        }
+
+        return $timeline;
+    }
+
+    createTimelineStages(order) {
+        const stages = [];
+
+        // Order Received Stage
+        stages.push({
+            icon: 'shopping-cart',
+            title: 'Order Received',
+            subtitle: `Order #${order.order_number}`,
+            date: new Date(order.created_at),
+            status: 'completed',
+            tasks: [{
+                status: 'completed',
+                name: 'Order Placement',
+                details: `Order placed by ${order.customer_name}`,
+                time: new Date(order.created_at)
+            }]
+        });
+
+        // Order Confirmed Stage
+        if (order.status !== 'pending') {
+            stages.push({
+                icon: 'check-circle',
+                title: 'Order Confirmed',
+                subtitle: 'Order verification complete',
+                date: new Date(order.updated_at),
+                status: 'completed',
+                tasks: [{
+                    status: 'completed',
+                    name: 'Order Verification',
+                    details: 'All order details have been verified and confirmed',
+                    time: new Date(order.updated_at)
+                }]
+            });
+        }
+
+        // Production Stage
+        if (order.status === 'in_production' || order.status === 'quality_check' || 
+            order.status === 'ready_for_delivery' || order.status === 'delivered') {
+            const productionStage = {
+                icon: 'cogs',
+                title: 'Production in Progress',
+                subtitle: 'Manufacturing and customization',
+                date: new Date(order.updated_at),
+                status: order.status === 'in_production' ? 'current' : 'completed',
+                tasks: []
+            };
+
+            // Group tasks by type
+            const tasksByType = {};
+            order.order_items.forEach(item => {
+                if (item.tasks) {
+                    item.tasks.forEach(task => {
+                        if (!tasksByType[task.task_type]) {
+                            tasksByType[task.task_type] = [];
+                        }
+                        tasksByType[task.task_type].push(task);
+                    });
+                }
+            });
+
+            // Add tasks to production stage
+            Object.entries(tasksByType).forEach(([type, tasks]) => {
+                const completed = tasks.filter(t => t.status === 'completed').length;
+                const total = tasks.length;
+                productionStage.tasks.push({
+                    status: completed === total ? 'completed' : 'in-progress',
+                    name: type.replace(/_/g, ' ').toUpperCase(),
+                    details: `${completed} of ${total} items completed`,
+                    progress: Math.round((completed / total) * 100),
+                    tasks: tasks
+                });
+            });
+
+            stages.push(productionStage);
+        }
+
+        // Quality Check Stage
+        if (order.status === 'quality_check' || order.status === 'ready_for_delivery' || 
+            order.status === 'delivered') {
+            stages.push({
+                icon: 'clipboard-check',
+                title: 'Quality Check',
+                subtitle: 'Final inspection and verification',
+                date: new Date(order.updated_at),
+                status: order.status === 'quality_check' ? 'current' : 'completed',
+                tasks: [{
+                    status: order.status === 'quality_check' ? 'in-progress' : 'completed',
+                    name: 'Quality Inspection',
+                    details: 'Verifying product quality and specifications',
+                    time: new Date(order.updated_at)
+                }]
+            });
+        }
+
+        // Ready for Delivery Stage
+        if (order.status === 'ready_for_delivery' || order.status === 'delivered') {
+            stages.push({
+                icon: 'box',
+                title: 'Ready for Delivery',
+                subtitle: 'Order packaging complete',
+                date: new Date(order.updated_at),
+                status: order.status === 'ready_for_delivery' ? 'current' : 'completed',
+                tasks: [{
+                    status: order.status === 'ready_for_delivery' ? 'in-progress' : 'completed',
+                    name: 'Order Packaging',
+                    details: 'Order has been packaged and is ready for delivery',
+                    time: new Date(order.updated_at)
+                }]
+            });
+        }
+
+        // Delivered Stage
+        if (order.status === 'delivered') {
+            stages.push({
+                icon: 'truck',
+                title: 'Order Delivered',
+                subtitle: 'Successfully delivered to customer',
+                date: new Date(order.updated_at),
+                status: 'completed',
+                tasks: [{
+                    status: 'completed',
+                    name: 'Delivery Confirmation',
+                    details: 'Order has been successfully delivered to the customer',
+                    time: new Date(order.updated_at)
+                }]
+            });
+        }
+
+        return stages;
+    }
+
+    renderTimelineStage(stage, isLast) {
+        const $stage = $('<div>').addClass(`timeline-stage ${stage.status}`);
+        
+        // Add stage dot
+        $stage.append($('<div>').addClass('timeline-stage-dot'));
+        
+        // Stage header
+        const $header = $('<div>').addClass('timeline-stage-header');
+        
+        $header.append(
+            $('<div>').addClass('timeline-stage-title')
+                .text(stage.title)
+        );
+        
+        $header.append(
+            $('<div>').addClass('timeline-stage-subtitle')
+                .text(stage.subtitle)
+        );
+        
+        $header.append(
+            $('<div>').addClass('timeline-stage-date')
+                .append($('<i>').addClass('far fa-calendar-alt mr-1'))
+                .append(stage.date.toLocaleDateString('id-ID'))
+                .append(' ')
+                .append($('<i>').addClass('far fa-clock mr-1'))
+                .append(stage.date.toLocaleTimeString('id-ID'))
+        );
+        
+        $stage.append($header);
+
+        // Tasks container
+        if (stage.tasks && stage.tasks.length > 0) {
+            const $tasks = $('<div>').addClass('timeline-tasks');
+            stage.tasks.forEach(task => {
+                $tasks.append(this.renderTimelineTask(task));
+            });
+            $stage.append($tasks);
+        }
+
+        return $stage;
+    }
+
+    renderTimelineTask(task) {
+        const $task = $('<div>').addClass('timeline-task');
+        
+        // Task header with collapse functionality
+        const $header = $('<div>').addClass('task-header')
+            .append(
+                $('<div>').addClass('task-header-left')
+                    .append(
+                        $('<div>').addClass('task-title-group')
+                            .append($('<i>').addClass('fas fa-chevron-right collapse-icon'))
+                            .append(
+                                $('<div>').addClass('task-title')
+                                    .text(task.name)
+                            )
+                    )
+                    .append(
+                        $('<div>').addClass('task-progress-text')
+                            .text(task.details)
+                    )
+            )
+            .append(
+                $('<div>').addClass('task-status-group')
+                    .append(
+                        $('<div>')
+                            .addClass(`task-status ${task.status}`)
+                            .text(task.status.replace(/-/g, ' ').toUpperCase())
+                    )
+                    .append(
+                        $('<div>').addClass('task-completion')
+                            .text(task.progress ? `${task.progress}%` : '')
+                    )
+            );
+
+        $task.append($header);
+
+        // Collapsible content
+        const $content = $('<div>').addClass('task-content collapsed');
+        
+        // Progress bar
+        if (task.progress !== undefined) {
+            $content.append(
+                $('<div>').addClass('task-progress')
+                    .append(
+                        $('<div>')
+                            .addClass('progress')
+                            .append(
+                                $('<div>')
+                                    .addClass('progress-bar')
+                                    .css('width', `${task.progress}%`)
+                            )
+                    )
+            );
+        }
+
+        // Task items grid for subtasks
+        if (task.tasks && task.tasks.length > 0) {
+            const $itemsGrid = $('<div>').addClass('task-items-grid');
+            
+            // Grid header
+            $itemsGrid.append(
+                $('<div>').addClass('grid-header')
+                    .append($('<div>').addClass('grid-cell').text('Employee'))
+                    .append($('<div>').addClass('grid-cell').text('Start Time'))
+                    .append($('<div>').addClass('grid-cell').text('End Time'))
+                    .append($('<div>').addClass('grid-cell').text('Status'))
+            );
+
+            // Grid rows
+            task.tasks.forEach(subtask => {
+                const $row = $('<div>').addClass('grid-row');
+                
+                // Employee cell
+                $row.append(
+                    $('<div>').addClass('grid-cell')
+                        .append($('<i>').addClass('fas fa-user'))
+                        .append(subtask.employee_name || 'N/A')
+                );
+                
+                // Start time cell
+                $row.append(
+                    $('<div>').addClass('grid-cell')
+                        .append($('<i>').addClass('far fa-play-circle'))
+                        .append(subtask.started_at ? 
+                            new Date(subtask.started_at).toLocaleString('id-ID') : 
+                            'Not started'
+                        )
+                );
+                
+                // End time cell
+                $row.append(
+                    $('<div>').addClass('grid-cell')
+                        .append($('<i>').addClass('far fa-check-circle'))
+                        .append(subtask.completed_at ? 
+                            new Date(subtask.completed_at).toLocaleString('id-ID') : 
+                            'In progress'
+                        )
+                );
+                
+                // Status cell
+                $row.append(
+                    $('<div>').addClass('grid-cell')
+                        .append(
+                            $('<span>')
+                                .addClass(`status-badge ${subtask.status}`)
+                                .text(subtask.status.toUpperCase())
+                        )
+                );
+                
+                $itemsGrid.append($row);
+            });
+            
+            $content.append($itemsGrid);
+        }
+
+        $task.append($content);
+
+        // Add click handler for collapse/expand
+        $header.on('click', () => {
+            $content.toggleClass('collapsed');
+            $header.find('.collapse-icon').toggleClass('fa-chevron-right fa-chevron-down');
+            $task.toggleClass('expanded');
+        });
+
+        return $task;
     }
 } 

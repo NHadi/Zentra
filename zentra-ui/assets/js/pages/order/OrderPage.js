@@ -130,7 +130,7 @@ export class OrderPage {
         $('#totalOrders').text(totalOrders);
         $('#inProduction').text(inProduction);
         $('#pendingOrders').text(pendingOrders);
-        $('#totalRevenue').text(`$${totalRevenue.toFixed(2)}`);
+        $('#totalRevenue').text(this.formatIDR(totalRevenue));
     }
 
     showOrderDetails(order) {
@@ -233,7 +233,7 @@ export class OrderPage {
                 <div class="invoice-header">
                     <h1 class="invoice-title">INVOICE</h1>
                     <p class="invoice-subtitle">Order #${order.order_number}</p>
-                    <p class="invoice-subtitle">Date: ${new Date(order.created_at).toLocaleDateString()}</p>
+                    <p class="invoice-subtitle">Date: ${new Date(order.created_at).toLocaleDateString('id-ID')}</p>
                 </div>
 
                 <div class="invoice-details">
@@ -272,8 +272,8 @@ export class OrderPage {
                                 <td>${item.size}</td>
                                 <td>${item.color}</td>
                                 <td>${item.quantity}</td>
-                                <td>$${item.unit_price.toFixed(2)}</td>
-                                <td>$${(item.quantity * item.unit_price).toFixed(2)}</td>
+                                <td>${this.formatIDR(item.unit_price)}</td>
+                                <td>${this.formatIDR(item.quantity * item.unit_price)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -282,15 +282,15 @@ export class OrderPage {
                 <div class="total-section">
                     <div class="total-row">
                         <span class="total-label">Subtotal:</span>
-                        <span class="total-value">$${order.subtotal.toFixed(2)}</span>
+                        <span class="total-value">${this.formatIDR(order.subtotal)}</span>
                     </div>
                     <div class="total-row">
                         <span class="total-label">Discount:</span>
-                        <span class="total-value">-$${order.discount_amount.toFixed(2)}</span>
+                        <span class="total-value">-${this.formatIDR(order.discount_amount)}</span>
                     </div>
                     <div class="total-row" style="font-size: 18px; font-weight: bold;">
                         <span class="total-label">Total Amount:</span>
-                        <span class="total-value">$${order.total_amount.toFixed(2)}</span>
+                        <span class="total-value">${this.formatIDR(order.total_amount)}</span>
                     </div>
                 </div>
 
@@ -325,6 +325,16 @@ export class OrderPage {
                 }
             });
         }
+    }
+
+    // Helper method to format currency in IDR
+    formatIDR(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
     }
 }
 
