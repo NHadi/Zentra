@@ -7,19 +7,19 @@ function detectEnvironment() {
     
     // Check for staging environment first
     if (hostname.includes('staging.')) {
-        console.log('[Config] Detected staging environment');
+        // console.log('[Config] Detected staging environment');
         return 'staging';
     }
     
     // Check for development environment
     if (hostname.includes('dev.')) {
-        console.log('[Config] Detected development environment');
+        // console.log('[Config] Detected development environment');
         return 'development';
     }
     
     // Check if running locally
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        console.log('[Config] Detected local environment');
+        // console.log('[Config] Detected local environment');
         return 'local';
     }
     
@@ -27,23 +27,23 @@ function detectEnvironment() {
     if (hostname === 'bisnisqu.badamigroups.com' || 
         hostname === 'eshop.badamigroups.com' || 
         hostname === 'zentra.badamigroups.com') {
-        console.log('[Config] Detected production environment');
+        // console.log('[Config] Detected production environment');
         return 'production';
     }
     
     // Default to local if running from file or unknown host
     if (hostname === '' || hostname === 'file' || hostname.startsWith('192.168.')) {
-        console.log('[Config] Defaulting to local environment');
+        // console.log('[Config] Defaulting to local environment');
         return 'local';
     }
     
     // If no match found, try to detect from window.APP_CONFIG
     if (window.APP_CONFIG && window.APP_CONFIG.ENVIRONMENT) {
-        console.log('[Config] Using environment from window.APP_CONFIG:', window.APP_CONFIG.ENVIRONMENT);
+        // console.log('[Config] Using environment from window.APP_CONFIG:', window.APP_CONFIG.ENVIRONMENT);
         return window.APP_CONFIG.ENVIRONMENT;
     }
     
-    console.log('[Config] No environment match found, defaulting to local');
+    // console.log('[Config] No environment match found, defaulting to local');
     return 'local';
 }
 
@@ -81,7 +81,7 @@ function getConfig() {
 
     // Use server-injected config if available, otherwise use environment-based config
     const config = window.APP_CONFIG || configs[environment];
-    console.log('[Config] Final configuration:', config);
+    // console.log('[Config] Final configuration:', config);
     return config;
 }
 
@@ -89,7 +89,7 @@ function getConfig() {
 export const getApiUrl = () => {
     const config = getConfig();
     const apiUrl = config.API_URL ? `${config.API_URL}/api` : 'http://localhost:8080/api';
-    console.log('[Config] Generated API URL:', apiUrl);
+    // console.log('[Config] Generated API URL:', apiUrl);
     return apiUrl;
 };
 
@@ -97,7 +97,7 @@ export const getApiUrl = () => {
 export const getBaseUrl = () => {
     const config = getConfig();
     const baseUrl = config.API_URL || 'http://localhost:8080';
-    console.log('[Config] Generated base URL:', baseUrl);
+    // console.log('[Config] Generated base URL:', baseUrl);
     return baseUrl;
 };
 

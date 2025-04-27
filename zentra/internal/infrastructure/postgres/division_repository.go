@@ -23,6 +23,8 @@ func NewDivisionRepository(db *gorm.DB) division.Repository {
 // Create creates a new division
 func (r *divisionRepository) Create(division *division.Division, ctx context.Context) error {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
+	// Always make sure ID is reset to zero for new records
+	division.ID = 0
 	division.TenantID = userCtx.TenantID
 	division.CreatedBy = userCtx.Username
 	division.UpdatedBy = userCtx.Username

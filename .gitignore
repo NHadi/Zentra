@@ -1,4 +1,3 @@
-
 #Ignore thumbnails created by Windows
 Thumbs.db
 #Ignore files built by Visual Studio
@@ -42,3 +41,7 @@ packages/
 *.sh
 *.conf
 node_modules
+# Mintlify
+.mintlify
+.vercel
+.next

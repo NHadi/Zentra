@@ -102,6 +102,7 @@ func CreateDivision(service *application.DivisionService) gin.HandlerFunc {
 		}
 
 		division := &division.Division{
+			ID:          0, // Explicitly set to 0 to ensure auto-increment
 			Name:        req.Name,
 			Description: req.Description,
 		}

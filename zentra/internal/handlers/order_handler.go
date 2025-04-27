@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -108,6 +109,14 @@ type UpdateOrderRequest struct {
 
 // UpdateOrderStatusRequest represents the request structure for updating order status
 type UpdateOrderStatusRequest struct {
+	Status            string `json:"status" binding:"required" example:"in_production"`
+	SendNotification  bool   `json:"send_notification" example:"true"`
+	AdditionalMessage string `json:"additional_message" example:"Your order will be ready in 2 days"`
+}
+
+// BulkUpdateOrderStatusRequest represents the request structure for bulk updating order statuses
+type BulkUpdateOrderStatusRequest struct {
+	OrderIDs          []int  `json:"order_ids" binding:"required" example:"[1, 2, 3]"`
 	Status            string `json:"status" binding:"required" example:"in_production"`
 	SendNotification  bool   `json:"send_notification" example:"true"`
 	AdditionalMessage string `json:"additional_message" example:"Your order will be ready in 2 days"`
@@ -656,6 +665,88 @@ func getTemplateParams(order *order.Order, status string, additionalMessage stri
 			order.OrderNumber,
 			status,
 			additionalMessage,
+		}
+	}
+}
+
+// @Summary Bulk update order statuses
+// @Description Update multiple orders' statuses and optionally send WhatsApp notifications
+// @Tags Order
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param X-Tenant-ID header string true "Tenant ID"
+// @Param request body BulkUpdateOrderStatusRequest true "Bulk Status Update Data"
+// @Success 200 {object} SuccessResponse
+// @Failure 400 {object} ErrorResponse "Invalid request parameters"
+// @Failure 401 {object} ErrorResponse "Unauthorized"
+// @Failure 403 {object} ErrorResponse "Forbidden"
+// @Failure 500 {object} ErrorResponse "Internal server error"
+// @Router /orders/bulk-status-update [put]
+func BulkUpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req BulkUpdateOrderStatusRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+			return
+		}
+
+		// Validate status
+		validStatuses := map[string]bool{
+			"pending":            true,
+			"confirmed":          true,
+			"in_production":      true,
+			"quality_check":      true,
+			"ready_for_delivery": true,
+			"delivered":          true,
+			"cancelled":          true,
+		}
+
+		if !validStatuses[req.Status] {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid status value"})
+			return
+		}
+
+		// Process each order
+		failedOrders := make([]int, 0)
+		successCount := 0
+
+		for _, orderID := range req.OrderIDs {
+			// Get existing order
+			order, err := service.FindByID(orderID, c)
+			if err != nil {
+				failedOrders = append(failedOrders, orderID)
+				continue
+			}
+
+			// Update status
+			order.Status = req.Status
+
+			// Update the order
+			if err := service.Update(order, c); err != nil {
+				failedOrders = append(failedOrders, orderID)
+				continue
+			}
+
+			// Send WhatsApp notification if requested
+			if req.SendNotification {
+				if err := sendWhatsAppNotification(order, req.Status, req.AdditionalMessage); err != nil {
+					// Log the error but don't fail the request
+					log.Printf("Failed to send WhatsApp notification for order %d: %v", orderID, err)
+				}
+			}
+
+			successCount++
+		}
+
+		// Return response with success count and failed orders
+		if len(failedOrders) > 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"message":       fmt.Sprintf("Updated %d orders successfully", successCount),
+				"failed_orders": failedOrders,
+			})
+		} else {
+			c.JSON(http.StatusOK, SuccessResponse{Message: fmt.Sprintf("Updated %d orders successfully", successCount)})
 		}
 	}
 }

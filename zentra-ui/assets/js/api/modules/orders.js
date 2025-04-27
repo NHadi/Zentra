@@ -103,7 +103,7 @@ export const orderAPI = {
         }
     },
 
-    async updateOrderStatus(orderId, status) {
+    async updateOrderStatus(orderId, statusData) {
         try {
             const response = await fetch(`${config.baseUrl}/orders/${orderId}/status`, {
                 method: 'PUT',
@@ -111,7 +111,7 @@ export const orderAPI = {
                     ...getAuthHeaders(),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ status })
+                body: JSON.stringify(statusData)
             });
 
             if (!response.ok) {
@@ -122,6 +122,32 @@ export const orderAPI = {
             return await response.json();
         } catch (error) {
             console.error('Update order status error:', error);
+            throw error;
+        }
+    },
+
+    async bulkUpdateOrderStatus(orderIds, statusData) {
+        try {
+            const response = await fetch(`${config.baseUrl}/orders/bulk-status-update`, {
+                method: 'PUT',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    order_ids: orderIds,
+                    ...statusData
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to bulk update order status');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Bulk update order status error:', error);
             throw error;
         }
     },

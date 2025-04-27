@@ -155,45 +155,46 @@ window.ProductCategoryPage = class {
                 popup: {
                     title: 'Product Category Information',
                     showTitle: true,
+                    showCloseButton: true,
                     width: 700,
-                    height: 325
+                    height: 400,
+                    position: {
+                        my: 'center',
+                        at: 'center',
+                        of: window
+                    }
                 },
                 form: {
+                    colCount: 1,
                     items: [
                         {
-                            itemType: 'group',
-                            colCount: 1,
-                            items: [
-                                {
-                                    dataField: 'name',
-                                    isRequired: true,
-                                    editorOptions: {
-                                        placeholder: 'Enter category name'
-                                    }
-                                },
-                                {
-                                    dataField: 'code',
-                                    isRequired: true,
-                                    editorOptions: {
-                                        placeholder: 'Enter category code'
-                                    }
-                                },
-                                {
-                                    dataField: 'description',
-                                    editorType: 'dxTextArea',
-                                    editorOptions: {
-                                        height: 100,
-                                        placeholder: 'Enter category description'
-                                    }
-                                },
-                                {
-                                    dataField: 'is_active',
-                                    editorType: 'dxSwitch',
-                                    editorOptions: {
-                                        text: 'Active Status'
-                                    }
-                                }
-                            ]
+                            dataField: 'name',
+                            isRequired: true,
+                            editorOptions: {
+                                placeholder: 'Enter category name'
+                            }
+                        },
+                        {
+                            dataField: 'code',
+                            isRequired: true,
+                            editorOptions: {
+                                placeholder: 'Enter category code'
+                            }
+                        },
+                        {
+                            dataField: 'description',
+                            editorType: 'dxTextArea',
+                            editorOptions: {
+                                height: 100,
+                                placeholder: 'Enter category description'
+                            }
+                        },
+                        {
+                            dataField: 'is_active',
+                            editorType: 'dxSwitch',
+                            editorOptions: {
+                                text: 'Active Status'
+                            }
                         }
                     ]
                 }

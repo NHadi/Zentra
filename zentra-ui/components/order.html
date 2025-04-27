@@ -107,6 +107,11 @@
                     <div class="col">
                         <h3 class="mb-0">Order Management</h3>
                     </div>
+                    <div class="col text-right">
+                        <button type="button" id="createOrderBtn" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Create Order
+                        </button>
+                    </div>
                 </div>
             </div>
             <!-- Card Body -->
@@ -329,6 +334,350 @@
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Order Modal -->
+<div class="modal fade" id="createOrderModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle mr-2"></i>
+                    <span>Create New Order</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createOrderForm">
+                    <!-- Customer Information -->
+                    <h6 class="heading-small text-muted mb-4">Customer Information</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-order-number">Order Number</label>
+                                    <input type="text" id="input-order-number" name="orderNumber" class="form-control" placeholder="e.g. ORD-001" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-customer-name">Customer Name</label>
+                                    <input type="text" id="input-customer-name" name="customerName" class="form-control" placeholder="Full Name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-customer-email">Email</label>
+                                    <input type="email" id="input-customer-email" name="customerEmail" class="form-control" placeholder="Email Address" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-customer-phone">Phone</label>
+                                    <input type="text" id="input-customer-phone" name="customerPhone" class="form-control" placeholder="Phone Number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Information -->
+                    <hr class="my-4">
+                    <h6 class="heading-small text-muted mb-4">Delivery Information</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-delivery-address">Delivery Address</label>
+                                    <textarea id="input-delivery-address" name="deliveryAddress" class="form-control" rows="3" placeholder="Delivery Address"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-office">Office</label>
+                                    <select id="input-office" name="officeId" class="form-control" required>
+                                        <option value="">Select Office</option>
+                                        <!-- Office options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-expected-delivery">Expected Delivery Date</label>
+                                    <input type="date" id="input-expected-delivery" name="expectedDeliveryDate" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Details -->
+                    <hr class="my-4">
+                    <h6 class="heading-small text-muted mb-4">Order Details</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-subtotal">Subtotal</label>
+                                    <input type="number" step="0.01" id="input-subtotal" name="subtotal" class="form-control" placeholder="0.00" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-discount">Discount</label>
+                                    <input type="number" step="0.01" id="input-discount" name="discountAmount" class="form-control" placeholder="0.00" value="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-total">Total Amount</label>
+                                    <input type="number" step="0.01" id="input-total" name="totalAmount" class="form-control" placeholder="0.00" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-status">Status</label>
+                                    <select id="input-status" name="status" class="form-control" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="in_production">In Production</option>
+                                        <option value="quality_check">Quality Check</option>
+                                        <option value="ready_for_delivery">Ready for Delivery</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-payment-status">Payment Status</label>
+                                    <select id="input-payment-status" name="paymentStatus" class="form-control" required>
+                                        <option value="unpaid">Unpaid</option>
+                                        <option value="partial">Partial</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="input-notes">Notes</label>
+                                    <textarea id="input-notes" name="notes" class="form-control" rows="3" placeholder="Order Notes"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add this after the Order Details section in the Create Order Modal -->
+                    <hr class="my-4">
+                    <h6 class="heading-small text-muted mb-4">Order Items</h6>
+                    <div id="orderItemsSection" class="pl-lg-4">
+                        <div class="row align-items-end">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Product</label>
+                                    <select id="productSelect" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>Quantity</label>
+                                    <input type="number" id="itemQuantity" class="form-control" min="1" value="1">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>Size</label>
+                                    <input type="text" id="itemSize" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>Color</label>
+                                    <input type="text" id="itemColor" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <button type="button" id="addItemBtn" class="btn btn-primary btn-block">Add Item</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <table class="table table-sm" id="orderItemsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th><th>Quantity</th><th>Size</th><th>Color</th><th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveOrder">Create Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Order Modal -->
+<div class="modal fade" id="editOrderModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit mr-2"></i>
+                    <span>Edit Order</span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editOrderForm">
+                    <input type="hidden" id="edit-order-id" name="orderId">
+                    <!-- Customer Information -->
+                    <h6 class="heading-small text-muted mb-4">Customer Information</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-order-number">Order Number</label>
+                                    <input type="text" id="edit-order-number" class="form-control" disabled>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-customer-name">Customer Name</label>
+                                    <input type="text" id="edit-customer-name" name="customerName" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-customer-email">Email</label>
+                                    <input type="email" id="edit-customer-email" name="customerEmail" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-customer-phone">Phone</label>
+                                    <input type="text" id="edit-customer-phone" name="customerPhone" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delivery Information -->
+                    <hr class="my-4">
+                    <h6 class="heading-small text-muted mb-4">Delivery Information</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-delivery-address">Delivery Address</label>
+                                    <textarea id="edit-delivery-address" name="deliveryAddress" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-office">Office</label>
+                                    <select id="edit-office" name="officeId" class="form-control" required>
+                                        <option value="">Select Office</option>
+                                        <!-- Office options will be populated dynamically -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-expected-delivery">Expected Delivery Date</label>
+                                    <input type="date" id="edit-expected-delivery" name="expectedDeliveryDate" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Details -->
+                    <hr class="my-4">
+                    <h6 class="heading-small text-muted mb-4">Order Details</h6>
+                    <div class="pl-lg-4">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-subtotal">Subtotal</label>
+                                    <input type="number" step="0.01" id="edit-subtotal" name="subtotal" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-discount">Discount</label>
+                                    <input type="number" step="0.01" id="edit-discount" name="discountAmount" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-total">Total Amount</label>
+                                    <input type="number" step="0.01" id="edit-total" name="totalAmount" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-status">Status</label>
+                                    <select id="edit-status" name="status" class="form-control" required>
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="in_production">In Production</option>
+                                        <option value="quality_check">Quality Check</option>
+                                        <option value="ready_for_delivery">Ready for Delivery</option>
+                                        <option value="delivered">Delivered</option>
+                                        <option value="cancelled">Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-payment-status">Payment Status</label>
+                                    <select id="edit-payment-status" name="paymentStatus" class="form-control" required>
+                                        <option value="unpaid">Unpaid</option>
+                                        <option value="partial">Partial</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="edit-notes">Notes</label>
+                                    <textarea id="edit-notes" name="notes" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateOrder">Save Changes</button>
             </div>
         </div>
     </div>

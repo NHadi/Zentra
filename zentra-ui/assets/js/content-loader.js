@@ -978,10 +978,10 @@
                             existingScript.remove();
                         }
 
-                        // Create a script element with type="module" to load the order.js module
+                        // Create a script element with type="module" to load the OrderPage.js module
                         const script = document.createElement('script');
                         script.type = 'module';
-                        script.src = './assets/js/pages/order.js';
+                        script.src = './assets/js/pages/order/OrderPage.js';
                         script.setAttribute('data-page', 'order');
                         
                         // Handle script load/error

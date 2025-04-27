@@ -1,6 +1,40 @@
 version: '3.8'
 
 services:
+  backend:
+    image: nurulhadii/zentra-api:dev
+    container_name: zentra_backend_local
+    ports:
+      - "8080:8080"
+    environment:
+      - GIN_MODE=debug
+      - ENV_MODE=Local
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ELASTICSEARCH_HOSTS=${ELASTICSEARCH_HOSTS}
+      - ELASTICSEARCH_INDEX_PREFIX=${ELASTICSEARCH_INDEX_PREFIX}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - SERVER_PORT=8080
+      - BACKUP_PATH=/backups
+      - ENABLE_PUBLIC_HEALTH=true
+    volumes:
+      - ./uploads:/app/uploads
+      - ./backups:/backups
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    env_file:
+      - .env.local
+
   eshop:
     image: nurulhadii/zentra-eshop:dev
     container_name: eshop_local

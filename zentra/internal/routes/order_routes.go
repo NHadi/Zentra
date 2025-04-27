@@ -20,5 +20,6 @@ func SetupOrderRoutes(router *gin.RouterGroup, service services.OrderService) {
 		orders.GET("/by-status", handlers.GetOrdersByStatus(service))
 		orders.GET("/by-payment-status", handlers.GetOrdersByPaymentStatus(service))
 		orders.PUT("/:id/status", handlers.UpdateOrderStatus(service))
+		orders.PUT("/bulk-status-update", handlers.BulkUpdateOrderStatus(service))
 	}
 }

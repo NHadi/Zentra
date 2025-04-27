@@ -1,0 +1,19 @@
+# Project specific files
+zentra-ui/ISSUE_TEMPLATE.md
+zentra-ui/README.md
+zentra-eshop/README.md
+
+# Dependencies and system files
+**/node_modules/**
+**/.git/**
+**/docs/_*.md
+**/.DS_Store
+**/Thumbs.db
+**/package-lock.json
+**/yarn.lock
+
+# Temporary and build files
+**/.next/**
+**/.cache/**
+**/dist/**
+**/build/** 

@@ -1,12 +1,15 @@
-import { zentra } from '../api/index.js';
+import { orderAPI } from '../api/modules/orders.js';
 import { gridUtils } from '../utils/gridUtils.js';
 import { getBaseUrl } from '../api/config.js';
+import { officeAPI } from '../api/modules/offices.js';
+import { productAPI } from '../api/modules/products.js';
 
 window.OrderPage = class {
     constructor() {
         this.grid = null;
         this.orderItemsGrid = null;
         this.currentOrder = null;
+        this.orderItems = [];
         
         // Initialize components
         if (typeof DevExpress !== 'undefined') {
@@ -85,6 +88,54 @@ window.OrderPage = class {
         $('#updateStatus').on('click', () => this.updateOrderStatus());
         $('#printOrder').on('click', () => this.printOrder());
         $('#cancelOrder').on('click', () => this.cancelOrder());
+
+        // Create order button
+        $('#createOrderBtn').on('click', () => {
+            this.showCreateOrderModal();
+        });
+        
+        // Create order form submission
+        $('#saveOrder').on('click', () => {
+            this.createOrder();
+        });
+        
+        // Edit order button in details modal
+        $('#editOrder').on('click', () => {
+            this.showEditOrderModal();
+        });
+        
+        // Update order form submission
+        $('#updateOrder').on('click', () => {
+            this.updateOrder();
+        });
+        
+        // Cancel order button
+        $('#cancelOrder').on('click', () => {
+            this.confirmCancelOrder();
+        });
+        
+        // Update order status button
+        $('#updateStatus').on('click', () => {
+            this.updateOrderStatus();
+        });
+        
+        // Calculate total amount from subtotal and discount in create form
+        $('#input-subtotal, #input-discount').on('input', this.calculateTotal);
+        
+        // Calculate total amount from subtotal and discount in edit form
+        $('#edit-subtotal, #edit-discount').on('input', this.calculateTotal);
+
+        // Add item button handler
+        $('#addItemBtn').on('click', () => {
+            const item = {
+                ProductID: Number($('#productSelect').val()),
+                Quantity: Number($('#itemQuantity').val()),
+                Size: $('#itemSize').val(),
+                Color: $('#itemColor').val()
+            };
+            this.orderItems.push(item);
+            this.renderOrderItemsTable();
+        });
     }
 
     initialize() {
@@ -501,12 +552,34 @@ window.OrderPage = class {
 
     async loadData() {
         try {
-            const data = await zentra.getOrders();
-            this.grid.option('dataSource', data);
-            this.updateStats(data);
+            if (!this.grid) {
+                console.warn('Grid instance is not available');
+                return;
+            }
+
+            // Show loading panel
+            this.grid.beginCustomLoading('Loading orders...');
+            
+            const orders = await orderAPI.getOrders();
+            if (Array.isArray(orders)) {
+                this.grid.option('dataSource', orders);
+                this.updateStats(orders);
+            } else {
+                console.warn('Invalid data format received:', orders);
+                this.grid.option('dataSource', []);
+            }
         } catch (error) {
             console.error('Error loading orders:', error);
-            DevExpress.ui.notify('Failed to load orders', 'error', 3000);
+            if (gridUtils && gridUtils.handleGridError) {
+                gridUtils.handleGridError(error, 'loading orders');
+            } else {
+                alert('Failed to load orders. Please try again.');
+            }
+        } finally {
+            // Always hide loading panel if grid exists
+            if (this.grid) {
+                this.grid.endCustomLoading();
+            }
         }
     }
 
@@ -525,20 +598,30 @@ window.OrderPage = class {
     }
 
     updateTabContent(tabId, order) {
+        // Clear previous content
+        this.clearOrderDetails();
+        
+        // Update the appropriate tab based on tabId
         switch (tabId) {
-            case '#orderInfo':
+            case 'orderInfo':
                 this.updateOrderInfoTab(order);
                 break;
-            case '#itemsInfo':
+            case 'itemsInfo':
                 this.updateItemsTab(order);
                 break;
-            case '#productionStatus':
+            case 'productionStatus':
                 this.updateProductionTab(order);
                 break;
-            case '#paymentInfo':
+            case 'paymentInfo':
                 this.updatePaymentTab(order);
                 break;
+            default:
+                // Default to orderInfo tab
+                this.updateOrderInfoTab(order);
         }
+        
+        // Activate the tab
+        $(`a[data-tab="${tabId}"]`).tab('show');
     }
 
     updateOrderInfoTab(order) {
@@ -658,18 +741,16 @@ window.OrderPage = class {
     }
 
     showOrderDetails(order) {
+        // Store the current order for reference in other methods
         this.currentOrder = order;
         
-        // Update modal title
-        $('#orderTitle').text(`Order ${order.order_number}`);
+        // Update the modal title
+        $('#orderTitle').text(`Order Details: ${order.orderNumber}`);
         
-        // Initialize all tabs
-        this.updateOrderInfoTab(order);
-        this.updateItemsTab(order);
-        this.updateProductionTab(order);
-        this.updatePaymentTab(order);
+        // Update tab content
+        this.updateTabContent('orderInfo', order);
         
-        // Show modal
+        // Show the modal
         $('#orderDetailsModal').modal('show');
     }
 
@@ -1519,128 +1600,37 @@ window.OrderPage = class {
     }
 
     async updateOrderStatus() {
-        if (this.currentOrder) {
-            // Create status update modal
-            const statusModal = `
-                <div class="modal fade" id="statusUpdateModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Update Order Status</h5>
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label>New Status</label>
-                                    <select class="form-control" id="newStatus">
-                                        <option value="pending">Pending</option>
-                                        <option value="confirmed">Confirmed</option>
-                                        <option value="in_production">In Production</option>
-                                        <option value="quality_check">Quality Check</option>
-                                        <option value="ready_for_delivery">Ready for Delivery</option>
-                                        <option value="delivered">Delivered</option>
-                                        <option value="cancelled">Cancelled</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Send WhatsApp Notification</label>
-                                    <div class="custom-control custom-checkbox">
-                                        <input type="checkbox" class="custom-control-input" id="sendWhatsApp" checked>
-                                        <label class="custom-control-label" for="sendWhatsApp">Send notification to customer</label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Additional Message (Optional)</label>
-                                    <textarea class="form-control" id="additionalMessage" rows="3" placeholder="Add any additional information for the customer..."></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" id="confirmStatusUpdate">Update Status</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Add modal to body if not exists
-            if (!$('#statusUpdateModal').length) {
-                $('body').append(statusModal);
-            }
-
-            // Show modal
-            $('#statusUpdateModal').modal('show');
-
-            // Handle status update confirmation
-            $('#confirmStatusUpdate').off('click').on('click', async () => {
-                const newStatus = $('#newStatus').val();
-                const sendWhatsApp = $('#sendWhatsApp').is(':checked');
-                const additionalMessage = $('#additionalMessage').val();
-
-                try {
-                    // Update order status
-                    await zentra.updateOrderStatus(this.currentOrder.id, newStatus);
-
-                    // Send WhatsApp notification if enabled
-                    if (sendWhatsApp) {
-                        await this.sendWhatsAppNotification(this.currentOrder, newStatus, additionalMessage);
-                    }
-
-                    // Show success message
-                    DevExpress.ui.notify('Order status updated successfully', 'success', 3000);
-
-                    // Refresh order details
-                    this.loadOrderDetails(this.currentOrder.id);
-
-                    // Close modal
-                    $('#statusUpdateModal').modal('hide');
-                } catch (error) {
-                    console.error('Error updating order status:', error);
-                    DevExpress.ui.notify('Failed to update order status', 'error', 3000);
-                }
-            });
-        }
-    }
-
-    async sendWhatsAppNotification(order, newStatus, additionalMessage = '') {
         try {
-            // Get status message template
-            const statusMessage = this.getStatusMessage(order, newStatus, additionalMessage);
-
-            // Send WhatsApp message
-            await zentra.sendWhatsAppMessage({
-                to: order.customer_phone,
-                message: statusMessage
-            });
-
-            DevExpress.ui.notify('WhatsApp notification sent successfully', 'success', 3000);
+            const order = this.currentOrder;
+            if (!order) return;
+            
+            // Prompt for new status
+            const newStatus = prompt("Enter new status (pending, confirmed, in_production, quality_check, ready_for_delivery, delivered, cancelled):", order.status);
+            if (newStatus === null) return; // User cancelled
+            
+            const additionalMessage = prompt("Enter additional message (optional):", "");
+            const sendNotification = confirm("Send notification to customer?");
+            
+            const statusData = {
+                status: newStatus,
+                send_notification: sendNotification,
+                additional_message: additionalMessage || ""
+            };
+            
+            // Update order status
+            await orderAPI.updateOrderStatus(order.id, statusData);
+            
+            // Refresh data
+            await this.loadData();
+            
+            // Show success message
+            console.log('Order status updated successfully!');
+            alert('Order status updated successfully!');
+            
         } catch (error) {
-            console.error('Error sending WhatsApp notification:', error);
-            DevExpress.ui.notify('Failed to send WhatsApp notification', 'error', 3000);
+            console.error('Update status error:', error);
+            alert(error.message || 'Failed to update order status. Please try again.');
         }
-    }
-
-    getStatusMessage(order, newStatus, additionalMessage = '') {
-        const statusMessages = {
-            pending: `Dear ${order.customer_name},\n\nYour order #${order.order_number} has been received and is pending confirmation. We will process it shortly.\n\nThank you for choosing us!`,
-            confirmed: `Dear ${order.customer_name},\n\nYour order #${order.order_number} has been confirmed. We will start processing your order soon.\n\nThank you for your patience!`,
-            in_production: `Dear ${order.customer_name},\n\nYour order #${order.order_number} is now in production. We will keep you updated on the progress.\n\nThank you for your patience!`,
-            quality_check: `Dear ${order.customer_name},\n\nYour order #${order.order_number} is undergoing quality check. We will notify you once it passes inspection.\n\nThank you for your patience!`,
-            ready_for_delivery: `Dear ${order.customer_name},\n\nYour order #${order.order_number} is ready for delivery. We will arrange the delivery soon.\n\nThank you for choosing us!`,
-            delivered: `Dear ${order.customer_name},\n\nYour order #${order.order_number} has been delivered. We hope you are satisfied with our service!\n\nThank you for choosing us!`,
-            cancelled: `Dear ${order.customer_name},\n\nWe regret to inform you that your order #${order.order_number} has been cancelled. Please contact us for more information.\n\nWe apologize for any inconvenience caused.`
-        };
-
-        let message = statusMessages[newStatus] || statusMessages.pending;
-
-        // Add additional message if provided
-        if (additionalMessage) {
-            message += `\n\nAdditional Information:\n${additionalMessage}`;
-        }
-
-        return message;
     }
 
     printOrder() {
@@ -1833,6 +1823,280 @@ window.OrderPage = class {
                     console.log('Cancel order:', this.currentOrder);
                 }
             });
+        }
+    }
+
+    // Calculate total amount from subtotal and discount
+    calculateTotal(e) {
+        const formPrefix = $(e.target).attr('id').startsWith('edit-') ? 'edit-' : 'input-';
+        const subtotal = parseFloat($(`#${formPrefix}subtotal`).val()) || 0;
+        const discount = parseFloat($(`#${formPrefix}discount`).val()) || 0;
+        const total = Math.max(0, subtotal - discount).toFixed(2);
+        $(`#${formPrefix}total`).val(total);
+    }
+
+    // Show create order modal
+    async showCreateOrderModal() {
+        // Reset form
+        $('#createOrderForm')[0].reset();
+        
+        // Load offices for dropdown
+        await this.loadOffices('#input-office');
+        
+        // Load products for dropdown
+        await this.loadProducts();
+        
+        // Show modal
+        $('#createOrderModal').modal('show');
+        
+        // Reset items
+        this.orderItems = [];
+        this.renderOrderItemsTable();
+    }
+
+    // Load offices for dropdown
+    async loadOffices(targetSelector) {
+        try {
+            const offices = await officeAPI.getOffices();
+            const $select = $(targetSelector);
+            $select.empty();
+            $select.append('<option value="">Select Office</option>');
+            offices.forEach(office => {
+                $select.append(`<option value="${office.id}">${office.name}</option>`);
+            });
+        } catch (error) {
+            console.error('Failed to load offices:', error);
+            gridUtils.handleGridError(error, 'loading offices');
+        }
+    }
+
+    // Load products for dropdown
+    async loadProducts() {
+        try {
+            const products = await productAPI.getProducts();
+            const $select = $('#productSelect');
+            $select.empty();
+            products.forEach(p => $select.append(`<option value="${p.id}">${p.name}</option>`));
+        } catch (error) {
+            console.error('Failed to load products:', error);
+            gridUtils.handleGridError(error, 'loading products');
+        }
+    }
+
+    // Render order items table
+    renderOrderItemsTable() {
+        const $tbody = $('#orderItemsTable tbody');
+        $tbody.empty();
+        this.orderItems.forEach((item, idx) => {
+            $tbody.append(`
+                <tr>
+                    <td>${$('#productSelect option[value="'+item.ProductID+'"]').text()}</td>
+                    <td>${item.Quantity}</td>
+                    <td>${item.Size}</td>
+                    <td>${item.Color}</td>
+                    <td><button type="button" class="btn btn-danger btn-sm" data-idx="${idx}">Remove</button></td>
+                </tr>
+            `);
+        });
+        // Remove item handler
+        $tbody.find('button').on('click', (e) => {
+            const idx = $(e.target).data('idx');
+            this.orderItems.splice(idx, 1);
+            this.renderOrderItemsTable();
+        });
+    }
+
+    // Create a new order
+    async createOrder() {
+        try {
+            // Validate form
+            const form = $('#createOrderForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Get form data
+            const formData = new FormData(form);
+            // Map to PascalCase keys for backend compatibility
+            const orderData = {
+                OrderNumber: formData.get('orderNumber'),
+                CustomerName: formData.get('customerName'),
+                CustomerEmail: formData.get('customerEmail'),
+                CustomerPhone: formData.get('customerPhone'),
+                DeliveryAddress: formData.get('deliveryAddress'),
+                OfficeID: Number(formData.get('officeId')),
+                ExpectedDeliveryDate: formData.get('expectedDeliveryDate'),
+                Subtotal: Number(formData.get('subtotal')),
+                DiscountAmount: Number(formData.get('discountAmount')),
+                TotalAmount: Number(formData.get('totalAmount')),
+                Status: formData.get('status'),
+                PaymentStatus: formData.get('paymentStatus'),
+                Notes: formData.get('notes'),
+                OrderItems: this.orderItems
+            };
+            
+            // Send API request
+            const response = await orderAPI.createOrder(orderData);
+            
+            // Close modal and refresh data
+            $('#createOrderModal').modal('hide');
+            await this.loadData();
+            
+            // Show success message
+            gridUtils.showSuccess('Order created successfully!');
+        } catch (error) {
+            console.error('Create order error:', error);
+            gridUtils.handleGridError(error, 'creating order');
+        }
+    }
+
+    // Show edit order modal with pre-populated data
+    showEditOrderModal() {
+        // Get current order
+        const currentOrder = this.currentOrder;
+        if (!currentOrder) return;
+        
+        // Populate form with current order data
+        $('#edit-order-id').val(currentOrder.id);
+        $('#edit-order-number').val(currentOrder.orderNumber);
+        $('#edit-customer-name').val(currentOrder.customerName);
+        $('#edit-customer-email').val(currentOrder.customerEmail);
+        $('#edit-customer-phone').val(currentOrder.customerPhone);
+        $('#edit-delivery-address').val(currentOrder.deliveryAddress);
+        $('#edit-subtotal').val(currentOrder.subtotal);
+        $('#edit-discount').val(currentOrder.discountAmount);
+        $('#edit-total').val(currentOrder.totalAmount);
+        $('#edit-status').val(currentOrder.status);
+        $('#edit-payment-status').val(currentOrder.paymentStatus);
+        $('#edit-expected-delivery').val(currentOrder.expectedDeliveryDate?.split('T')[0]);
+        $('#edit-notes').val(currentOrder.notes);
+        
+        // Load offices for dropdown
+        this.loadOffices('#edit-office').then(() => {
+            $('#edit-office').val(currentOrder.officeId);
+        });
+        
+        // Hide details modal and show edit modal
+        $('#orderDetailsModal').modal('hide');
+        $('#editOrderModal').modal('show');
+    }
+
+    // Update existing order
+    async updateOrder() {
+        try {
+            // Validate form
+            const form = $('#editOrderForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            // Get form data
+            const formData = new FormData(form);
+            // Map to PascalCase keys for backend compatibility
+            const orderData = {
+                CustomerName: formData.get('customerName'),
+                CustomerEmail: formData.get('customerEmail'),
+                CustomerPhone: formData.get('customerPhone'),
+                DeliveryAddress: formData.get('deliveryAddress'),
+                OfficeID: Number(formData.get('officeId')),
+                ExpectedDeliveryDate: formData.get('expectedDeliveryDate'),
+                Subtotal: Number(formData.get('subtotal')),
+                DiscountAmount: Number(formData.get('discountAmount')),
+                TotalAmount: Number(formData.get('totalAmount')),
+                Status: formData.get('status'),
+                PaymentStatus: formData.get('paymentStatus'),
+                Notes: formData.get('notes'),
+                OrderItems: this.orderItems
+            };
+            
+            const orderId = $('#edit-order-id').val();
+            
+            // Send API request
+            const response = await orderAPI.updateOrder(orderId, orderData);
+            
+            // Close modal and refresh data
+            $('#editOrderModal').modal('hide');
+            await this.loadData();
+            
+            // Show success message
+            gridUtils.showSuccess('Order updated successfully!');
+        } catch (error) {
+            console.error('Update order error:', error);
+            gridUtils.handleGridError(error, 'updating order');
+        }
+    }
+
+    // Confirm order cancellation
+    confirmCancelOrder() {
+        const order = this.currentOrder;
+        if (!order) return;
+        
+        if (confirm(`Are you sure you want to cancel order ${order.orderNumber}?`)) {
+            this.cancelOrder();
+        }
+    }
+
+    // Cancel order
+    async cancelOrder() {
+        try {
+            const order = this.currentOrder;
+            if (!order) return;
+            
+            // Update order status to cancelled
+            const statusData = {
+                status: 'cancelled',
+                send_notification: true,
+                additional_message: 'Your order has been cancelled.'
+            };
+            
+            await orderAPI.updateOrderStatus(order.id, statusData);
+            
+            // Close modal and refresh data
+            $('#orderDetailsModal').modal('hide');
+            await this.loadData();
+            
+            // Show success message
+            gridUtils.showSuccess('Order cancelled successfully!');
+        } catch (error) {
+            console.error('Cancel order error:', error);
+            gridUtils.handleGridError(error, 'cancelling order');
+        }
+    }
+
+    // Update order status
+    async updateOrderStatus() {
+        try {
+            const order = this.currentOrder;
+            if (!order) return;
+            
+            // Prompt for new status
+            const newStatus = prompt("Enter new status (pending, confirmed, in_production, quality_check, ready_for_delivery, delivered, cancelled):", order.status);
+            if (newStatus === null) return; // User cancelled
+            
+            const additionalMessage = prompt("Enter additional message (optional):", "");
+            const sendNotification = confirm("Send notification to customer?");
+            
+            const statusData = {
+                status: newStatus,
+                send_notification: sendNotification,
+                additional_message: additionalMessage || ""
+            };
+            
+            // Update order status
+            await orderAPI.updateOrderStatus(order.id, statusData);
+            
+            // Refresh data
+            await this.loadData();
+            
+            // Show success message
+            console.log('Order status updated successfully!');
+            alert('Order status updated successfully!');
+            
+        } catch (error) {
+            console.error('Update status error:', error);
+            alert(error.message || 'Failed to update order status. Please try again.');
         }
     }
 };

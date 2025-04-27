@@ -154,7 +154,14 @@ window.EmployeePage = class {
                 {
                     dataField: 'phone',
                     caption: 'Phone',
-                    validationRules: [{ type: 'required' }],
+                    validationRules: [
+                        { type: 'required', message: 'Phone number is required' },
+                        { 
+                            type: 'pattern', 
+                            pattern: /^\+[1-9]\d{1,14}$/, 
+                            message: 'Enter valid international format starting with + and country code' 
+                        }
+                    ],
                     cellTemplate: (container, options) => {
                         $('<div>')
                             .addClass('d-flex align-items-center')
@@ -332,12 +339,20 @@ window.EmployeePage = class {
                                     label: { text: 'Phone Number' },
                                     editorOptions: {
                                         stylingMode: 'filled',
-                                        placeholder: 'Enter phone number',
-                                        mask: '+1 (000) 000-0000',
-                                        maskRules: {"0": /[0-9]/},
-                                        maskInvalidMessage: 'Please enter a valid phone number'
+                                        placeholder: 'Enter phone number with country code',
+                                        showClearButton: true,
+                                        buttons: [{
+                                            name: 'country',
+                                            location: 'before',
+                                            options: {
+                                                icon: 'fas fa-globe',
+                                                hint: 'International Format'
+                                            }
+                                        }]
                                     },
-                                    validationRules: [{ type: 'required', message: 'Phone number is required' }]
+                                    validationRules: [
+                                        { type: 'required', message: 'Phone number is required' }
+                                    ]
                                 },
                                 {
                                     dataField: 'division_id',
