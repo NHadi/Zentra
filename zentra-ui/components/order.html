@@ -340,189 +340,171 @@
 </div>
 
 <!-- Create Order Modal -->
-<div class="modal fade" id="createOrderModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade order-modal" id="createOrderModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-plus-circle mr-2"></i>
-                    <span>Create New Order</span>
-                </h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
+                <h5 class="modal-title">Create New Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <form id="createOrderForm">
-                    <!-- Customer Information -->
-                    <h6 class="heading-small text-muted mb-4">Customer Information</h6>
-                    <div class="pl-lg-4">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-order-number">Order Number</label>
-                                    <input type="text" id="input-order-number" name="orderNumber" class="form-control" placeholder="e.g. ORD-001" required>
-                                </div>
+                    <div class="row">
+                        <!-- Customer Information -->
+                        <div class="col-md-6">
+                            <h6 class="heading-small text-muted mb-4">Customer Information</h6>
+                            <div class="form-group">
+                                <label>Customer Name</label>
+                                <input type="text" class="form-control" name="customerName" required>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-customer-name">Customer Name</label>
-                                    <input type="text" id="input-customer-name" name="customerName" class="form-control" placeholder="Full Name" required>
-                                </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" name="customerEmail" required>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-customer-email">Email</label>
-                                    <input type="email" id="input-customer-email" name="customerEmail" class="form-control" placeholder="Email Address" required>
-                                </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" class="form-control" name="customerPhone" required>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-customer-phone">Phone</label>
-                                    <input type="text" id="input-customer-phone" name="customerPhone" class="form-control" placeholder="Phone Number">
-                                </div>
+                            <div class="form-group">
+                                <label>Delivery Address</label>
+                                <textarea class="form-control" name="deliveryAddress" rows="3" required></textarea>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Delivery Information -->
-                    <hr class="my-4">
-                    <h6 class="heading-small text-muted mb-4">Delivery Information</h6>
-                    <div class="pl-lg-4">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-delivery-address">Delivery Address</label>
-                                    <textarea id="input-delivery-address" name="deliveryAddress" class="form-control" rows="3" placeholder="Delivery Address"></textarea>
-                                </div>
+                        
+                        <!-- Order Details -->
+                        <div class="col-md-6">
+                            <h6 class="heading-small text-muted mb-4">Order Details</h6>
+                            <div class="form-group">
+                                <label>Office</label>
+                                <select class="form-control" name="officeId" id="input-office" required></select>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-office">Office</label>
-                                    <select id="input-office" name="officeId" class="form-control" required>
-                                        <option value="">Select Office</option>
-                                        <!-- Office options will be populated dynamically -->
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label>Expected Delivery Date</label>
+                                <input type="date" class="form-control" name="expectedDeliveryDate" required>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-expected-delivery">Expected Delivery Date</label>
-                                    <input type="date" id="input-expected-delivery" name="expectedDeliveryDate" class="form-control">
-                                </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select class="form-control" name="status" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="in_production">In Production</option>
+                                    <option value="ready_for_delivery">Ready for Delivery</option>
+                                    <option value="delivered">Delivered</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Payment Status</label>
+                                <select class="form-control" name="paymentStatus" required>
+                                    <option value="unpaid">Unpaid</option>
+                                    <option value="partial">Partial</option>
+                                    <option value="paid">Paid</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Order Details -->
-                    <hr class="my-4">
-                    <h6 class="heading-small text-muted mb-4">Order Details</h6>
-                    <div class="pl-lg-4">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-subtotal">Subtotal</label>
-                                    <input type="number" step="0.01" id="input-subtotal" name="subtotal" class="form-control" placeholder="0.00" required>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-discount">Discount</label>
-                                    <input type="number" step="0.01" id="input-discount" name="discountAmount" class="form-control" placeholder="0.00" value="0">
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-total">Total Amount</label>
-                                    <input type="number" step="0.01" id="input-total" name="totalAmount" class="form-control" placeholder="0.00" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-status">Status</label>
-                                    <select id="input-status" name="status" class="form-control" required>
-                                        <option value="pending">Pending</option>
-                                        <option value="confirmed">Confirmed</option>
-                                        <option value="in_production">In Production</option>
-                                        <option value="quality_check">Quality Check</option>
-                                        <option value="ready_for_delivery">Ready for Delivery</option>
-                                        <option value="delivered">Delivered</option>
-                                        <option value="cancelled">Cancelled</option>
+
+                    <!-- Add Items Section -->
+                    <div class="item-details-form mt-4">
+                        <h6 class="heading-small text-muted mb-4">ADD ITEMS</h6>
+                        <div class="row align-items-end">
+                            <div class="col-md-3">
+                                <div class="form-group mb-0">
+                                    <label class="form-control-label">Product</label>
+                                    <select class="form-control" id="productSelect">
+                                        <option value="">Select Product</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-payment-status">Payment Status</label>
-                                    <select id="input-payment-status" name="paymentStatus" class="form-control" required>
-                                        <option value="unpaid">Unpaid</option>
-                                        <option value="partial">Partial</option>
-                                        <option value="paid">Paid</option>
+                            <div class="col-md-3">
+                                <div class="form-group mb-0">
+                                    <label class="form-control-label">Size</label>
+                                    <select class="form-control" id="itemSize">
+                                        <option value="">Select Size</option>
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="form-group mb-0">
+                                    <label class="form-control-label">Color</label>
+                                    <select class="form-control" id="itemColor">
+                                        <option value="">Select Color</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group mb-0">
+                                    <label class="form-control-label">Quantity</label>
+                                    <input type="number" class="form-control" id="itemQuantity" value="1" min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-primary btn-block" id="addItemBtn">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <label class="form-control-label" for="input-notes">Notes</label>
-                                    <textarea id="input-notes" name="notes" class="form-control" rows="3" placeholder="Order Notes"></textarea>
+                    </div>
+
+                    <!-- Order Items Table -->
+                    <div class="order-items-table mt-4">
+                        <h6 class="heading-small text-muted mb-4">ORDER ITEMS</h6>
+                        <div class="table-responsive">
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">PRODUCT</th>
+                                        <th scope="col" class="text-center">QUANTITY</th>
+                                        <th scope="col" class="text-right">UNIT PRICE</th>
+                                        <th scope="col" class="text-right">TOTAL</th>
+                                        <th scope="col" class="text-center">ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderItemsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="order-summary mt-4">
+                        <div class="row justify-content-end">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="heading-small text-muted mb-4">ORDER SUMMARY</h6>
+                                        <div class="order-summary-row">
+                                            <span>Subtotal</span>
+                                            <span class="subtotal-value">$0.00</span>
+                                        </div>
+                                        <div class="order-summary-row">
+                                            <span>Discount</span>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">$</span>
+                                                </div>
+                                                <input type="number" class="form-control text-right" id="input-discount" name="discountAmount" value="0" min="0" step="0.01">
+                                            </div>
+                                            <span class="discount-value ml-2">$0.00</span>
+                                        </div>
+                                        <div class="order-summary-row total-row">
+                                            <span>Total</span>
+                                            <span class="total-value">$0.00</span>
+                                        </div>
+                                        
+                                        <!-- Hidden fields for form submission -->
+                                        <input type="hidden" name="subtotal" value="0">
+                                        <input type="hidden" name="totalAmount" value="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Add this after the Order Details section in the Create Order Modal -->
-                    <hr class="my-4">
-                    <h6 class="heading-small text-muted mb-4">Order Items</h6>
-                    <div id="orderItemsSection" class="pl-lg-4">
-                        <div class="row align-items-end">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Product</label>
-                                    <select id="productSelect" class="form-control"></select>
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>Quantity</label>
-                                    <input type="number" id="itemQuantity" class="form-control" min="1" value="1">
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>Size</label>
-                                    <input type="text" id="itemSize" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>Color</label>
-                                    <input type="text" id="itemColor" class="form-control">
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <button type="button" id="addItemBtn" class="btn btn-primary btn-block">Add Item</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <table class="table table-sm" id="orderItemsTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th><th>Quantity</th><th>Size</th><th>Color</th><th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <!-- Notes -->
+                    <div class="form-group mt-4">
+                        <label>Notes</label>
+                        <textarea class="form-control" name="notes" rows="3"></textarea>
                     </div>
                 </form>
             </div>
@@ -952,5 +934,91 @@
     .modal-dialog {
         margin: 0.5rem;
     }
+}
+
+/* Add these styles to your existing styles */
+.item-details-form {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid #e9ecef;
+}
+
+.product-preview {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+    border: 2px solid #e9ecef;
+}
+
+.order-items-table {
+    background: #fff;
+    border-radius: 0.375rem;
+    border: 1px solid #e9ecef;
+}
+
+.table thead th {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+.product-info .product-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.product-info .product-details {
+    color: #8898aa;
+    font-size: 0.875rem;
+}
+
+.btn-remove {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.order-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.order-summary-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.total-row {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2643e9;
+}
+
+.heading-small {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-bottom: 0.5rem;
 }
 </style> 

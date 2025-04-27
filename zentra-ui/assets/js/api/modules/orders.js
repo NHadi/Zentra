@@ -40,21 +40,59 @@ export const orderAPI = {
 
     async createOrder(orderData) {
         try {
+            // Extract order items from the request
+            const { OrderItems, ...orderRequest } = orderData;
+
+            // Ensure all required fields are present and properly formatted
+            const createOrderRequest = {
+                order_number: orderRequest.OrderNumber,
+                customer_name: orderRequest.CustomerName,
+                customer_email: orderRequest.CustomerEmail,
+                customer_phone: orderRequest.CustomerPhone,
+                delivery_address: orderRequest.DeliveryAddress,
+                office_id: orderRequest.OfficeID,
+                expected_delivery_date: orderRequest.ExpectedDeliveryDate,
+                subtotal: Number(orderRequest.Subtotal),
+                discount_amount: Number(orderRequest.DiscountAmount),
+                total_amount: Number(orderRequest.TotalAmount),
+                status: orderRequest.Status || 'pending',
+                payment_status: orderRequest.PaymentStatus || 'unpaid',
+                notes: orderRequest.Notes,
+                order_items: OrderItems.map(item => ({
+                    product_id: item.ProductID,
+                    quantity: item.Quantity,
+                    size: item.Size,
+                    color: item.Color,
+                    unit_price: Number(item.UnitPrice),
+                    original_subtotal: Number(item.Total),
+                    final_subtotal: Number(item.Total),
+                    customization: item.Customization || {},
+                    production_status: 'pending'
+                }))
+            };
+
+            console.log('Sending order request:', createOrderRequest); // Debug log
+
+            // Create the order with items
             const response = await fetch(`${config.baseUrl}/orders`, {
                 method: 'POST',
                 headers: {
                     ...getAuthHeaders(),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(orderData)
+                body: JSON.stringify(createOrderRequest)
             });
 
             if (!response.ok) {
                 const error = await response.json();
+                console.error('Order creation response:', error); // Debug log
                 throw new Error(error.error || 'Failed to create order');
             }
 
-            return await response.json();
+            const createdOrder = await response.json();
+            console.log('Created order:', createdOrder); // Debug log
+
+            return createdOrder;
         } catch (error) {
             console.error('Create order error:', error);
             throw error;

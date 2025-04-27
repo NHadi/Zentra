@@ -72,22 +72,35 @@ type OrderResponse struct {
 	TenantID             int                 `json:"tenant_id" example:"1"`
 }
 
+// CreateOrderItemRequest represents the request structure for creating an order item
+type CreateOrderItemRequest struct {
+	ProductID        int             `json:"product_id" binding:"required" example:"1"`
+	Quantity         int             `json:"quantity" binding:"required" example:"2"`
+	Size             string          `json:"size" binding:"required" example:"M"`
+	Color            string          `json:"color" binding:"required" example:"Red/White"`
+	UnitPrice        float64         `json:"unit_price" binding:"required" example:"49.99"`
+	OriginalSubtotal float64         `json:"original_subtotal" example:"99.98"`
+	Customization    json.RawMessage `json:"customization" example:"{}"`
+	ProductionStatus string          `json:"production_status" example:"pending"`
+}
+
 // CreateOrderRequest represents the request structure for creating an order
 // @Description Create order request model
 type CreateOrderRequest struct {
-	OrderNumber          string  `json:"order_number" binding:"required" example:"ORD-001"`
-	CustomerName         string  `json:"customer_name" binding:"required" example:"John Doe"`
-	CustomerEmail        string  `json:"customer_email" binding:"required,email" example:"john.doe@example.com"`
-	CustomerPhone        string  `json:"customer_phone" example:"123-456-7890"`
-	DeliveryAddress      string  `json:"delivery_address" example:"123 Main St"`
-	OfficeID             int     `json:"office_id" binding:"required" example:"1"`
-	Subtotal             float64 `json:"subtotal" binding:"required" example:"100.00"`
-	DiscountAmount       float64 `json:"discount_amount" example:"10.00"`
-	TotalAmount          float64 `json:"total_amount" binding:"required" example:"90.00"`
-	Status               string  `json:"status" binding:"required" example:"pending"`
-	PaymentStatus        string  `json:"payment_status" binding:"required" example:"unpaid"`
-	ExpectedDeliveryDate string  `json:"expected_delivery_date" example:"2024-03-25"`
-	Notes                string  `json:"notes" example:"Please deliver in the morning"`
+	OrderNumber          string                   `json:"order_number" binding:"required" example:"ORD-001"`
+	CustomerName         string                   `json:"customer_name" binding:"required" example:"John Doe"`
+	CustomerEmail        string                   `json:"customer_email" binding:"required,email" example:"john.doe@example.com"`
+	CustomerPhone        string                   `json:"customer_phone" example:"123-456-7890"`
+	DeliveryAddress      string                   `json:"delivery_address" example:"123 Main St"`
+	OfficeID             int                      `json:"office_id" binding:"required" example:"1"`
+	Subtotal             float64                  `json:"subtotal" binding:"required" example:"100.00"`
+	DiscountAmount       float64                  `json:"discount_amount" example:"10.00"`
+	TotalAmount          float64                  `json:"total_amount" binding:"required" example:"90.00"`
+	Status               string                   `json:"status" binding:"required" example:"pending"`
+	PaymentStatus        string                   `json:"payment_status" binding:"required" example:"unpaid"`
+	ExpectedDeliveryDate string                   `json:"expected_delivery_date" example:"2024-03-25"`
+	Notes                string                   `json:"notes" example:"Please deliver in the morning"`
+	OrderItems           []CreateOrderItemRequest `json:"order_items"`
 }
 
 // UpdateOrderRequest represents the request structure for updating an order
@@ -227,7 +240,8 @@ func CreateOrder(service *application.OrderService) gin.HandlerFunc {
 			return
 		}
 
-		order := &order.Order{
+		// Create the order
+		newOrder := &order.Order{
 			OrderNumber:          req.OrderNumber,
 			CustomerName:         req.CustomerName,
 			CustomerEmail:        req.CustomerEmail,
@@ -243,13 +257,32 @@ func CreateOrder(service *application.OrderService) gin.HandlerFunc {
 			Notes:                req.Notes,
 		}
 
-		if err := service.Create(order, c); err != nil {
+		// Create order items
+		if len(req.OrderItems) > 0 {
+			orderItems := make([]order.OrderItem, len(req.OrderItems))
+			for i, item := range req.OrderItems {
+				orderItems[i] = order.OrderItem{
+					ProductID:        item.ProductID,
+					Quantity:         item.Quantity,
+					Size:             item.Size,
+					Color:            item.Color,
+					UnitPrice:        item.UnitPrice,
+					OriginalSubtotal: item.OriginalSubtotal,
+					FinalSubtotal:    item.OriginalSubtotal, // Initially same as original
+					Customization:    item.Customization,
+					ProductionStatus: item.ProductionStatus,
+				}
+			}
+			newOrder.OrderItems = orderItems
+		}
+
+		if err := service.Create(newOrder, c); err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 			return
 		}
 
 		// Fetch the created order
-		createdOrder, err := service.FindByID(order.ID, c)
+		createdOrder, err := service.FindByID(newOrder.ID, c)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to fetch created order"})
 			return

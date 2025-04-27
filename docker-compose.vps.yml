@@ -22,9 +22,8 @@ services:
       - "--certificatesresolvers.zerossl.acme.caserver=https://acme.zerossl.com/v2/DV90"
       - "--certificatesresolvers.zerossl.acme.eab.kid=2YsNtypbR2F8IYffYc6bdQ"
       - "--certificatesresolvers.zerossl.acme.eab.hmacencoded=2x_i41U1jBIAwQ-tp1ghEDxR3tyqZMKj96PNgObPKlzK7k0eOW4_7vyc8ndj-iz4MIzcBY9jMMuvVvt7v2F0zQ"
-      - "--log.level=DEBUG"
-      - "--accesslog=true"
-      - "--accesslog.filepath=/var/log/traefik/access.log"
+      - "--log.level=INFO"
+      - "--accesslog=false"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${REMOTE_PATH}/traefik/letsencrypt/acme.json:/etc/traefik/acme.json
@@ -38,6 +37,10 @@ services:
       - "traefik.http.routers.dashboard.tls.certresolver=zerossl"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.services.dashboard.loadbalancer.server.port=8080"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Frontend Development
   frontend_dev:
@@ -72,6 +75,10 @@ services:
       - "traefik.http.services.frontend-dev.loadbalancer.healthcheck.interval=10s"
     networks:
       - traefik-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # E-shop Development
   eshop_dev:
@@ -106,6 +113,10 @@ services:
       - "traefik.http.services.eshop-dev.loadbalancer.healthcheck.interval=10s"
     networks:
       - traefik-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Backend Development
   backend_dev:
@@ -149,6 +160,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Staging Environment
   frontend_staging:
@@ -183,6 +198,10 @@ services:
       - "traefik.http.services.frontend-staging.loadbalancer.healthcheck.interval=10s"
     networks:
       - traefik-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   eshop_staging:
     image: nurulhadii/zentra-eshop:staging
@@ -215,6 +234,10 @@ services:
       - "traefik.http.services.eshop-staging.loadbalancer.healthcheck.interval=10s"
     networks:
       - traefik-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Backend Staging
   backend_staging:
@@ -258,6 +281,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Production Environment
   frontend_prod:
@@ -292,6 +319,10 @@ services:
       - "traefik.http.services.frontend-prod.loadbalancer.healthcheck.interval=10s"
     networks:
       - traefik-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # E-shop Production
   eshop_prod:
@@ -322,6 +353,10 @@ services:
       - "traefik.http.routers.eshop.middlewares=eshop-headers"
     networks:
       - traefik-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Backend Production
   backend_prod:
@@ -365,6 +400,10 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Centralized PostgreSQL
   postgres:
@@ -386,6 +425,10 @@ services:
       start_period: 10s
     networks:
       - backend-net
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Single pgAdmin instance
   pgadmin:
@@ -417,6 +460,10 @@ services:
       - "traefik.http.middlewares.pgadmin-headers.headers.customRequestHeaders.X-Scheme=https"
       - "traefik.http.middlewares.pgadmin-headers.headers.customRequestHeaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.pgadmin.middlewares=pgadmin-headers"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   # Shared Services
   elasticsearch:
@@ -442,6 +489,10 @@ services:
       - "traefik.http.routers.elasticsearch.entrypoints=websecure"
       - "traefik.http.routers.elasticsearch.tls.certresolver=zerossl"
       - "traefik.http.services.elasticsearch.loadbalancer.server.port=9200"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.7.0
@@ -465,6 +516,10 @@ services:
       - "traefik.http.routers.kibana.entrypoints=websecure"
       - "traefik.http.routers.kibana.tls.certresolver=zerossl"
       - "traefik.http.services.kibana.loadbalancer.server.port=5601"
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   postgres_data:
