@@ -251,25 +251,108 @@ export class OrderGrid {
     }
 
     renderDetailTemplate(container, options) {
-        // Create a container for the details
-        const $detailContent = $('<div>').addClass('order-detail-container p-4');
-        
-        // Customer Information Section
-        const $customerInfo = this.renderCustomerInfo(options.data);
+        const $detailContent = $('<div>').addClass('order-detail-container');
 
-        // Order Items Section
-        const $itemsSection = this.renderItemsSection(options.data);
+        // Create the exact tab structure from screenshot
+        const $tabs = $(`
+            <div class="tab-container">
+                <a href="#" class="tab-item active" data-tab="orderInfo">
+                    <i class="fas fa-info-circle"></i> Order Info
+                </a>
+                <a href="#" class="tab-item" data-tab="items">
+                    <i class="fas fa-box"></i> Items
+                </a>
+                <a href="#" class="tab-item" data-tab="production">
+                    <i class="fas fa-cogs"></i> Production Status
+                </a>
+                <a href="#" class="tab-item" data-tab="payment">
+                    <i class="fas fa-credit-card"></i> Payment
+                </a>
+            </div>
+        `);
 
-        // Production Timeline Section
-        const $timelineSection = this.renderTimelineSection(options.data);
+        // Create content sections
+        const $orderInfo = $('<div>').attr('id', 'orderInfo').addClass('content active')
+            .append(this.renderCustomerInfo(options.data));
 
-        // Append all sections to the container
+        const $items = $('<div>').attr('id', 'items').addClass('content')
+            .append(this.renderItemsSection(options.data));
+
+        const $production = $('<div>').attr('id', 'production').addClass('content')
+            .append(this.renderTimelineSection(options.data));
+
+        const $payment = $('<div>').attr('id', 'payment').addClass('content')
+            .append(this.renderPaymentSection(options.data));
+
+        // Add tab click handlers
+        $tabs.find('.tab-item').on('click', function(e) {
+            e.preventDefault();
+            const tabId = $(this).data('tab');
+            
+            // Update active tab
+            $tabs.find('.tab-item').removeClass('active');
+            $(this).addClass('active');
+            
+            // Update content
+            $detailContent.find('.content').removeClass('active');
+            $detailContent.find(`#${tabId}`).addClass('active');
+        });
+
+        // Add styles
+        const styles = `
+            .tab-container {
+                display: flex;
+                border-bottom: 1px solid #e9ecef;
+                margin-bottom: 20px;
+            }
+            
+            .tab-item {
+                padding: 15px 20px;
+                color: #8898aa;
+                text-decoration: none;
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .tab-item:hover {
+                color: #5e72e4;
+                text-decoration: none;
+            }
+            
+            .tab-item.active {
+                color: #5e72e4;
+                border-bottom: 2px solid #5e72e4;
+                margin-bottom: -1px;
+            }
+            
+            .content {
+                display: none;
+                padding: 20px;
+            }
+            
+            .content.active {
+                display: block;
+            }
+        `;
+
+        // Add styles if not already present
+        if (!document.getElementById('order-detail-styles')) {
+            const styleSheet = document.createElement('style');
+            styleSheet.id = 'order-detail-styles';
+            styleSheet.textContent = styles;
+            document.head.appendChild(styleSheet);
+        }
+
+        // Assemble the content
         $detailContent
-            .append($customerInfo)
-            .append($itemsSection)
-            .append($timelineSection);
+            .append($tabs)
+            .append($orderInfo)
+            .append($items)
+            .append($production)
+            .append($payment);
 
-        // Append the detail content to the container
         container.append($detailContent);
     }
 
@@ -297,7 +380,7 @@ export class OrderGrid {
                                         $('<span>')
                                             .addClass('font-weight-bold')
                                             .text(order.customer_name)
-                                    )
+                                        )
                             )
                     )
                     .append(
@@ -313,7 +396,7 @@ export class OrderGrid {
                                         $('<span>')
                                             .addClass('font-weight-bold')
                                             .text(order.customer_email)
-                                    )
+                                        )
                             )
                     )
                     .append(
@@ -329,7 +412,7 @@ export class OrderGrid {
                                         $('<span>')
                                             .addClass('font-weight-bold')
                                             .text(order.customer_phone)
-                                    )
+                                        )
                             )
                     )
             );
@@ -973,7 +1056,8 @@ export class OrderGrid {
         // Progress bar
         if (task.progress !== undefined) {
             $content.append(
-                $('<div>').addClass('task-progress')
+                $('<div>')
+                    .addClass('task-progress')
                     .append(
                         $('<div>')
                             .addClass('progress')
@@ -1056,5 +1140,225 @@ export class OrderGrid {
         });
 
         return $task;
+    }
+
+    renderPaymentSection(order) {
+        const $paymentSection = $('<div>').addClass('payment-section');
+
+        // Payment Summary Card
+        const $summaryCard = $('<div>').addClass('card mb-4')
+            .append(
+                $('<div>').addClass('card-body')
+                    .append($('<h5>').addClass('card-title').text('Payment Summary'))
+                    .append(
+                        $('<div>').addClass('row')
+                            .append(
+                                $('<div>').addClass('col-md-4')
+                                    .append($('<p>').addClass('mb-1 text-muted').text('Subtotal'))
+                                    .append($('<h3>').addClass('text-primary').text(this.formatIDR(order.subtotal)))
+                            )
+                            .append(
+                                $('<div>').addClass('col-md-4')
+                                    .append($('<p>').addClass('mb-1 text-muted').text('Discount'))
+                                    .append($('<h3>').addClass('text-danger').text(`-${this.formatIDR(order.discount_amount)}`))
+                            )
+                            .append(
+                                $('<div>').addClass('col-md-4')
+                                    .append($('<p>').addClass('mb-1 text-muted').text('Total Amount'))
+                                    .append($('<h3>').addClass('text-success').text(this.formatIDR(order.total_amount)))
+                            )
+                    )
+            );
+
+        // Payment Status Card
+        const $statusCard = $('<div>').addClass('card mb-4')
+            .append(
+                $('<div>').addClass('card-body')
+                    .append($('<h5>').addClass('card-title').text('Payment Status'))
+                    .append(
+                        $('<div>')
+                            .addClass(`payment-badge ${this.getPaymentClass(order.payment_status)}`)
+                            .append($('<i>').addClass(`fas ${this.getPaymentIcon(order.payment_status)} mr-2`))
+                            .append(order.payment_status.replace(/_/g, ' ').toUpperCase())
+                    )
+            );
+
+        // Add cards to payment section
+        $paymentSection
+            .append($summaryCard)
+            .append($statusCard);
+
+        return $paymentSection;
+    }
+
+    showOrderDetails(order) {
+        // Store the current order for reference in other methods
+        this.currentOrder = order;
+        
+        // Update the modal title
+        $('#orderTitle').text(`Order Details: ${order.order_number}`);
+
+        // Update customer information
+        $('#customerName').text(order.customer_name);
+        $('#customerEmail').text(order.customer_email);
+        $('#customerPhone').text(order.customer_phone);
+        $('#officeId').text(order.office_id);
+        $('#expectedDelivery').text(new Date(order.expected_delivery_date).toLocaleDateString());
+
+        // Update order summary
+        $('#orderNumber').text(order.order_number);
+        $('#createdDate').text(new Date(order.created_at).toLocaleDateString());
+        $('#updatedDate').text(new Date(order.updated_at).toLocaleDateString());
+        $('#subtotal').text(this.formatIDR(order.subtotal));
+        $('#discount').text(`-${this.formatIDR(order.discount_amount)}`);
+        $('#totalAmount').text(this.formatIDR(order.total_amount));
+
+        // Update status badges
+        const orderStatusClass = this.getStatusClass(order.status);
+        $('#orderStatus')
+            .removeClass()
+            .addClass(`value status-badge ${orderStatusClass}`)
+            .html(`<i class="bg-${orderStatusClass}"></i>${order.status.replace(/_/g, ' ').toUpperCase()}`);
+
+        const paymentStatusClass = this.getPaymentClass(order.payment_status);
+        $('#paymentStatus')
+            .removeClass()
+            .addClass(`value status-badge ${paymentStatusClass}`)
+            .html(`<i class="bg-${paymentStatusClass}"></i>${order.payment_status.replace(/_/g, ' ').toUpperCase()}`);
+
+        // Clear previous content
+        $('#orderItemsGrid').empty();
+        $('.production-timeline').empty();
+        $('.payment-history').empty();
+
+        // Initialize order items grid
+        if (order.order_items && order.order_items.length > 0) {
+            const $itemsGrid = $('<div>').addClass('order-items-table');
+            const $table = $(`
+                <table class="table align-items-center">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Jersey Details</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-right">Unit Price</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `);
+
+            order.order_items.forEach(item => {
+                const $row = $(`
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                ${item.main_photo ? `
+                                    <div class="mr-3">
+                                        <img src="${item.main_photo}" alt="Product" class="avatar rounded">
+                                    </div>
+                                ` : ''}
+                                <div>
+                                    <h5 class="mb-0">${item.product_detail?.name || 'Custom Jersey'}</h5>
+                                    <p class="text-sm mb-0">${item.size} - ${item.color}</p>
+                                    ${item.customization ? `
+                                        <span class="badge badge-primary">
+                                            ${item.customization.name} #${item.customization.number}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">${item.quantity}</td>
+                        <td class="text-right">${this.formatIDR(item.unit_price)}</td>
+                        <td class="text-right">${this.formatIDR(item.quantity * item.unit_price)}</td>
+                    </tr>
+                `);
+                $table.find('tbody').append($row);
+            });
+
+            $itemsGrid.append($table);
+            $('#orderItemsGrid').append($itemsGrid);
+        }
+
+        // Render production timeline
+        const $timeline = $('<div>').addClass('timeline');
+        const stages = [
+            { status: 'pending', icon: 'clock', title: 'Order Placed' },
+            { status: 'confirmed', icon: 'check', title: 'Order Confirmed' },
+            { status: 'in_production', icon: 'cogs', title: 'In Production' },
+            { status: 'quality_check', icon: 'clipboard-check', title: 'Quality Check' },
+            { status: 'ready_for_delivery', icon: 'box', title: 'Ready for Delivery' },
+            { status: 'delivered', icon: 'truck', title: 'Delivered' }
+        ];
+
+        const currentStageIndex = stages.findIndex(s => s.status === order.status);
+        stages.forEach((stage, index) => {
+            const isCompleted = index < currentStageIndex;
+            const isCurrent = index === currentStageIndex;
+            
+            const $stage = $(`
+                <div class="timeline-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}">
+                    <div class="timeline-marker">
+                        <i class="fas fa-${stage.icon}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h3 class="timeline-title">${stage.title}</h3>
+                        ${isCurrent ? `
+                            <p class="text-sm text-muted">
+                                Current Status - Updated ${new Date(order.updated_at).toLocaleDateString()}
+                            </p>
+                        ` : ''}
+                    </div>
+                </div>
+            `);
+            $timeline.append($stage);
+        });
+        $('.production-timeline').append($timeline);
+
+        // Render payment history
+        const $paymentHistory = $('<div>').addClass('payment-info-card');
+        $paymentHistory.append(`
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Payment Status</h3>
+                    </div>
+                    <div class="col text-right">
+                        <span class="badge badge-${paymentStatusClass}">
+                            ${order.payment_status.replace(/_/g, ' ').toUpperCase()}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="text-muted mb-2">Subtotal</div>
+                        <div class="h3">${this.formatIDR(order.subtotal)}</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted mb-2">Discount</div>
+                        <div class="h3 text-danger">-${this.formatIDR(order.discount_amount)}</div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="text-muted mb-2">Total Amount</div>
+                        <div class="h3 text-success">${this.formatIDR(order.total_amount)}</div>
+                    </div>
+                </div>
+            </div>
+        `);
+        $('.payment-history').append($paymentHistory);
+
+        // Show the modal
+        $('#orderDetailsModal').modal('show');
+    }
+
+    clearOrderDetails() {
+        // Clear all content
+        $('#customerName, #customerEmail, #customerPhone, #officeId, #expectedDelivery').empty();
+        $('#orderNumber, #createdDate, #updatedDate, #subtotal, #discount, #totalAmount').empty();
+        $('#orderStatus, #paymentStatus').empty();
+        $('#orderItemsGrid, .production-timeline, .payment-history').empty();
     }
 } 

@@ -1,0 +1,128 @@
+/* Payment History Styles */
+.payment-history {
+    padding: 20px;
+}
+
+.payment-info-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.total-amount {
+    margin-bottom: 20px;
+}
+
+.total-amount .label {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.total-amount .amount {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.payment-progress {
+    margin-top: 16px;
+}
+
+.payment-progress .progress-bar {
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.payment-progress .progress {
+    height: 100%;
+    background: #3498db;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-amounts {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.progress-amounts .paid {
+    color: #2ecc71;
+}
+
+.progress-amounts .remaining {
+    color: #e74c3c;
+}
+
+.payment-history-list {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.payment-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-item:last-child {
+    border-bottom: none;
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.payment-id {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.completed {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-badge.pending {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.status-badge.failed {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.payment-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.payment-details .amount {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.payment-details i {
+    color: #95a5a6;
+    margin-right: 8px;
+} 
