@@ -184,9 +184,9 @@ func toWorkOrderResponse(w interface{}) WorkOrderResponse {
 	orderInfo := OrderInfo{
 		ID:                   workOrder.Order.ID,
 		OrderNumber:          workOrder.Order.OrderNumber,
-		CustomerEmail:        workOrder.Order.CustomerEmail,
-		CustomerPhone:        workOrder.Order.CustomerPhone,
-		DeliveryAddress:      workOrder.Order.DeliveryAddress,
+		CustomerEmail:        workOrder.Order.Customer.Email,
+		CustomerPhone:        workOrder.Order.Customer.Phone,
+		DeliveryAddress:      workOrder.Order.Customer.Address,
 		Status:               workOrder.Order.Status,
 		PaymentStatus:        workOrder.Order.PaymentStatus,
 		ExpectedDeliveryDate: workOrder.Order.ExpectedDeliveryDate,

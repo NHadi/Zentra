@@ -52,10 +52,8 @@ type OrderItemResponse struct {
 type OrderResponse struct {
 	ID                   int                 `json:"id" example:"1"`
 	OrderNumber          string              `json:"order_number" example:"ORD-001"`
-	CustomerName         string              `json:"customer_name" example:"John Doe"`
-	CustomerEmail        string              `json:"customer_email" example:"john.doe@example.com"`
-	CustomerPhone        string              `json:"customer_phone" example:"123-456-7890"`
-	DeliveryAddress      string              `json:"delivery_address" example:"123 Main St"`
+	CustomerID           int                 `json:"customer_id" example:"1"`
+	Customer             *CustomerResponse   `json:"customer,omitempty"`
 	OfficeID             int                 `json:"office_id" example:"1"`
 	Subtotal             float64             `json:"subtotal" example:"100.00"`
 	DiscountAmount       float64             `json:"discount_amount" example:"10.00"`
@@ -88,10 +86,7 @@ type CreateOrderItemRequest struct {
 // @Description Create order request model
 type CreateOrderRequest struct {
 	OrderNumber          string                   `json:"order_number" binding:"required" example:"ORD-001"`
-	CustomerName         string                   `json:"customer_name" binding:"required" example:"John Doe"`
-	CustomerEmail        string                   `json:"customer_email" binding:"required,email" example:"john.doe@example.com"`
-	CustomerPhone        string                   `json:"customer_phone" example:"123-456-7890"`
-	DeliveryAddress      string                   `json:"delivery_address" example:"123 Main St"`
+	CustomerID           int                      `json:"customer_id" binding:"required" example:"1"`
 	OfficeID             int                      `json:"office_id" binding:"required" example:"1"`
 	Subtotal             float64                  `json:"subtotal" binding:"required" example:"100.00"`
 	DiscountAmount       float64                  `json:"discount_amount" example:"10.00"`
@@ -106,10 +101,7 @@ type CreateOrderRequest struct {
 // UpdateOrderRequest represents the request structure for updating an order
 // @Description Update order request model
 type UpdateOrderRequest struct {
-	CustomerName         string  `json:"customer_name" binding:"required" example:"John Doe"`
-	CustomerEmail        string  `json:"customer_email" binding:"required,email" example:"john.doe@example.com"`
-	CustomerPhone        string  `json:"customer_phone" example:"123-456-7890"`
-	DeliveryAddress      string  `json:"delivery_address" example:"123 Main St"`
+	CustomerID           int     `json:"customer_id" binding:"required" example:"1"`
 	OfficeID             int     `json:"office_id" binding:"required" example:"1"`
 	Subtotal             float64 `json:"subtotal" binding:"required" example:"100.00"`
 	DiscountAmount       float64 `json:"discount_amount" example:"10.00"`
@@ -181,10 +173,7 @@ func toOrderResponse(o *order.Order) OrderResponse {
 	response := OrderResponse{
 		ID:                   o.ID,
 		OrderNumber:          o.OrderNumber,
-		CustomerName:         o.CustomerName,
-		CustomerEmail:        o.CustomerEmail,
-		CustomerPhone:        o.CustomerPhone,
-		DeliveryAddress:      o.DeliveryAddress,
+		CustomerID:           o.CustomerID,
 		OfficeID:             o.OfficeID,
 		Subtotal:             o.Subtotal,
 		DiscountAmount:       o.DiscountAmount,
@@ -198,6 +187,12 @@ func toOrderResponse(o *order.Order) OrderResponse {
 		UpdatedAt:            o.UpdatedAt.String(),
 		UpdatedBy:            o.UpdatedBy,
 		TenantID:             o.TenantID,
+	}
+
+	// Add customer if it exists
+	if o.Customer != nil {
+		customerResponse := toCustomerResponse(o.Customer)
+		response.Customer = &customerResponse
 	}
 
 	// Add order items if they exist
@@ -243,10 +238,7 @@ func CreateOrder(service *application.OrderService) gin.HandlerFunc {
 		// Create the order
 		newOrder := &order.Order{
 			OrderNumber:          req.OrderNumber,
-			CustomerName:         req.CustomerName,
-			CustomerEmail:        req.CustomerEmail,
-			CustomerPhone:        req.CustomerPhone,
-			DeliveryAddress:      req.DeliveryAddress,
+			CustomerID:           req.CustomerID,
 			OfficeID:             req.OfficeID,
 			Subtotal:             req.Subtotal,
 			DiscountAmount:       req.DiscountAmount,
@@ -389,10 +381,7 @@ func UpdateOrder(service *application.OrderService) gin.HandlerFunc {
 			return
 		}
 
-		order.CustomerName = req.CustomerName
-		order.CustomerEmail = req.CustomerEmail
-		order.CustomerPhone = req.CustomerPhone
-		order.DeliveryAddress = req.DeliveryAddress
+		order.CustomerID = req.CustomerID
 		order.OfficeID = req.OfficeID
 		order.Subtotal = req.Subtotal
 		order.DiscountAmount = req.DiscountAmount
@@ -644,7 +633,7 @@ func sendWhatsAppNotification(order *order.Order, status string, additionalMessa
 	templateName, params := getTemplateParams(order, status, additionalMessage)
 
 	// Send message using template
-	return whatsappClient.SendMessage(order.CustomerPhone, templateName, params)
+	return whatsappClient.SendMessage(order.Customer.Phone, templateName, params)
 }
 
 func getTemplateParams(order *order.Order, status string, additionalMessage string) (string, []string) {
@@ -652,49 +641,49 @@ func getTemplateParams(order *order.Order, status string, additionalMessage stri
 	switch status {
 	case "pending":
 		return "order_pending", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	case "confirmed":
 		return "order_confirmed", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	case "in_production":
 		return "order_in_production", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	case "quality_check":
 		return "order_quality_check", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	case "ready_for_delivery":
 		return "order_ready", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	case "delivered":
 		return "order_delivered", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	case "cancelled":
 		return "order_cancelled", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			additionalMessage,
 		}
 	default:
 		return "order_status_update", []string{
-			order.CustomerName,
+			order.Customer.Name,
 			order.OrderNumber,
 			status,
 			additionalMessage,

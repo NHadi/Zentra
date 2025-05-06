@@ -8,15 +8,17 @@ import (
 
 // OrderService handles business logic for order operations
 type OrderService struct {
-	repo     order.Repository
-	auditSvc *audit.Service
+	repo        order.Repository
+	auditSvc    *audit.Service
+	customerSvc *CustomerService
 }
 
 // NewOrderService creates a new order service instance
-func NewOrderService(repo order.Repository, auditSvc *audit.Service) *OrderService {
+func NewOrderService(repo order.Repository, auditSvc *audit.Service, customerSvc *CustomerService) *OrderService {
 	return &OrderService{
-		repo:     repo,
-		auditSvc: auditSvc,
+		repo:        repo,
+		auditSvc:    auditSvc,
+		customerSvc: customerSvc,
 	}
 }
 
@@ -74,7 +76,14 @@ func (s *OrderService) Delete(id int, ctx context.Context) error {
 
 // FindByCustomerEmail retrieves all orders for a given customer email
 func (s *OrderService) FindByCustomerEmail(email string, ctx context.Context) ([]order.Order, error) {
-	return s.repo.FindByCustomerEmail(email, ctx)
+	// First find the customer by email
+	customer, err := s.customerSvc.FindByEmail(email, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Then find orders by customer ID
+	return s.repo.FindByCustomerID(customer.ID, ctx)
 }
 
 // FindByOrderNumber retrieves an order by order number
@@ -90,4 +99,9 @@ func (s *OrderService) FindByStatus(status string, ctx context.Context) ([]order
 // FindByPaymentStatus retrieves all orders with a specific payment status
 func (s *OrderService) FindByPaymentStatus(status string, ctx context.Context) ([]order.Order, error) {
 	return s.repo.FindByPaymentStatus(status, ctx)
+}
+
+// FindByCustomerID retrieves all orders for a given customer ID
+func (s *OrderService) FindByCustomerID(customerID int, ctx context.Context) ([]order.Order, error) {
+	return s.repo.FindByCustomerID(customerID, ctx)
 }

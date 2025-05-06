@@ -98,28 +98,35 @@ export class OrderGrid {
                     }
                 },
                 {
-                    dataField: 'customer_name',
+                    dataField: 'customer',
                     caption: 'Customer',
                     cellTemplate: (container, options) => {
                         const order = options.data;
+                        const customer = order.customer || {};
                         $('<div>')
                             .addClass('d-flex flex-column')
                             .append(
                                 $('<div>')
                                     .addClass('font-weight-bold')
-                                    .text(order.customer_name)
+                                    .text(customer.name)
+                            )
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex align-items-center text-muted mb-1')
+                                    .append($('<i>').addClass('fas fa-hashtag mr-1'))
+                                    .append(customer.customer_number)
                             )
                             .append(
                                 $('<small>')
-                                    .addClass('text-muted')
+                                    .addClass('text-muted d-flex align-items-center')
                                     .append($('<i>').addClass('fas fa-envelope mr-1'))
-                                    .append(order.customer_email)
+                                    .append(customer.email)
                             )
                             .append(
                                 $('<small>')
-                                    .addClass('text-muted')
+                                    .addClass('text-muted d-flex align-items-center')
                                     .append($('<i>').addClass('fas fa-phone mr-1'))
-                                    .append(order.customer_phone)
+                                    .append(customer.phone || 'N/A')
                             )
                             .appendTo(container);
                     }
@@ -357,6 +364,7 @@ export class OrderGrid {
     }
 
     renderCustomerInfo(order) {
+        const customer = order.customer || {};
         return $('<div>')
             .addClass('mb-4')
             .append(
@@ -374,15 +382,51 @@ export class OrderGrid {
                                 $('<div>')
                                     .addClass('d-flex flex-column')
                                     .append(
+                                        $('<small>').addClass('text-muted').text('Customer Number')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(customer.customer_number)
+                                    )
+                            )
+                    )
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-4')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
                                         $('<small>').addClass('text-muted').text('Name')
                                     )
                                     .append(
                                         $('<span>')
                                             .addClass('font-weight-bold')
-                                            .text(order.customer_name)
-                                        )
+                                            .text(customer.name)
+                                    )
                             )
                     )
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-4')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('Status')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('badge badge-' + (customer.status === 'active' ? 'success' : 'danger'))
+                                            .text(customer.status?.toUpperCase() || 'N/A')
+                                    )
+                            )
+                    )
+            )
+            .append(
+                $('<div>')
+                    .addClass('row mt-3')
                     .append(
                         $('<div>')
                             .addClass('col-md-4')
@@ -395,8 +439,8 @@ export class OrderGrid {
                                     .append(
                                         $('<span>')
                                             .addClass('font-weight-bold')
-                                            .text(order.customer_email)
-                                        )
+                                            .text(customer.email)
+                                    )
                             )
                     )
                     .append(
@@ -411,10 +455,68 @@ export class OrderGrid {
                                     .append(
                                         $('<span>')
                                             .addClass('font-weight-bold')
-                                            .text(order.customer_phone)
-                                        )
+                                            .text(customer.phone || 'N/A')
+                                    )
                             )
                     )
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-4')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('City')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(customer.city || 'N/A')
+                                    )
+                            )
+                    )
+            )
+            .append(
+                $('<div>')
+                    .addClass('row mt-3')
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-12')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('Address')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(customer.address || 'N/A')
+                                    )
+                            )
+                    )
+            )
+            .append(
+                customer.notes ? 
+                $('<div>')
+                    .addClass('row mt-3')
+                    .append(
+                        $('<div>')
+                            .addClass('col-md-12')
+                            .append(
+                                $('<div>')
+                                    .addClass('d-flex flex-column')
+                                    .append(
+                                        $('<small>').addClass('text-muted').text('Notes')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold font-italic')
+                                            .text(customer.notes)
+                                    )
+                            )
+                    )
+                : null
             );
     }
 
@@ -1198,11 +1300,12 @@ export class OrderGrid {
         // Update the modal title
         $('#orderTitle').text(`Order Details: ${order.order_number}`);
 
+        const customer = order.customer || {};
         // Update customer information
-        $('#customerName').text(order.customer_name);
-        $('#customerEmail').text(order.customer_email);
-        $('#customerPhone').text(order.customer_phone);
-        $('#officeId').text(order.office_id);
+        $('#customerName').text(customer.name || 'N/A');
+        $('#customerEmail').text(customer.email || 'N/A');
+        $('#customerPhone').text(customer.phone || 'N/A');
+        $('#officeId').text(order.office_id || 'N/A');
         $('#expectedDelivery').text(new Date(order.expected_delivery_date).toLocaleDateString());
 
         // Update order summary
@@ -1280,75 +1383,6 @@ export class OrderGrid {
             $itemsGrid.append($table);
             $('#orderItemsGrid').append($itemsGrid);
         }
-
-        // Render production timeline
-        const $timeline = $('<div>').addClass('timeline');
-        const stages = [
-            { status: 'pending', icon: 'clock', title: 'Order Placed' },
-            { status: 'confirmed', icon: 'check', title: 'Order Confirmed' },
-            { status: 'in_production', icon: 'cogs', title: 'In Production' },
-            { status: 'quality_check', icon: 'clipboard-check', title: 'Quality Check' },
-            { status: 'ready_for_delivery', icon: 'box', title: 'Ready for Delivery' },
-            { status: 'delivered', icon: 'truck', title: 'Delivered' }
-        ];
-
-        const currentStageIndex = stages.findIndex(s => s.status === order.status);
-        stages.forEach((stage, index) => {
-            const isCompleted = index < currentStageIndex;
-            const isCurrent = index === currentStageIndex;
-            
-            const $stage = $(`
-                <div class="timeline-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''}">
-                    <div class="timeline-marker">
-                        <i class="fas fa-${stage.icon}"></i>
-                    </div>
-                    <div class="timeline-content">
-                        <h3 class="timeline-title">${stage.title}</h3>
-                        ${isCurrent ? `
-                            <p class="text-sm text-muted">
-                                Current Status - Updated ${new Date(order.updated_at).toLocaleDateString()}
-                            </p>
-                        ` : ''}
-                    </div>
-                </div>
-            `);
-            $timeline.append($stage);
-        });
-        $('.production-timeline').append($timeline);
-
-        // Render payment history
-        const $paymentHistory = $('<div>').addClass('payment-info-card');
-        $paymentHistory.append(`
-            <div class="card-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <h3 class="mb-0">Payment Status</h3>
-                    </div>
-                    <div class="col text-right">
-                        <span class="badge badge-${paymentStatusClass}">
-                            ${order.payment_status.replace(/_/g, ' ').toUpperCase()}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="text-muted mb-2">Subtotal</div>
-                        <div class="h3">${this.formatIDR(order.subtotal)}</div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="text-muted mb-2">Discount</div>
-                        <div class="h3 text-danger">-${this.formatIDR(order.discount_amount)}</div>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="text-muted mb-2">Total Amount</div>
-                        <div class="h3 text-success">${this.formatIDR(order.total_amount)}</div>
-                    </div>
-                </div>
-            </div>
-        `);
-        $('.payment-history').append($paymentHistory);
 
         // Show the modal
         $('#orderDetailsModal').modal('show');

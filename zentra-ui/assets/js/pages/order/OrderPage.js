@@ -338,10 +338,10 @@ export class OrderPage {
     }
 }
 
-// Add the class to window object for compatibility with content loader
-window.OrderPage = OrderPage;
+// Make it available globally for the content loader
+globalThis.OrderPage = OrderPage;
 
 // Initialize only if DevExtreme is loaded
-if (typeof DevExpress !== 'undefined' && !window.orderPageInstance) {
-    window.orderPageInstance = new OrderPage();
+if (typeof DevExpress !== 'undefined' && !globalThis.orderPageInstance) {
+    globalThis.orderPageInstance = new OrderPage();
 } 

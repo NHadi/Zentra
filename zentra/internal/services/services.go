@@ -26,6 +26,7 @@ type ItemService = *application.ItemService
 type StockOpnameService = *application.StockOpnameService
 type StockMovementService = *application.StockMovementService
 type SupplierService = *application.SupplierService
+type CustomerService = *application.CustomerService
 
 // Services holds all the application services
 type Services struct {
@@ -51,6 +52,7 @@ type Services struct {
 	StockMovementService   *application.StockMovementService
 	SupplierService        *application.SupplierService
 	ChannelService         *application.ChannelService
+	CustomerService        *application.CustomerService
 
 	// Accounting Services
 	TransactionCategoryService *application.TransactionCategoryService
@@ -85,6 +87,7 @@ func NewServices(db *gorm.DB, cfg *config.Config) *Services {
 	stockMovementRepo := postgres.NewStockMovementRepository(db)
 	supplierRepo := postgres.NewSupplierRepository(db)
 	channelRepo := postgres.NewChannelRepository(db)
+	customerRepo := postgres.NewCustomerRepository(db)
 
 	// Initialize accounting repositories
 	transactionCategoryRepo := postgres.NewTransactionCategoryRepository(db)
@@ -111,7 +114,8 @@ func NewServices(db *gorm.DB, cfg *config.Config) *Services {
 	productService := application.NewProductService(productRepo, auditService)
 	productCategoryService := application.NewProductCategoryService(productCategoryRepo, auditService)
 	productImageService := application.NewProductImageService(productImageRepo, productRepo)
-	orderService := application.NewOrderService(orderRepo, auditService)
+	customerService := application.NewCustomerService(customerRepo)
+	orderService := application.NewOrderService(orderRepo, auditService, customerService)
 	paymentService := application.NewPaymentService(paymentRepo, auditService)
 	taskService := application.NewTaskService(taskRepo, auditService)
 	itemService := application.NewItemService(itemRepo, auditService)
@@ -151,6 +155,7 @@ func NewServices(db *gorm.DB, cfg *config.Config) *Services {
 		StockMovementService:   stockMovementService,
 		SupplierService:        supplierService,
 		ChannelService:         channelService,
+		CustomerService:        customerService,
 
 		// Accounting Services
 		TransactionCategoryService: transactionCategoryService,

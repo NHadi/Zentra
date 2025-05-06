@@ -33,11 +33,36 @@ func NewLogger(addresses []string, username, password, index string) (*Logger, e
 	}, nil
 }
 
+// shouldSkipLogging returns true if the message should not be logged
+func shouldSkipLogging(msg string, fields map[string]interface{}) bool {
+	// Skip health check messages
+	if msg == "Service is healthy" {
+		return true
+	}
+
+	// Check if it's a health check API call
+	if fields != nil {
+		if path, ok := fields["path"].(string); ok {
+			if path == "/api/health" {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (l *Logger) Info(msg string, fields map[string]interface{}) error {
+	if shouldSkipLogging(msg, fields) {
+		return nil
+	}
 	return l.log("info", msg, fields, nil)
 }
 
 func (l *Logger) Error(msg string, fields map[string]interface{}, err error) error {
+	if shouldSkipLogging(msg, fields) {
+		return nil
+	}
 	if fields == nil {
 		fields = make(map[string]interface{})
 	}

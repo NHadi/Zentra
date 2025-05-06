@@ -15,6 +15,8 @@ services:
       - "--providers.docker.network=traefik-net"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       - "--certificatesresolvers.zerossl.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.zerossl.acme.storage=/etc/traefik/acme.json"
       - "--certificatesresolvers.zerossl.acme.httpchallenge=true"
@@ -22,8 +24,8 @@ services:
       - "--certificatesresolvers.zerossl.acme.caserver=https://acme.zerossl.com/v2/DV90"
       - "--certificatesresolvers.zerossl.acme.eab.kid=2YsNtypbR2F8IYffYc6bdQ"
       - "--certificatesresolvers.zerossl.acme.eab.hmacencoded=2x_i41U1jBIAwQ-tp1ghEDxR3tyqZMKj96PNgObPKlzK7k0eOW4_7vyc8ndj-iz4MIzcBY9jMMuvVvt7v2F0zQ"
-      - "--log.level=INFO"
-      - "--accesslog=false"
+      - "--log.level=DEBUG"
+      - "--accesslog=true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${REMOTE_PATH}/traefik/letsencrypt/acme.json:/etc/traefik/acme.json
@@ -41,6 +43,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
 
   # Frontend Development
   frontend_dev:
@@ -79,6 +89,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 256M
 
   # E-shop Development
   eshop_dev:
@@ -117,6 +135,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 256M
 
   # Backend Development
   backend_dev:
@@ -164,6 +190,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.20'
+          memory: 256M
 
   # Staging Environment
   frontend_staging:
@@ -202,6 +236,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 256M
 
   eshop_staging:
     image: nurulhadii/zentra-eshop:staging
@@ -238,6 +280,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 256M
 
   # Backend Staging
   backend_staging:
@@ -285,6 +335,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.20'
+          memory: 256M
 
   # Production Environment
   frontend_prod:
@@ -323,6 +381,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 768M
+        reservations:
+          cpus: '0.20'
+          memory: 384M
 
   # E-shop Production
   eshop_prod:
@@ -357,6 +423,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 768M
+        reservations:
+          cpus: '0.20'
+          memory: 384M
 
   # Backend Production
   backend_prod:
@@ -404,6 +478,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.70'
+          memory: 1G
+        reservations:
+          cpus: '0.30'
+          memory: 512M
 
   # Centralized PostgreSQL
   postgres:
@@ -429,6 +511,24 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 1G
+        reservations:
+          cpus: '0.20'
+          memory: 512M
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_buffers=256MB"
+      - "-c"
+      - "work_mem=16MB"
+      - "-c"
+      - "maintenance_work_mem=128MB"
+      - "-c"
+      - "max_connections=100"
 
   # Single pgAdmin instance
   pgadmin:
@@ -464,6 +564,14 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.20'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
 
   # Shared Services
   elasticsearch:
@@ -474,9 +582,34 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - cluster.name=zentra-cluster
       - network.host=0.0.0.0
+      - bootstrap.memory_lock=true
+      - thread_pool.write.queue_size=100
+      - thread_pool.search.queue_size=100
+      - indices.queries.cache.size=5%
+      - indices.memory.index_buffer_size=10%
+      - indices.fielddata.cache.size=10%
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.low=85%
+      - cluster.routing.allocation.disk.watermark.high=90%
+      - cluster.routing.allocation.disk.watermark.flood_stage=95%
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 768M
+        reservations:
+          cpus: '0.4'
+          memory: 512M
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
@@ -504,6 +637,25 @@ services:
       - SERVER_NAME=kibana.${DOMAIN}
       - SERVER_PUBLICBASEURL=${KIBANA_SERVER_PUBLICBASEURL}
       - SERVER_HOST=0.0.0.0
+      - NODE_OPTIONS="--max-old-space-size=256"
+      - TELEMETRY_ENABLED=false
+      - MONITORING_UI_CONTAINER_ELASTICSEARCH_ENABLED=false
+      - XPACK_REPORTING_ENABLED=false
+      - XPACK_SECURITY_ENABLED=false
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENABLED=false
+      - XPACK_TASK_MANAGER_ENABLED=false
+      - XPACK_ACTIONS_ENABLED=false
+      - XPACK_ALERTING_ENABLED=false
+      - XPACK_GRAPH_ENABLED=false
+      - XPACK_ML_ENABLED=false
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
     depends_on:
       - elasticsearch
     networks:
@@ -520,6 +672,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
 
 volumes:
   postgres_data:

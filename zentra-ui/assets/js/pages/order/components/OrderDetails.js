@@ -5,6 +5,16 @@ export class OrderDetails {
         this.orderPage = orderPage;
     }
 
+    // Helper method to format currency in IDR
+    formatIDR(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    }
+
     render(container, order) {
         // Create a container for the details
         const $detailContent = $('<div>').addClass('order-detail-container p-4');
@@ -211,12 +221,21 @@ export class OrderDetails {
     updateOrderInfoTab(order) {
         if (!order) return;
         
+        const customer = order.customer || {};
+        
         // Update customer information
-        $('#customerName').text(order.customer_name || 'N/A');
-        $('#customerEmail').text(order.customer_email || 'N/A');
-        $('#customerPhone').text(order.customer_phone || 'N/A');
+        $('#customerName').text(customer.name || 'N/A');
+        $('#customerEmail').text(customer.email || 'N/A');
+        $('#customerPhone').text(customer.phone || 'N/A');
+        $('#customerNumber').text(customer.customer_number || 'N/A');
+        $('#customerStatus').html(`
+            <span class="badge badge-${customer.status === 'active' ? 'success' : 'danger'}">
+                ${customer.status?.toUpperCase() || 'N/A'}
+            </span>
+        `);
+        $('#customerAddress').text(customer.address || 'N/A');
+        $('#customerCity').text(customer.city || 'N/A');
         $('#officeId').text(order.office_id || 'N/A');
-        $('#deliveryAddress').text(order.delivery_address || 'N/A');
         $('#expectedDelivery').text(order.expected_delivery_date ? 
             new Date(order.expected_delivery_date).toLocaleDateString() : 'N/A');
 
@@ -228,9 +247,9 @@ export class OrderDetails {
             new Date(order.updated_at).toLocaleDateString() : 'N/A');
 
         // Update payment information
-        $('#subtotal').text(`$${(order.subtotal || 0).toFixed(2)}`);
-        $('#discount').text(`-$${(order.discount_amount || 0).toFixed(2)}`);
-        $('#totalAmount').text(`$${(order.total_amount || 0).toFixed(2)}`);
+        $('#subtotal').text(this.orderPage.formatIDR(order.subtotal || 0));
+        $('#discount').text(`-${this.orderPage.formatIDR(order.discount_amount || 0)}`);
+        $('#totalAmount').text(this.orderPage.formatIDR(order.total_amount || 0));
     }
 
     updateItemsTab(order) {

@@ -987,8 +987,8 @@
                         // Handle script load/error
                         script.onload = () => {
                             // Initialize the order page instance
-                            if (!window.orderPageInstance) {
-                                window.orderPageInstance = new window.OrderPage();
+                            if (!globalThis.orderPageInstance) {
+                                globalThis.orderPageInstance = new globalThis.OrderPage();
                             }
                             resolve();
                         };

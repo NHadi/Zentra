@@ -1,0 +1,92 @@
+apiVersion: 1
+
+groups:
+  - name: Docker Alerts
+    folder: Docker
+    interval: 1m
+    rules:
+      - name: High CPU Usage
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: sum(rate(container_cpu_usage_seconds_total{container!=""}[5m])) by (container) * 100 > 80
+              instant: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+              type: math
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Container {{$labels.container}} CPU usage is high"
+        labels:
+          severity: warning
+
+      - name: High Memory Usage
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: prometheus
+            model:
+              expr: (container_memory_usage_bytes{container!=""} / container_spec_memory_limit_bytes{container!=""} * 100) > 80
+              instant: false
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator:
+                    params:
+                      - 0
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params: []
+                  reducer:
+                    params: []
+                    type: last
+                  type: query
+              datasource:
+                name: Expression
+                type: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+              type: math
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: "Container {{$labels.container}} memory usage is high"
+        labels:
+          severity: warning 

@@ -1,0 +1,39 @@
+groups:
+  - name: container_metrics
+    rules:
+      - record: container:cpu_usage_percent
+        expr: sum(rate(container_cpu_usage_seconds_total{container!=""}[5m])) by (container) * 100
+
+      - record: container:memory_usage_mb
+        expr: sum(container_memory_usage_bytes{container!=""}) by (container) / 1024 / 1024
+
+      - record: container:network_receive_bytes_rate
+        expr: rate(container_network_receive_bytes_total{container!=""}[5m])
+
+      - record: container:network_transmit_bytes_rate
+        expr: rate(container_network_transmit_bytes_total{container!=""}[5m])
+
+      - record: container:disk_reads_rate
+        expr: rate(container_fs_reads_bytes_total{container!=""}[5m])
+
+      - record: container:disk_writes_rate
+        expr: rate(container_fs_writes_bytes_total{container!=""}[5m])
+
+  - name: service_metrics
+    rules:
+      - record: service:request_duration_seconds
+        expr: rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])
+
+      - record: service:error_rate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)
+
+  - name: system_metrics
+    rules:
+      - record: system:cpu_usage_percent
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+
+      - record: system:memory_usage_percent
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+
+      - record: system:disk_usage_percent
+        expr: (1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 

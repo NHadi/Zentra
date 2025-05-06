@@ -46,10 +46,7 @@ export const orderAPI = {
             // Ensure all required fields are present and properly formatted
             const createOrderRequest = {
                 order_number: orderRequest.OrderNumber,
-                customer_name: orderRequest.CustomerName,
-                customer_email: orderRequest.CustomerEmail,
-                customer_phone: orderRequest.CustomerPhone,
-                delivery_address: orderRequest.DeliveryAddress,
+                customer_id: orderRequest.CustomerID,
                 office_id: orderRequest.OfficeID,
                 expected_delivery_date: orderRequest.ExpectedDeliveryDate,
                 subtotal: Number(orderRequest.Subtotal),
@@ -71,9 +68,8 @@ export const orderAPI = {
                 }))
             };
 
-            console.log('Sending order request:', createOrderRequest); // Debug log
+            console.log('Sending order request:', createOrderRequest);
 
-            // Create the order with items
             const response = await fetch(`${config.baseUrl}/orders`, {
                 method: 'POST',
                 headers: {
@@ -85,14 +81,10 @@ export const orderAPI = {
 
             if (!response.ok) {
                 const error = await response.json();
-                console.error('Order creation response:', error); // Debug log
                 throw new Error(error.error || 'Failed to create order');
             }
 
-            const createdOrder = await response.json();
-            console.log('Created order:', createdOrder); // Debug log
-
-            return createdOrder;
+            return await response.json();
         } catch (error) {
             console.error('Create order error:', error);
             throw error;
@@ -101,13 +93,26 @@ export const orderAPI = {
 
     async updateOrder(orderId, orderData) {
         try {
+            // Convert to snake_case for backend
+            const updateOrderRequest = {
+                customer_id: orderData.CustomerID,
+                office_id: orderData.OfficeID,
+                subtotal: Number(orderData.Subtotal),
+                discount_amount: Number(orderData.DiscountAmount),
+                total_amount: Number(orderData.TotalAmount),
+                status: orderData.Status,
+                payment_status: orderData.PaymentStatus,
+                expected_delivery_date: orderData.ExpectedDeliveryDate,
+                notes: orderData.Notes
+            };
+
             const response = await fetch(`${config.baseUrl}/orders/${orderId}`, {
                 method: 'PUT',
                 headers: {
                     ...getAuthHeaders(),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(orderData)
+                body: JSON.stringify(updateOrderRequest)
             });
 
             if (!response.ok) {
@@ -213,9 +218,9 @@ export const orderAPI = {
         }
     },
 
-    async getOrdersByCustomer(customerEmail) {
+    async getOrdersByCustomer(customerId) {
         try {
-            const response = await fetch(`${config.baseUrl}/orders/by-customer?email=${encodeURIComponent(customerEmail)}`, {
+            const response = await fetch(`${config.baseUrl}/orders/by-customer/${customerId}`, {
                 headers: getAuthHeaders()
             });
             
