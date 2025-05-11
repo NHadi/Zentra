@@ -270,5 +270,39 @@ export const orderAPI = {
             console.error('Get orders by payment status error:', error);
             throw error;
         }
+    },
+
+    async processPayment(paymentData) {
+        try {
+            // Convert to snake_case for backend
+            const paymentRequest = {
+                order_id: paymentData.OrderID,
+                amount: Number(paymentData.Amount),
+                payment_method: paymentData.PaymentMethod,
+                reference_number: paymentData.ReferenceNumber,
+                payment_date: paymentData.PaymentDate,
+                status: "completed",
+                notes: paymentData.Notes
+            };
+
+            const response = await fetch(`${config.baseUrl}/orders/${paymentData.OrderID}/payments`, {
+                method: 'POST',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(paymentRequest)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to process payment');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Process payment error:', error);
+            throw error;
+        }
     }
 }; 

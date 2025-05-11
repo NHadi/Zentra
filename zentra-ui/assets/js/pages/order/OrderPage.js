@@ -7,6 +7,7 @@ import { OrderGrid } from './components/OrderGrid.js';
 import { OrderDetails } from './components/OrderDetails.js';
 import { OrderTimeline } from './components/OrderTimeline.js';
 import { OrderModal } from './components/OrderModal.js';
+import { PaymentModal } from './components/PaymentModal.js';
 
 export class OrderPage {
     constructor() {
@@ -20,6 +21,7 @@ export class OrderPage {
         this.orderDetails = new OrderDetails(this);
         this.orderTimeline = new OrderTimeline(this);
         this.orderModal = new OrderModal(this);
+        this.paymentModal = new PaymentModal(this);
         
         // Initialize components
         if (typeof DevExpress !== 'undefined') {
@@ -67,6 +69,7 @@ export class OrderPage {
         $('#updateStatus').on('click', () => this.updateOrderStatus());
         $('#printOrder').on('click', () => this.printOrder());
         $('#cancelOrder').on('click', () => this.cancelOrder());
+        $('#processPaymentBtn').on('click', () => this.showPaymentModal());
 
         // Create order button
         $('#createOrderBtn').on('click', () => {
@@ -328,6 +331,12 @@ export class OrderPage {
                     console.log('Cancel order:', this.currentOrder);
                 }
             });
+        }
+    }
+
+    showPaymentModal() {
+        if (this.currentOrder) {
+            this.paymentModal.showPaymentModal(this.currentOrder);
         }
     }
 

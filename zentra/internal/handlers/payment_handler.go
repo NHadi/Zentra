@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"zentra/internal/application"
 	"zentra/internal/domain/payment"
+	"zentra/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
@@ -343,5 +344,73 @@ func GetPaymentsByStatus(service *application.PaymentService) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, response)
+	}
+}
+
+// GetOrderPayments handles retrieving payments for an order
+func GetOrderPayments(service services.OrderService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orderID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid order ID"})
+			return
+		}
+
+		payments, err := service.PaymentService.FindByOrderID(orderID, c)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to get order payments"})
+			return
+		}
+
+		response := make([]PaymentResponse, len(payments))
+		for i, p := range payments {
+			response[i] = toPaymentResponse(&p)
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+// ProcessPayment handles creating a new payment for an order
+func ProcessPayment(service services.OrderService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		orderID, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Invalid order ID"})
+			return
+		}
+
+		var req CreatePaymentRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+			return
+		}
+
+		// Create payment record
+		payment := &payment.Payment{
+			OrderID:         orderID,
+			Amount:          req.Amount,
+			PaymentMethod:   req.PaymentMethod,
+			ReferenceNumber: req.ReferenceNumber,
+			Status:          "completed",
+			PaymentDate:     req.PaymentDate,
+			Notes:           req.Notes,
+		}
+
+		// Process payment
+		err = service.PaymentService.Create(payment, c)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to process payment"})
+			return
+		}
+
+		// Get the created payment
+		createdPayment, err := service.PaymentService.FindByID(payment.ID, c)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "Failed to fetch created payment"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, toPaymentResponse(createdPayment))
 	}
 }
