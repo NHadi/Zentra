@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"strconv"
+	"time"
 	"zentra/internal/domain/audit"
 	"zentra/internal/domain/order"
 	"zentra/internal/domain/payment"
@@ -164,6 +165,13 @@ func (s *OrderService) ProcessPayment(c *gin.Context) {
 		return
 	}
 
+	// Get the order to check total amount and current payment status
+	order, err := s.repo.FindByID(orderIDInt, c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get order details"})
+		return
+	}
+
 	// Create payment record
 	payment := &payment.Payment{
 		OrderID:         orderIDInt,
@@ -171,6 +179,7 @@ func (s *OrderService) ProcessPayment(c *gin.Context) {
 		PaymentMethod:   paymentRequest.PaymentMethod,
 		ReferenceNumber: paymentRequest.ReferenceNumber,
 		Status:          "completed",
+		PaymentDate:     time.Now().Format(time.RFC3339),
 		Notes:           paymentRequest.Notes,
 	}
 
@@ -178,6 +187,39 @@ func (s *OrderService) ProcessPayment(c *gin.Context) {
 	err = s.PaymentService.Create(payment, c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process payment"})
+		return
+	}
+
+	// Get all payments for this order to calculate total paid amount
+	payments, err := s.PaymentService.FindByOrderID(orderIDInt, c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get order payments"})
+		return
+	}
+
+	// Calculate total paid amount
+	var totalPaid float64
+	for _, p := range payments {
+		if p.Status == "completed" {
+			totalPaid += p.Amount
+		}
+	}
+
+	// Update order payment status based on total paid amount
+	var newPaymentStatus string
+	if totalPaid >= order.TotalAmount {
+		newPaymentStatus = "paid"
+	} else if totalPaid > 0 {
+		newPaymentStatus = "partial"
+	} else {
+		newPaymentStatus = "unpaid"
+	}
+
+	// Update order payment status
+	order.PaymentStatus = newPaymentStatus
+	err = s.repo.Update(order, c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update order payment status"})
 		return
 	}
 

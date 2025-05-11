@@ -28,11 +28,15 @@ export class OrderDetails {
         // Production Timeline Section
         const $timelineSection = this.createTimelineSection(order);
 
+        // Payment Section
+        const $paymentSection = this.renderPaymentSection(order);
+
         // Append all sections to the container
         $detailContent
             .append($customerInfo)
             .append($itemsSection)
-            .append($timelineSection);
+            .append($timelineSection)
+            .append($paymentSection);
 
         // Append the detail content to the container
         container.append($detailContent);
@@ -189,6 +193,123 @@ export class OrderDetails {
         $timelineSection.append($timeline);
 
         return $timelineSection;
+    }
+
+    renderPaymentSection(order) {
+        const $paymentSection = $('<div>').addClass('payment-section');
+
+        // Calculate total paid amount
+        const totalPaid = order.payments?.reduce((sum, payment) => {
+            if (payment.status === 'completed') {
+                return sum + payment.amount;
+            }
+            return sum;
+        }, 0) || 0;
+
+        // Payment Summary Card
+        const $summaryCard = $('<div>').addClass('card mb-4')
+            .append(
+                $('<div>').addClass('card-body')
+                    .append($('<h5>').addClass('card-title').text('Payment Summary'))
+                    .append(
+                        $('<div>').addClass('row')
+                            .append(
+                                $('<div>').addClass('col-md-4')
+                                    .append($('<p>').addClass('mb-1 text-muted').text('Total Amount'))
+                                    .append($('<h3>').addClass('text-primary').text(this.formatIDR(order.total_amount)))
+                            )
+                            .append(
+                                $('<div>').addClass('col-md-4')
+                                    .append($('<p>').addClass('mb-1 text-muted').text('Amount Paid'))
+                                    .append($('<h3>').addClass('text-success').text(this.formatIDR(totalPaid)))
+                            )
+                            .append(
+                                $('<div>').addClass('col-md-4')
+                                    .append($('<p>').addClass('mb-1 text-muted').text('Balance'))
+                                    .append($('<h3>').addClass('text-danger').text(this.formatIDR(Math.max(0, order.total_amount - totalPaid))))
+                            )
+                    )
+            );
+
+        // Payment History Card
+        const $historyCard = $('<div>').addClass('card mb-4')
+            .append(
+                $('<div>').addClass('card-body')
+                    .append($('<h5>').addClass('card-title').text('Payment History'))
+                    .append(
+                        order.payments && order.payments.length > 0 ?
+                            this.renderPaymentHistory(order.payments) :
+                            $('<div>')
+                                .addClass('text-center text-muted py-4')
+                                .append($('<i>').addClass('fas fa-receipt fa-3x mb-3'))
+                                .append($('<p>').text('No payment transactions found'))
+                    )
+            );
+
+        // Add cards to payment section
+        $paymentSection
+            .append($summaryCard)
+            .append($historyCard);
+
+        return $paymentSection;
+    }
+
+    renderPaymentHistory(payments) {
+        const $history = $('<div>').addClass('payment-history');
+
+        payments.forEach(payment => {
+            const $paymentItem = $('<div>').addClass('payment-item d-flex align-items-center justify-content-between p-3 border-bottom');
+
+            // Payment method and reference
+            $paymentItem.append(
+                $('<div>').addClass('payment-info')
+                    .append(
+                        $('<div>').addClass('d-flex align-items-center mb-1')
+                            .append(
+                                $('<i>').addClass('fas fa-money-bill text-primary mr-2')
+                            )
+                            .append(
+                                $('<span>').addClass('font-weight-bold')
+                                    .text(payment.payment_method.replace(/_/g, ' ').toUpperCase())
+                            )
+                    )
+                    .append(
+                        $('<small>').addClass('text-muted d-block')
+                            .text(`Ref: ${payment.reference_number}`)
+                    )
+                    .append(
+                        $('<small>').addClass('text-muted d-block')
+                            .text(new Date(payment.payment_date).toLocaleString())
+                    )
+            );
+
+            // Payment amount and status
+            $paymentItem.append(
+                $('<div>').addClass('payment-details text-right')
+                    .append(
+                        $('<div>').addClass('font-weight-bold text-success mb-1')
+                            .text(this.formatIDR(payment.amount))
+                    )
+                    .append(
+                        $('<span>')
+                            .addClass(`badge badge-${payment.status === 'completed' ? 'success' : 'warning'}`)
+                            .text(payment.status.toUpperCase())
+                    )
+            );
+
+            // Add notes if exists
+            if (payment.notes) {
+                $paymentItem.append(
+                    $('<div>').addClass('payment-notes mt-2 small text-muted')
+                        .append($('<i>').addClass('fas fa-sticky-note mr-1'))
+                        .append(payment.notes)
+                );
+            }
+
+            $history.append($paymentItem);
+        });
+
+        return $history;
     }
 
     updateTabContent(tabId, order) {

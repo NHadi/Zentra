@@ -4,6 +4,7 @@ import (
 	"context"
 	"zentra/internal/domain/common"
 	"zentra/internal/domain/customer"
+	"zentra/internal/domain/payment"
 )
 
 // Order represents the orders table
@@ -21,6 +22,7 @@ type Order struct {
 	ExpectedDeliveryDate string             `gorm:"type:date" json:"expected_delivery_date"`
 	Notes                string             `gorm:"type:text" json:"notes"`
 	OrderItems           []OrderItem        `gorm:"foreignKey:OrderID" json:"order_items,omitempty"`
+	Payments             []payment.Payment  `gorm:"foreignKey:OrderID" json:"payments,omitempty"`
 	common.TenantModel
 }
 

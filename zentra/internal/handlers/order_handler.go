@@ -63,6 +63,7 @@ type OrderResponse struct {
 	ExpectedDeliveryDate string              `json:"expected_delivery_date" example:"2024-03-25"`
 	Notes                string              `json:"notes" example:"Please deliver in the morning"`
 	OrderItems           []OrderItemResponse `json:"order_items,omitempty"`
+	Payments             []PaymentResponse   `json:"payments,omitempty"`
 	CreatedAt            string              `json:"created_at" example:"2024-03-24T21:41:49Z"`
 	CreatedBy            string              `json:"created_by" example:"admin"`
 	UpdatedAt            string              `json:"updated_at" example:"2024-03-24T21:41:49Z"`
@@ -200,6 +201,14 @@ func toOrderResponse(o *order.Order) OrderResponse {
 		response.OrderItems = make([]OrderItemResponse, len(o.OrderItems))
 		for i, item := range o.OrderItems {
 			response.OrderItems[i] = toOrderItemResponse(&item)
+		}
+	}
+
+	// Add payments if they exist
+	if len(o.Payments) > 0 {
+		response.Payments = make([]PaymentResponse, len(o.Payments))
+		for i, p := range o.Payments {
+			response.Payments[i] = toPaymentResponse(&p)
 		}
 	}
 

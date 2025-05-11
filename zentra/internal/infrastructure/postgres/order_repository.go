@@ -32,7 +32,12 @@ func (r *orderRepository) Create(order *order.Order, ctx context.Context) error 
 func (r *orderRepository) FindByID(id int, ctx context.Context) (*order.Order, error) {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
 	var order order.Order
-	err := r.db.Preload("Customer").Preload("OrderItems.Product.Images").Preload("OrderItems.Tasks.Employee").Where("id = ? AND tenant_id = ?", id, userCtx.TenantID).First(&order).Error
+	err := r.db.Preload("Customer").
+		Preload("OrderItems.Product.Images").
+		Preload("OrderItems.Tasks.Employee").
+		Preload("Payments", "status = ?", "completed").
+		Where("id = ? AND tenant_id = ?", id, userCtx.TenantID).
+		First(&order).Error
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +48,12 @@ func (r *orderRepository) FindByID(id int, ctx context.Context) (*order.Order, e
 func (r *orderRepository) FindAll(ctx context.Context) ([]order.Order, error) {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
 	var orders []order.Order
-	err := r.db.Preload("Customer").Preload("OrderItems.Product.Images").Preload("OrderItems.Tasks.Employee").Where("tenant_id = ?", userCtx.TenantID).Find(&orders).Error
+	err := r.db.Preload("Customer").
+		Preload("OrderItems.Product.Images").
+		Preload("OrderItems.Tasks.Employee").
+		Preload("Payments", "status = ?", "completed").
+		Where("tenant_id = ?", userCtx.TenantID).
+		Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +77,12 @@ func (r *orderRepository) Delete(id int, ctx context.Context) error {
 func (r *orderRepository) FindByCustomerID(customerID int, ctx context.Context) ([]order.Order, error) {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
 	var orders []order.Order
-	err := r.db.Preload("Customer").Preload("OrderItems.Product.Images").Preload("OrderItems.Tasks.Employee").Where("customer_id = ? AND tenant_id = ?", customerID, userCtx.TenantID).Find(&orders).Error
+	err := r.db.Preload("Customer").
+		Preload("OrderItems.Product.Images").
+		Preload("OrderItems.Tasks.Employee").
+		Preload("Payments", "status = ?", "completed").
+		Where("customer_id = ? AND tenant_id = ?", customerID, userCtx.TenantID).
+		Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +93,12 @@ func (r *orderRepository) FindByCustomerID(customerID int, ctx context.Context) 
 func (r *orderRepository) FindByOrderNumber(orderNumber string, ctx context.Context) (*order.Order, error) {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
 	var order order.Order
-	err := r.db.Preload("Customer").Preload("OrderItems.Product.Images").Preload("OrderItems.Tasks.Employee").Where("order_number = ? AND tenant_id = ?", orderNumber, userCtx.TenantID).First(&order).Error
+	err := r.db.Preload("Customer").
+		Preload("OrderItems.Product.Images").
+		Preload("OrderItems.Tasks.Employee").
+		Preload("Payments", "status = ?", "completed").
+		Where("order_number = ? AND tenant_id = ?", orderNumber, userCtx.TenantID).
+		First(&order).Error
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +109,12 @@ func (r *orderRepository) FindByOrderNumber(orderNumber string, ctx context.Cont
 func (r *orderRepository) FindByStatus(status string, ctx context.Context) ([]order.Order, error) {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
 	var orders []order.Order
-	err := r.db.Preload("Customer").Preload("OrderItems.Product.Images").Preload("OrderItems.Tasks.Employee").Where("status = ? AND tenant_id = ?", status, userCtx.TenantID).Find(&orders).Error
+	err := r.db.Preload("Customer").
+		Preload("OrderItems.Product.Images").
+		Preload("OrderItems.Tasks.Employee").
+		Preload("Payments", "status = ?", "completed").
+		Where("status = ? AND tenant_id = ?", status, userCtx.TenantID).
+		Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +125,12 @@ func (r *orderRepository) FindByStatus(status string, ctx context.Context) ([]or
 func (r *orderRepository) FindByPaymentStatus(status string, ctx context.Context) ([]order.Order, error) {
 	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
 	var orders []order.Order
-	err := r.db.Preload("Customer").Preload("OrderItems.Product.Images").Preload("OrderItems.Tasks.Employee").Where("payment_status = ? AND tenant_id = ?", status, userCtx.TenantID).Find(&orders).Error
+	err := r.db.Preload("Customer").
+		Preload("OrderItems.Product.Images").
+		Preload("OrderItems.Tasks.Employee").
+		Preload("Payments", "status = ?", "completed").
+		Where("payment_status = ? AND tenant_id = ?", status, userCtx.TenantID).
+		Find(&orders).Error
 	if err != nil {
 		return nil, err
 	}

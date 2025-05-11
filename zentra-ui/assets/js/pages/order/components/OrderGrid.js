@@ -157,14 +157,14 @@ export class OrderGrid {
                                                     $('<div>')
                                                         .addClass('font-weight-bold')
                                                         .text(`${item.size} - ${item.color}`)
-                                                )
-                                                .append(
-                                                    $('<small>')
-                                                        .addClass('text-muted')
-                                                        .text(item.customization?.name ? 
-                                                            `${item.customization.name} #${item.customization.number}` : 
-                                                            'No customization')
-                                                )
+                                                    )
+                                                    .append(
+                                                        $('<small>')
+                                                            .addClass('text-muted')
+                                                            .text(item.customization?.name ? 
+                                                                `${item.customization.name} #${item.customization.number}` : 
+                                                                'No customization')
+                                                    )
                                         )
                                 )
                                 .appendTo($container);
@@ -192,22 +192,70 @@ export class OrderGrid {
                     dataField: 'payment_status',
                     caption: 'Payment',
                     cellTemplate: (container, options) => {
-                        const status = options.value;
-                        const paymentClass = this.getPaymentClass(status);
-                        const paymentIcon = this.getPaymentIcon(status);
+                        const order = options.data;
+                        
+                        // Calculate total paid amount from payments
+                        const totalPaid = order.payments?.reduce((sum, payment) => {
+                            if (payment.status === 'completed') {
+                                return sum + payment.amount;
+                            }
+                            return sum;
+                        }, 0) || 0;
+
+                        // Calculate payment status
+                        let paymentStatus;
+                        let statusClass;
+                        let statusIcon;
+
+                        if (totalPaid >= order.total_amount) {
+                            paymentStatus = 'PAID';
+                            statusClass = 'paid';
+                            statusIcon = 'fa-check-circle';
+                        } else if (totalPaid > 0) {
+                            paymentStatus = 'PARTIAL';
+                            statusClass = 'partial';
+                            statusIcon = 'fa-clock';
+                        } else {
+                            paymentStatus = 'UNPAID';
+                            statusClass = 'unpaid';
+                            statusIcon = 'fa-times-circle';
+                        }
                         
                         $('<div>')
                             .addClass('d-flex flex-column')
                             .append(
                                 $('<div>')
-                                    .addClass(`payment-badge ${paymentClass}`)
-                                    .append($('<i>').addClass(`fas ${paymentIcon} mr-1`))
-                                    .append(status.replace(/_/g, ' ').toUpperCase())
+                                    .addClass(`payment-badge ${statusClass}`)
+                                    .append($('<i>').addClass(`fas ${statusIcon} mr-1`))
+                                    .append(paymentStatus)
                             )
                             .append(
                                 $('<div>')
-                                    .addClass('mt-1 font-weight-bold')
-                                    .text(this.formatIDR(options.data.total_amount))
+                                    .addClass('mt-1')
+                                    .append(
+                                        $('<small>')
+                                            .addClass('text-muted')
+                                            .text('Paid: ')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold text-success')
+                                            .text(this.formatIDR(totalPaid))
+                                    )
+                            )
+                            .append(
+                                $('<div>')
+                                    .addClass('mt-1')
+                                    .append(
+                                        $('<small>')
+                                            .addClass('text-muted')
+                                            .text('Total: ')
+                                    )
+                                    .append(
+                                        $('<span>')
+                                            .addClass('font-weight-bold')
+                                            .text(this.formatIDR(order.total_amount))
+                                    )
                             )
                             .appendTo(container);
                     }
@@ -341,6 +389,75 @@ export class OrderGrid {
             
             .content.active {
                 display: block;
+            }
+
+            .payment-section {
+                padding: 20px;
+            }
+
+            .payment-summary {
+                background: #fff;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 24px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .payment-history {
+                background: #fff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            .payment-item {
+                padding: 16px 20px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .payment-item:last-child {
+                border-bottom: none;
+            }
+
+            .payment-info {
+                flex: 1;
+            }
+
+            .payment-amount {
+                font-weight: 600;
+                color: #2dce89;
+            }
+
+            .payment-status {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 500;
+                margin-left: 12px;
+            }
+
+            .payment-status.completed {
+                background: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .payment-status.pending {
+                background: #fff3e0;
+                color: #ef6c00;
+            }
+
+            .payment-status.failed {
+                background: #ffebee;
+                color: #c62828;
+            }
+
+            .payment-notes {
+                font-size: 12px;
+                color: #8898aa;
+                margin-top: 8px;
             }
         `;
 
@@ -1245,52 +1362,95 @@ export class OrderGrid {
     }
 
     renderPaymentSection(order) {
-        const $paymentSection = $('<div>').addClass('payment-section');
+        const $section = $('<div>').addClass('payment-section');
 
-        // Payment Summary Card
-        const $summaryCard = $('<div>').addClass('card mb-4')
+        // Calculate total paid amount
+        const totalPaid = order.payments?.reduce((sum, payment) => {
+            if (payment.status === 'completed') {
+                return sum + payment.amount;
+            }
+            return sum;
+        }, 0) || 0;
+
+        // Payment Summary
+        const $summary = $('<div>').addClass('payment-summary')
             .append(
-                $('<div>').addClass('card-body')
-                    .append($('<h5>').addClass('card-title').text('Payment Summary'))
+                $('<div>').addClass('row')
                     .append(
-                        $('<div>').addClass('row')
-                            .append(
-                                $('<div>').addClass('col-md-4')
-                                    .append($('<p>').addClass('mb-1 text-muted').text('Subtotal'))
-                                    .append($('<h3>').addClass('text-primary').text(this.formatIDR(order.subtotal)))
-                            )
-                            .append(
-                                $('<div>').addClass('col-md-4')
-                                    .append($('<p>').addClass('mb-1 text-muted').text('Discount'))
-                                    .append($('<h3>').addClass('text-danger').text(`-${this.formatIDR(order.discount_amount)}`))
-                            )
-                            .append(
-                                $('<div>').addClass('col-md-4')
-                                    .append($('<p>').addClass('mb-1 text-muted').text('Total Amount'))
-                                    .append($('<h3>').addClass('text-success').text(this.formatIDR(order.total_amount)))
-                            )
+                        $('<div>').addClass('col-md-4')
+                            .append($('<h6>').addClass('text-muted mb-1').text('Total Amount'))
+                            .append($('<h3>').addClass('text-primary').text(this.formatIDR(order.total_amount)))
+                    )
+                    .append(
+                        $('<div>').addClass('col-md-4')
+                            .append($('<h6>').addClass('text-muted mb-1').text('Amount Paid'))
+                            .append($('<h3>').addClass('text-success').text(this.formatIDR(totalPaid)))
+                    )
+                    .append(
+                        $('<div>').addClass('col-md-4')
+                            .append($('<h6>').addClass('text-muted mb-1').text('Balance'))
+                            .append($('<h3>').addClass('text-danger').text(this.formatIDR(Math.max(0, order.total_amount - totalPaid))))
                     )
             );
 
-        // Payment Status Card
-        const $statusCard = $('<div>').addClass('card mb-4')
-            .append(
-                $('<div>').addClass('card-body')
-                    .append($('<h5>').addClass('card-title').text('Payment Status'))
-                    .append(
-                        $('<div>')
-                            .addClass(`payment-badge ${this.getPaymentClass(order.payment_status)}`)
-                            .append($('<i>').addClass(`fas ${this.getPaymentIcon(order.payment_status)} mr-2`))
-                            .append(order.payment_status.replace(/_/g, ' ').toUpperCase())
-                    )
+        // Payment History
+        const $history = $('<div>').addClass('payment-history mt-4');
+        
+        // Add history title
+        $history.append($('<h6>').addClass('text-muted mb-3').text('Payment History'));
+
+        if (order.payments && order.payments.length > 0) {
+            order.payments.forEach(payment => {
+                const $item = $('<div>').addClass('payment-item');
+                
+                // Payment info
+                $item.append(
+                    $('<div>').addClass('payment-info')
+                        .append(
+                            $('<div>').addClass('d-flex align-items-center')
+                                .append($('<i>').addClass('fas fa-money-bill text-primary mr-2'))
+                                .append($('<strong>').text(payment.payment_method.replace(/_/g, ' ').toUpperCase()))
+                        )
+                        .append(
+                            $('<div>').addClass('text-muted small mt-1')
+                                .append($('<span>').text(`Ref: ${payment.reference_number}`))
+                                .append($('<span>').addClass('ml-2').text(new Date(payment.payment_date).toLocaleString()))
+                        )
+                );
+                
+                // Payment amount and status
+                $item.append(
+                    $('<div>').addClass('text-right')
+                        .append(
+                            $('<span>').addClass('payment-amount').text(this.formatIDR(payment.amount))
+                        )
+                        .append(
+                            $('<span>')
+                                .addClass(`payment-status ${payment.status}`)
+                                .text(payment.status.toUpperCase())
+                        )
+                );
+
+                // Add notes if any
+                if (payment.notes) {
+                    $item.append(
+                        $('<div>').addClass('payment-notes')
+                            .append($('<i>').addClass('fas fa-sticky-note mr-1'))
+                            .append(payment.notes)
+                    );
+                }
+
+                $history.append($item);
+            });
+        } else {
+            $history.append(
+                $('<div>').addClass('text-center text-muted py-4')
+                    .append($('<i>').addClass('fas fa-receipt fa-3x mb-3'))
+                    .append($('<p>').text('No payment transactions found'))
             );
+        }
 
-        // Add cards to payment section
-        $paymentSection
-            .append($summaryCard)
-            .append($statusCard);
-
-        return $paymentSection;
+        return $section.append($summary).append($history);
     }
 
     showOrderDetails(order) {
