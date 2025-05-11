@@ -204,6 +204,9 @@ export class OrderPage {
         // Create a new window for printing
         const printWindow = window.open('', '_blank');
         
+        // Get customer details from the order
+        const customer = order.customer || {};
+        
         // Create the invoice HTML
         const invoiceHTML = `
             <!DOCTYPE html>
@@ -247,10 +250,11 @@ export class OrderPage {
                     </div>
                     <div class="customer-info">
                         <div class="info-title">To:</div>
-                        <div>${order.customer_name}</div>
-                        <div>${order.customer_email}</div>
-                        <div>${order.customer_phone}</div>
-                        <div>${order.delivery_address}</div>
+                        <div>${customer.name || 'N/A'}</div>
+                        <div>${customer.email || 'N/A'}</div>
+                        <div>${customer.phone || 'N/A'}</div>
+                        <div>${customer.address || 'N/A'}</div>
+                        <div>${customer.city || 'N/A'}</div>
                     </div>
                 </div>
 
@@ -268,7 +272,7 @@ export class OrderPage {
                     <tbody>
                         ${order.order_items.map(item => `
                             <tr>
-                                <td>${item.product_detail?.name || 'Custom Item'}</td>
+                                <td>${item.product_name || 'Custom Item'}</td>
                                 <td>${item.size}</td>
                                 <td>${item.color}</td>
                                 <td>${item.quantity}</td>
