@@ -388,7 +388,7 @@ window.PaymentPage = class {
                     cellTemplate: (container, options) => {
                         $('<div>')
                             .addClass('amount-display')
-                            .text(`$${options.value.toFixed(2)}`)
+                            .text(this.formatIDR(options.value))
                             .appendTo(container);
                     }
                 },
@@ -486,7 +486,7 @@ window.PaymentPage = class {
                     .addClass('card-body')
                     .append(this.createInfoGroup('Reference Number', payment.reference_number))
                     .append(this.createInfoGroup('Payment Method', this.formatPaymentMethod(payment.payment_method)))
-                    .append(this.createInfoGroup('Amount', `$${payment.amount.toFixed(2)}`))
+                    .append(this.createInfoGroup('Amount', this.formatIDR(payment.amount)))
                     .append(this.createInfoGroup('Status', this.formatStatus(payment.status)))
                     .append(this.createInfoGroup('Payment Date', new Date(payment.payment_date).toLocaleString()))
             );
@@ -554,7 +554,7 @@ window.PaymentPage = class {
         if (payment.status === 'completed') {
             $timeline.append(this.createTimelineItem(
                 'Payment Completed',
-                `Successfully processed payment of $${payment.amount.toFixed(2)}`,
+                `Successfully processed payment of ${this.formatIDR(payment.amount)}`,
                 payment.updated_at
             ));
         } else if (payment.status === 'failed') {
@@ -587,15 +587,15 @@ window.PaymentPage = class {
 
     formatPaymentMethod(method) {
         const methodIcons = {
-            'bank_transfer': 'ni ni-building',
-            'credit_card': 'ni ni-credit-card',
-            'cash': 'ni ni-money-coins',
-            'digital_wallet': 'ni ni-mobile-button'
+            'bank_transfer': 'ni ni-building mr-2',
+            'credit_card': 'ni ni-credit-card mr-2',
+            'cash': 'ni ni-money-coins mr-2',
+            'digital_wallet': 'ni ni-mobile-button mr-2'
         };
-        const icon = methodIcons[method] || 'ni ni-money-coins';
+        const icon = methodIcons[method] || 'ni ni-money-coins mr-2';
         const displayText = method.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
         
-        return `<i class="${icon} mr-2"></i>${displayText}`;
+        return `<i class="${icon}"></i>${displayText}`;
     }
 
     formatStatus(status) {
@@ -618,7 +618,7 @@ window.PaymentPage = class {
         $('#totalPayments').text(totalPayments);
         $('#completedPayments').text(completedPayments);
         $('#pendingPayments').text(pendingPayments);
-        $('#totalAmount').text('$' + totalAmount.toFixed(2));
+        $('#totalAmount').text(this.formatIDR(totalAmount));
     }
 
     updateGridData() {
@@ -649,7 +649,7 @@ window.PaymentPage = class {
         $('#referenceNumber').text(payment.reference_number);
         $('#paymentMethod').html(this.formatPaymentMethod(payment.payment_method));
         $('#paymentDate').text(new Date(payment.payment_date).toLocaleString());
-        $('#paymentAmount').text(`$${payment.amount.toFixed(2)}`);
+        $('#paymentAmount').text(this.formatIDR(payment.amount));
         $('#paymentNotes').text(payment.notes || 'No notes available');
         
         // Update status badge
@@ -691,13 +691,13 @@ window.PaymentPage = class {
             .append(
                 $('<div>')
                     .addClass('transaction-details')
-                    .append($('<div>').addClass('font-weight-bold').text(this.formatPaymentMethod(payment.payment_method)))
+                    .append($('<div>').addClass('font-weight-bold').html(this.formatPaymentMethod(payment.payment_method)))
                     .append($('<small>').addClass('text-muted').text(new Date(payment.payment_date).toLocaleString()))
             )
             .append(
                 $('<div>')
                     .addClass('transaction-amount')
-                    .text(`$${payment.amount.toFixed(2)}`)
+                    .text(this.formatIDR(payment.amount))
             );
 
         $summary.append($transaction);
@@ -720,7 +720,7 @@ window.PaymentPage = class {
                             .addClass('pl-lg-4')
                             .append(this.createInfoGroup('Order Number', order.order_number))
                             .append(this.createInfoGroup('Customer', order.customer_name))
-                            .append(this.createInfoGroup('Total Amount', `$${order.total_amount.toFixed(2)}`))
+                            .append(this.createInfoGroup('Total Amount', this.formatIDR(order.total_amount)))
                             .append(this.createInfoGroup('Status', this.formatOrderStatus(order.status)))
                     )
             );
@@ -739,16 +739,25 @@ window.PaymentPage = class {
 
     getPaymentMethodIcon(method) {
         const icons = {
-            'bank_transfer': 'ni ni-building',
-            'credit_card': 'ni ni-credit-card',
-            'cash': 'ni ni-money-coins',
-            'digital_wallet': 'ni ni-mobile-button'
+            'bank_transfer': 'ni ni-building mr-2',
+            'credit_card': 'ni ni-credit-card mr-2',
+            'cash': 'ni ni-money-coins mr-2',
+            'digital_wallet': 'ni ni-mobile-button mr-2'
         };
-        return icons[method] || 'ni ni-money-coins';
+        return icons[method] || 'ni ni-money-coins mr-2';
     }
 
     formatOrderStatus(status) {
         return status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    formatIDR(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
     }
 
     clearPaymentDetails() {
@@ -955,7 +964,7 @@ window.PaymentPage = class {
                         <div class="payment-label">Amount:</div>
                         <div class="payment-value">
                             <span style="font-size: 18px; font-weight: bold; color: #2dce89;">
-                                $${payment.amount.toFixed(2)}
+                                ${this.formatIDR(payment.amount)}
                             </span>
                         </div>
                     </div>
