@@ -115,7 +115,7 @@ func NewServices(db *gorm.DB, cfg *config.Config) *Services {
 	productCategoryService := application.NewProductCategoryService(productCategoryRepo, auditService)
 	productImageService := application.NewProductImageService(productImageRepo, productRepo)
 	customerService := application.NewCustomerService(customerRepo)
-	paymentService := application.NewPaymentService(paymentRepo, auditService)
+	paymentService := application.NewPaymentService(paymentRepo, orderRepo, auditService)
 	orderService := application.NewOrderService(orderRepo, auditService, customerService, paymentService)
 	taskService := application.NewTaskService(taskRepo, auditService)
 	itemService := application.NewItemService(itemRepo, auditService)

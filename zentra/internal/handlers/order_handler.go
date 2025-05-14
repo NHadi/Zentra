@@ -638,8 +638,26 @@ func sendWhatsAppNotification(order *order.Order, status string, additionalMessa
 	// Initialize WhatsApp client
 	whatsappClient := whatsapp.NewClient()
 
+	// Format additional message with order details
+	detailedMessage := additionalMessage
+	if additionalMessage == "" {
+		detailedMessage = fmt.Sprintf("Total Amount: Rp %.2f", order.TotalAmount)
+	}
+
+	// If there are order items, add their details
+	if len(order.OrderItems) > 0 {
+		detailedMessage += "\n\nOrder Items:"
+		for _, item := range order.OrderItems {
+			detailedMessage += fmt.Sprintf("\n- %s (Qty: %d, Size: %s, Color: %s)",
+				item.Product.Name,
+				item.Quantity,
+				item.Size,
+				item.Color)
+		}
+	}
+
 	// Get template name and parameters based on status
-	templateName, params := getTemplateParams(order, status, additionalMessage)
+	templateName, params := getTemplateParams(order, status, detailedMessage)
 
 	// Send message using template
 	return whatsappClient.SendMessage(order.Customer.Phone, templateName, params)

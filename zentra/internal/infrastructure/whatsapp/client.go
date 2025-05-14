@@ -1,74 +1,74 @@
 package whatsapp
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 type Client struct {
-	accountSid   string
-	authToken    string
-	fromNumber   string
-	isProduction bool
+	apiKey     string
+	numberKey  string
+	apiBaseURL string
 }
 
-type TwilioResponse struct {
-	Status  string `json:"status"`
+type WatzapRequest struct {
+	APIKey    string `json:"api_key"`
+	NumberKey string `json:"number_key"`
+	PhoneNo   string `json:"phone_no"`
+	Message   string `json:"message"`
+}
+
+type WatzapResponse struct {
+	Status  bool   `json:"status"`
 	Message string `json:"message"`
-	Code    int    `json:"code"`
 }
 
-// NewClient creates a new WhatsApp client using Twilio
+// NewClient creates a new WhatsApp client using watzap.id
 func NewClient() *Client {
 	return &Client{
-		accountSid:   os.Getenv("TWILIO_ACCOUNT_SID"),
-		authToken:    os.Getenv("TWILIO_AUTH_TOKEN"),
-		fromNumber:   os.Getenv("TWILIO_WHATSAPP_NUMBER"),
-		isProduction: os.Getenv("TWILIO_PRODUCTION_MODE") == "true",
+		apiKey:     os.Getenv("WATZAP_API_KEY"),
+		numberKey:  os.Getenv("WATZAP_NUMBER_KEY"),
+		apiBaseURL: "https://api.watzap.id/v1/send_message",
 	}
 }
 
-// SendMessage sends a WhatsApp message using Twilio's API
+// SendMessage sends a WhatsApp message using watzap.id API
 func (c *Client) SendMessage(to string, templateName string, params []string) error {
 	// Format the message based on the template and parameters
 	message := c.formatMessage(templateName, params)
 
-	// Format phone numbers
+	// Format phone number
 	toNumber := formatPhoneNumber(to)
 
-	// Validate phone number format
-	if !strings.HasPrefix(toNumber, "+") {
-		return fmt.Errorf("invalid phone number format. Number must start with country code (e.g., +62)")
+	// Prepare request body
+	reqBody := WatzapRequest{
+		APIKey:    c.apiKey,
+		NumberKey: c.numberKey,
+		PhoneNo:   toNumber,
+		Message:   message,
 	}
 
-	// Create the request URL
-	endpoint := fmt.Sprintf("https://api.twilio.com/2010-04-01/Accounts/%s/Messages.json", c.accountSid)
-
-	// Prepare form data
-	data := url.Values{}
-	data.Set("To", fmt.Sprintf("whatsapp:%s", toNumber)) // Use formatted number
-	data.Set("From", fmt.Sprintf("whatsapp:%s", c.fromNumber))
-	data.Set("Body", message)
-
-	// Log the request details (for debugging)
-	log.Printf("Sending WhatsApp message to: %s", toNumber)
-	log.Printf("From number: %s", c.fromNumber)
+	// Convert request to JSON
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request: %v", err)
+	}
 
 	// Create request
-	req, err := http.NewRequest("POST", endpoint, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", c.apiBaseURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %v", err)
 	}
 
 	// Set headers
-	req.SetBasicAuth(c.accountSid, c.authToken)
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Content-Type", "application/json")
 
 	// Send request
 	client := &http.Client{}
@@ -85,32 +85,17 @@ func (c *Client) SendMessage(to string, templateName string, params []string) er
 	}
 
 	// Log the response (for debugging)
-	log.Printf("Twilio Response: %s", string(body))
+	log.Printf("Watzap Response: %s", string(body))
 
 	// Parse response
-	var twilioResp TwilioResponse
-	if err := json.Unmarshal(body, &twilioResp); err != nil {
+	var watzapResp WatzapResponse
+	if err := json.Unmarshal(body, &watzapResp); err != nil {
 		return fmt.Errorf("failed to parse response: %v", err)
 	}
 
 	// Check response status
-	if resp.StatusCode != http.StatusCreated {
-		// Handle specific error cases
-		switch resp.StatusCode {
-		case http.StatusForbidden:
-			if !c.isProduction {
-				// Only show sandbox join message in sandbox mode
-				joinMessage := fmt.Sprintf("", c.fromNumber)
-				return fmt.Errorf(joinMessage)
-			}
-			return fmt.Errorf("message rejected: %s", twilioResp.Message)
-		case http.StatusUnauthorized:
-			return fmt.Errorf("invalid Twilio credentials. Please check your Account SID and Auth Token")
-		case http.StatusBadRequest:
-			return fmt.Errorf("invalid request: %s", twilioResp.Message)
-		default:
-			return fmt.Errorf("failed to send WhatsApp message: %s", twilioResp.Message)
-		}
+	if !watzapResp.Status {
+		return fmt.Errorf("failed to send WhatsApp message: %s", watzapResp.Message)
 	}
 
 	return nil
@@ -122,44 +107,36 @@ func (c *Client) formatMessage(templateName string, params []string) string {
 
 	switch templateName {
 	case "order_pending":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been received and is pending confirmation.\n\nAdditional Info: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been received and is pending confirmation.\n\nOrder Details:\n- Status: Pending\n- Date: %s\n\nAdditional Info: %s",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	case "order_confirmed":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been confirmed and will be processed soon.\n\nAdditional Info: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been confirmed and will be processed soon.\n\nOrder Details:\n- Status: Confirmed\n- Date: %s\n\nAdditional Info: %s",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	case "order_in_production":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is now in production. We'll keep you updated!\n\nAdditional Info: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is now in production.\n\nOrder Details:\n- Status: In Production\n- Date: %s\n\nAdditional Info: %s\n\nWe'll keep you updated on the progress!",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	case "order_quality_check":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is undergoing quality inspection.\n\nAdditional Info: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is undergoing quality inspection.\n\nOrder Details:\n- Status: Quality Check\n- Date: %s\n\nAdditional Info: %s\n\nWe ensure your order meets our quality standards!",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	case "order_ready":
-		message = fmt.Sprintf("Hello %s!\n\nGreat news! Your order #%s is ready for delivery.\n\nAdditional Info: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nGreat news! Your order #%s is ready for delivery.\n\nOrder Details:\n- Status: Ready for Delivery\n- Date: %s\n\nAdditional Info: %s\n\nWe'll contact you shortly to arrange delivery.",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	case "order_delivered":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been delivered. We hope you're satisfied!\n\nAdditional Info: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been delivered.\n\nOrder Details:\n- Status: Delivered\n- Date: %s\n\nAdditional Info: %s\n\nWe hope you're satisfied with our service!",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	case "order_cancelled":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been cancelled.\n\nReason: %s",
-			params[0], params[1], params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been cancelled.\n\nOrder Details:\n- Status: Cancelled\n- Date: %s\n\nReason: %s",
+			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
 
 	default:
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s status has been updated to: %s.\n\nAdditional Info: %s",
-			params[0], params[1], params[2], params[3])
-	}
-
-	// Add sandbox instructions only in sandbox mode
-	if !c.isProduction {
-		message += fmt.Sprintf("\n\nNote: If you haven't received this message, please:\n"+
-			"1. Save this number: %s\n"+
-			"2. Send this message: 'join plenty-drawn'\n"+
-			"3. Wait for confirmation before retrying", c.fromNumber)
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s status has been updated.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3])
 	}
 
 	// Add company signature
@@ -168,12 +145,12 @@ func (c *Client) formatMessage(templateName string, params []string) string {
 	return message
 }
 
-// formatPhoneNumber ensures the phone number is in the correct format for Twilio
+// formatPhoneNumber ensures the phone number is in the correct format
 func formatPhoneNumber(phone string) string {
 	// Remove any non-numeric characters except +
 	var numbers []rune
-	for i, r := range phone {
-		if (r >= '0' && r <= '9') || (i == 0 && r == '+') {
+	for _, r := range phone {
+		if r >= '0' && r <= '9' {
 			numbers = append(numbers, r)
 		}
 	}
@@ -182,18 +159,10 @@ func formatPhoneNumber(phone string) string {
 	cleanNumber := string(numbers)
 
 	// Ensure number starts with country code
-	if !strings.HasPrefix(cleanNumber, "+") {
-		// For Indonesian numbers
-		if strings.HasPrefix(cleanNumber, "08") {
-			cleanNumber = "+62" + cleanNumber[1:] // Convert 08xx to +62xx
-		} else if strings.HasPrefix(cleanNumber, "62") {
-			cleanNumber = "+" + cleanNumber
-		} else if strings.HasPrefix(cleanNumber, "1") {
-			cleanNumber = "+" + cleanNumber // US/Canada numbers
-		} else {
-			// Assume Indonesian number if no country code
-			cleanNumber = "+62" + cleanNumber
-		}
+	if strings.HasPrefix(cleanNumber, "08") {
+		cleanNumber = "62" + cleanNumber[1:] // Convert 08xx to 62xx
+	} else if !strings.HasPrefix(cleanNumber, "62") {
+		cleanNumber = "62" + cleanNumber
 	}
 
 	return cleanNumber
