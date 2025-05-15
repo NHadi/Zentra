@@ -107,36 +107,40 @@ func (c *Client) formatMessage(templateName string, params []string) string {
 
 	switch templateName {
 	case "order_pending":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been received and is pending confirmation.\n\nOrder Details:\n- Status: Pending\n- Date: %s\n\nAdditional Info: %s",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been received and is pending confirmation.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	case "order_confirmed":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been confirmed and will be processed soon.\n\nOrder Details:\n- Status: Confirmed\n- Date: %s\n\nAdditional Info: %s",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been confirmed and will be processed soon.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	case "order_in_production":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is now in production.\n\nOrder Details:\n- Status: In Production\n- Date: %s\n\nAdditional Info: %s\n\nWe'll keep you updated on the progress!",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is now in production.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s\n\nWe'll keep you updated on the progress!",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	case "order_quality_check":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is undergoing quality inspection.\n\nOrder Details:\n- Status: Quality Check\n- Date: %s\n\nAdditional Info: %s\n\nWe ensure your order meets our quality standards!",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s is undergoing quality inspection.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s\n\nWe ensure your order meets our quality standards!",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	case "order_ready":
-		message = fmt.Sprintf("Hello %s!\n\nGreat news! Your order #%s is ready for delivery.\n\nOrder Details:\n- Status: Ready for Delivery\n- Date: %s\n\nAdditional Info: %s\n\nWe'll contact you shortly to arrange delivery.",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nGreat news! Your order #%s is ready for delivery.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s\n\nWe'll contact you shortly to arrange delivery.",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	case "order_delivered":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been delivered.\n\nOrder Details:\n- Status: Delivered\n- Date: %s\n\nAdditional Info: %s\n\nWe hope you're satisfied with our service!",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been delivered.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s\n\nWe hope you're satisfied with our service!",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
+
+	case "order_completed":
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s status has been updated.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	case "order_cancelled":
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been cancelled.\n\nOrder Details:\n- Status: Cancelled\n- Date: %s\n\nReason: %s",
-			params[0], params[1], time.Now().Format("02 Jan 2006 15:04"), params[2])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s has been cancelled.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 
 	default:
-		message = fmt.Sprintf("Hello %s!\n\nYour order #%s status has been updated.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s",
-			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3])
+		message = fmt.Sprintf("Hello %s!\n\nYour order #%s status has been updated.\n\nOrder Details:\n- Status: %s\n- Date: %s\n\nAdditional Info: %s\n\nOrder Items:\n%s",
+			params[0], params[1], params[2], time.Now().Format("02 Jan 2006 15:04"), params[3], params[4])
 	}
 
 	// Add company signature

@@ -5,7 +5,6 @@ import { officeAPI } from '../../api/modules/offices.js';
 import { productAPI } from '../../api/modules/products.js';
 import { OrderGrid } from './components/OrderGrid.js';
 import { OrderDetails } from './components/OrderDetails.js';
-import { OrderTimeline } from './components/OrderTimeline.js';
 import { OrderModal } from './components/OrderModal.js';
 import { PaymentModal } from './components/PaymentModal.js';
 
@@ -19,7 +18,6 @@ export class OrderPage {
         // Initialize components
         this.orderGrid = new OrderGrid(this);
         this.orderDetails = new OrderDetails(this);
-        this.orderTimeline = new OrderTimeline(this);
         this.orderModal = new OrderModal(this);
         this.paymentModal = new PaymentModal(this);
         

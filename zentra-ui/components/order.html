@@ -706,19 +706,25 @@
                     <input type="hidden" id="status-order-id" name="orderId">
                     
                     <!-- Current Status -->
-                    <div class="current-status mb-4">
-                        <label class="form-control-label">Current Status</label>
-                        <div class="current-status-badge" id="currentStatusBadge"></div>
+                    <div class="form-group">
+                        <label>Current Status</label>
+                        <div class="current-status-badge" id="currentStatusBadge">
+                            <i class="fas fa-circle"></i>
+                            <span>PENDING</span>
+                        </div>
                     </div>
 
                     <!-- New Status -->
                     <div class="form-group">
-                        <label class="form-control-label" for="new-status">New Status</label>
+                        <label for="new-status">New Status</label>
                         <select class="form-control" id="new-status" name="status" required>
                             <option value="">Select New Status</option>
                             <option value="pending">Pending</option>
                             <option value="confirmed">Confirmed</option>
                             <option value="in_production">In Production</option>
+                            <option value="quality_check">Quality Check</option>
+                            <option value="ready_for_delivery">Ready for Delivery</option>
+                            <option value="delivered">Delivered</option>
                             <option value="completed">Completed</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
@@ -726,13 +732,14 @@
 
                     <!-- Additional Message -->
                     <div class="form-group">
-                        <label class="form-control-label" for="status-message">Additional Message</label>
-                        <textarea class="form-control" id="status-message" name="additional_message" rows="3" placeholder="Enter any additional notes or comments about this status change..."></textarea>
+                        <label for="additional-message">Additional Message</label>
+                        <textarea class="form-control" id="additional-message" name="additional_message" rows="3" 
+                            placeholder="Enter any additional notes or comments about this status change..."></textarea>
                     </div>
 
-                    <!-- Notification Option -->
+                    <!-- Notification Toggle -->
                     <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="send-notification" name="send_notification">
+                        <input type="checkbox" class="custom-control-input" id="send-notification" name="send_notification" checked>
                         <label class="custom-control-label" for="send-notification">Send notification to customer</label>
                     </div>
                 </form>

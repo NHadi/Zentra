@@ -588,11 +588,14 @@ func UpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 
 		// Validate status
 		validStatuses := map[string]bool{
-			"pending":       true,
-			"confirmed":     true,
-			"in_production": true,
-			"completed":     true,
-			"cancelled":     true,
+			"pending":            true,
+			"confirmed":          true,
+			"in_production":      true,
+			"quality_check":      true,
+			"ready_for_delivery": true,
+			"delivered":          true,
+			"completed":          true,
+			"cancelled":          true,
 		}
 
 		if !validStatuses[req.Status] {
@@ -617,9 +620,11 @@ func UpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 		}
 
 		// Send WhatsApp notification if requested
-		if err := sendWhatsAppNotification(order, req.Status, req.AdditionalMessage); err != nil {
-			// Log the error but don't fail the request
-			log.Printf("Failed to send WhatsApp notification: %v", err)
+		if req.SendNotification {
+			if err := sendWhatsAppNotification(order, req.Status, req.AdditionalMessage); err != nil {
+				// Log the error but don't fail the request
+				log.Printf("Failed to send WhatsApp notification: %v", err)
+			}
 		}
 
 		// Fetch the updated order
@@ -630,68 +635,6 @@ func UpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, toOrderResponse(updatedOrder))
-	}
-}
-
-func getTemplateParams(order *order.Order, status string, additionalMessage string) (string, []string) {
-	// Map status to a more user-friendly display text
-	statusDisplay := map[string]string{
-		"pending":       "Pending",
-		"confirmed":     "Confirmed",
-		"in_production": "In Production",
-		"completed":     "Completed",
-		"cancelled":     "Cancelled",
-	}[status]
-
-	// If status not found in map, use capitalized version
-	if statusDisplay == "" {
-		statusDisplay = strings.Title(strings.ReplaceAll(status, "_", " "))
-	}
-
-	// Map status to template name and parameters
-	switch status {
-	case "pending":
-		return "order_pending", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			statusDisplay,
-			additionalMessage,
-		}
-	case "confirmed":
-		return "order_confirmed", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			statusDisplay,
-			additionalMessage,
-		}
-	case "in_production":
-		return "order_in_production", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			statusDisplay,
-			additionalMessage,
-		}
-	case "completed":
-		return "order_completed", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			statusDisplay,
-			additionalMessage,
-		}
-	case "cancelled":
-		return "order_cancelled", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			statusDisplay,
-			additionalMessage,
-		}
-	default:
-		return "order_status_update", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			statusDisplay,
-			additionalMessage,
-		}
 	}
 }
 
@@ -712,16 +655,106 @@ func sendWhatsAppNotification(order *order.Order, status string, additionalMessa
 			item.Color))
 	}
 
-	// Format additional message
-	messageDetails := fmt.Sprintf("%s\n\nOrder Items:\n%s",
-		additionalMessage,
-		itemDetails.String())
-
 	// Get template name and parameters
-	templateName, params := getTemplateParams(order, status, messageDetails)
+	templateName, params := getTemplateParams(order, status, additionalMessage, itemDetails.String())
 
 	// Send message using template
 	return whatsappClient.SendMessage(order.Customer.Phone, templateName, params)
+}
+
+func getTemplateParams(order *order.Order, status string, additionalMessage string, itemDetails string) (string, []string) {
+	// Map status to a more user-friendly display text
+	statusDisplay := map[string]string{
+		"pending":            "Pending",
+		"confirmed":          "Confirmed",
+		"in_production":      "In Production",
+		"quality_check":      "Quality Check",
+		"ready_for_delivery": "Ready for Delivery",
+		"delivered":          "Delivered",
+		"completed":          "Completed",
+		"cancelled":          "Cancelled",
+	}[status]
+
+	// If status not found in map, use capitalized version
+	if statusDisplay == "" {
+		statusDisplay = strings.Title(strings.ReplaceAll(status, "_", " "))
+	}
+
+	// Map status to template name and parameters
+	switch status {
+	case "pending":
+		return "order_pending", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "confirmed":
+		return "order_confirmed", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "in_production":
+		return "order_in_production", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "quality_check":
+		return "order_quality_check", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "ready_for_delivery":
+		return "order_ready", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "delivered":
+		return "order_delivered", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "completed":
+		return "order_completed", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	case "cancelled":
+		return "order_cancelled", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	default:
+		return "order_status_update", []string{
+			order.Customer.Name,
+			order.OrderNumber,
+			statusDisplay,
+			additionalMessage,
+			itemDetails,
+		}
+	}
 }
 
 // @Summary Bulk update order statuses
@@ -748,11 +781,14 @@ func BulkUpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 
 		// Validate status
 		validStatuses := map[string]bool{
-			"pending":       true,
-			"confirmed":     true,
-			"in_production": true,
-			"completed":     true,
-			"cancelled":     true,
+			"pending":            true,
+			"confirmed":          true,
+			"in_production":      true,
+			"quality_check":      true,
+			"ready_for_delivery": true,
+			"delivered":          true,
+			"completed":          true,
+			"cancelled":          true,
 		}
 
 		if !validStatuses[req.Status] {

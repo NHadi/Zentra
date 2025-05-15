@@ -24,6 +24,9 @@ export class OrderGrid {
             pending: 'pending',
             confirmed: 'in-production',
             in_production: 'in-production',
+            quality_check: 'in-production',
+            ready_for_delivery: 'completed',
+            delivered: 'completed',
             completed: 'completed',
             cancelled: 'cancelled'
         };
@@ -35,6 +38,9 @@ export class OrderGrid {
             pending: 'fa-clock',
             confirmed: 'fa-check',
             in_production: 'fa-cogs',
+            quality_check: 'fa-clipboard-check',
+            ready_for_delivery: 'fa-box',
+            delivered: 'fa-truck',
             completed: 'fa-check-circle',
             cancelled: 'fa-times'
         };
@@ -189,8 +195,11 @@ export class OrderGrid {
                     caption: 'Payment',
                     cellTemplate: (container, options) => {
                         const order = options.data;
+                        const paymentStatus = order.payment_status;
+                        const statusClass = this.getPaymentClass(paymentStatus);
+                        const statusIcon = this.getPaymentIcon(paymentStatus);
                         
-                        // Calculate total paid amount from payments
+                        // Calculate total paid for display
                         const totalPaid = order.payments?.reduce((sum, payment) => {
                             if (payment.status === 'completed') {
                                 return sum + payment.amount;
@@ -198,32 +207,13 @@ export class OrderGrid {
                             return sum;
                         }, 0) || 0;
 
-                        // Calculate payment status
-                        let paymentStatus;
-                        let statusClass;
-                        let statusIcon;
-
-                        if (totalPaid >= order.total_amount) {
-                            paymentStatus = 'PAID';
-                            statusClass = 'paid';
-                            statusIcon = 'fa-check-circle';
-                        } else if (totalPaid > 0) {
-                            paymentStatus = 'PARTIAL';
-                            statusClass = 'partial';
-                            statusIcon = 'fa-clock';
-                        } else {
-                            paymentStatus = 'UNPAID';
-                            statusClass = 'unpaid';
-                            statusIcon = 'fa-times-circle';
-                        }
-                        
                         $('<div>')
                             .addClass('d-flex flex-column')
                             .append(
                                 $('<div>')
                                     .addClass(`payment-badge ${statusClass}`)
                                     .append($('<i>').addClass(`fas ${statusIcon} mr-1`))
-                                    .append(paymentStatus)
+                                    .append(paymentStatus.toUpperCase())
                             )
                             .append(
                                 $('<div>')
@@ -1060,7 +1050,7 @@ export class OrderGrid {
     createTimelineStages(order) {
         const stages = [];
 
-        // Order Received Stage
+        // Order Received Stage (always shown)
         stages.push({
             icon: 'shopping-cart',
             title: 'Order Received',
@@ -1070,12 +1060,12 @@ export class OrderGrid {
             tasks: [{
                 status: 'completed',
                 name: 'Order Placement',
-                details: `Order placed by ${order.customer_name}`,
+                details: `Order placed by ${order.customer.name}`,
                 time: new Date(order.created_at)
             }]
         });
 
-        // Order Confirmed Stage
+        // Order Confirmed Stage (shown if not pending)
         if (order.status !== 'pending') {
             stages.push({
                 icon: 'check-circle',
@@ -1092,9 +1082,8 @@ export class OrderGrid {
             });
         }
 
-        // Production Stage
-        if (order.status === 'in_production' || order.status === 'quality_check' || 
-            order.status === 'ready_for_delivery' || order.status === 'delivered') {
+        // Production Stage (shown if in_production or later)
+        if (['in_production', 'quality_check', 'ready_for_delivery', 'delivered', 'completed'].includes(order.status)) {
             const productionStage = {
                 icon: 'cogs',
                 title: 'Production in Progress',
@@ -1133,9 +1122,8 @@ export class OrderGrid {
             stages.push(productionStage);
         }
 
-        // Quality Check Stage
-        if (order.status === 'quality_check' || order.status === 'ready_for_delivery' || 
-            order.status === 'delivered') {
+        // Quality Check Stage (shown if quality_check or later)
+        if (['quality_check', 'ready_for_delivery', 'delivered', 'completed'].includes(order.status)) {
             stages.push({
                 icon: 'clipboard-check',
                 title: 'Quality Check',
@@ -1151,8 +1139,8 @@ export class OrderGrid {
             });
         }
 
-        // Ready for Delivery Stage
-        if (order.status === 'ready_for_delivery' || order.status === 'delivered') {
+        // Ready for Delivery Stage (shown if ready_for_delivery or later)
+        if (['ready_for_delivery', 'delivered', 'completed'].includes(order.status)) {
             stages.push({
                 icon: 'box',
                 title: 'Ready for Delivery',
@@ -1168,8 +1156,8 @@ export class OrderGrid {
             });
         }
 
-        // Delivered Stage
-        if (order.status === 'delivered') {
+        // Delivered Stage (shown if delivered or completed)
+        if (['delivered', 'completed'].includes(order.status)) {
             stages.push({
                 icon: 'truck',
                 title: 'Order Delivered',
@@ -1180,6 +1168,40 @@ export class OrderGrid {
                     status: 'completed',
                     name: 'Delivery Confirmation',
                     details: 'Order has been successfully delivered to the customer',
+                    time: new Date(order.updated_at)
+                }]
+            });
+        }
+
+        // Completed Stage (shown if completed)
+        if (order.status === 'completed') {
+            stages.push({
+                icon: 'check-double',
+                title: 'Order Completed',
+                subtitle: 'All processes completed',
+                date: new Date(order.updated_at),
+                status: 'completed',
+                tasks: [{
+                    status: 'completed',
+                    name: 'Final Verification',
+                    details: 'All items have been completed and verified',
+                    time: new Date(order.updated_at)
+                }]
+            });
+        }
+
+        // Cancelled Stage (shown if cancelled)
+        if (order.status === 'cancelled') {
+            stages.push({
+                icon: 'times-circle',
+                title: 'Order Cancelled',
+                subtitle: 'Order has been cancelled',
+                date: new Date(order.updated_at),
+                status: 'cancelled',
+                tasks: [{
+                    status: 'cancelled',
+                    name: 'Order Cancellation',
+                    details: 'Order has been cancelled',
                     time: new Date(order.updated_at)
                 }]
             });
@@ -1360,7 +1382,7 @@ export class OrderGrid {
     renderPaymentSection(order) {
         const $section = $('<div>').addClass('payment-section');
 
-        // Calculate total paid amount
+        // Calculate total paid amount from completed payments
         const totalPaid = order.payments?.reduce((sum, payment) => {
             if (payment.status === 'completed') {
                 return sum + payment.amount;
@@ -1384,8 +1406,13 @@ export class OrderGrid {
                     )
                     .append(
                         $('<div>').addClass('col-md-4')
-                            .append($('<h6>').addClass('text-muted mb-1').text('Balance'))
-                            .append($('<h3>').addClass('text-danger').text(this.formatIDR(Math.max(0, order.total_amount - totalPaid))))
+                            .append($('<h6>').addClass('text-muted mb-1').text('Status'))
+                            .append(
+                                $('<h3>')
+                                    .addClass(`text-${order.payment_status === 'paid' ? 'success' : order.payment_status === 'partial' ? 'warning' : 'danger'}`)
+                                    .append($('<i>').addClass(`fas ${this.getPaymentIcon(order.payment_status)} mr-2`))
+                                    .append(order.payment_status.toUpperCase())
+                            )
                     )
             );
 
@@ -1472,18 +1499,73 @@ export class OrderGrid {
         $('#discount').text(`-${this.formatIDR(order.discount_amount)}`);
         $('#totalAmount').text(this.formatIDR(order.total_amount));
 
-        // Update status badges
-        const orderStatusClass = this.getStatusClass(order.status);
-        $('#orderStatus')
-            .removeClass()
-            .addClass(`value status-badge ${orderStatusClass}`)
-            .html(`<i class="bg-${orderStatusClass}"></i>${order.status.replace(/_/g, ' ').toUpperCase()}`);
+        // Calculate total paid amount from payments
+        const totalPaid = order.payments?.reduce((sum, payment) => {
+            if (payment.status === 'completed') {
+                return sum + payment.amount;
+            }
+            return sum;
+        }, 0) || 0;
 
-        const paymentStatusClass = this.getPaymentClass(order.payment_status);
+        // Get payment status display info
+        let paymentStatusClass;
+        let paymentStatusIcon;
+        switch (order.payment_status) {
+            case 'paid':
+                paymentStatusClass = 'paid';
+                paymentStatusIcon = 'fa-check-circle';
+                break;
+            case 'partial':
+                paymentStatusClass = 'partial';
+                paymentStatusIcon = 'fa-clock';
+                break;
+            case 'unpaid':
+            default:
+                paymentStatusClass = 'unpaid';
+                paymentStatusIcon = 'fa-times-circle';
+                break;
+        }
+
+        // Update payment status badge
         $('#paymentStatus')
             .removeClass()
             .addClass(`value status-badge ${paymentStatusClass}`)
-            .html(`<i class="bg-${paymentStatusClass}"></i>${order.payment_status.replace(/_/g, ' ').toUpperCase()}`);
+            .html(`
+                <i class="fas ${paymentStatusIcon}"></i>
+                <span>${order.payment_status.toUpperCase()}</span>
+                <small class="ml-2">${this.formatIDR(totalPaid)} / ${this.formatIDR(order.total_amount)}</small>
+            `);
+
+        // Update order status badge
+        const orderStatusClass = this.getStatusClass(order.status);
+        const orderStatusIcon = this.getStatusIcon(order.status);
+        $('#orderStatus')
+            .removeClass()
+            .addClass(`value status-badge ${orderStatusClass}`)
+            .html(`<i class="fas ${orderStatusIcon}"></i>${order.status.replace(/_/g, ' ').toUpperCase()}`);
+
+        // Update status update modal
+        $('#status-order-id').val(order.id);
+        $('#currentStatusBadge')
+            .removeClass()
+            .addClass(`current-status-badge ${orderStatusClass}`)
+            .html(`
+                <i class="fas ${orderStatusIcon}"></i>
+                <span>${order.status.replace(/_/g, ' ').toUpperCase()}</span>
+            `);
+
+        // Update new status dropdown
+        $('#new-status').val('');
+        
+        // Disable current status in dropdown to prevent selecting same status
+        $('#new-status option').prop('disabled', false);
+        $(`#new-status option[value="${order.status}"]`).prop('disabled', true);
+
+        // Clear additional message
+        $('#additional-message').val('');
+        
+        // Enable notification by default
+        $('#send-notification').prop('checked', true);
 
         // Clear previous content
         $('#orderItemsGrid').empty();

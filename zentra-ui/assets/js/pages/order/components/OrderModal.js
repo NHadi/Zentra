@@ -844,7 +844,7 @@ export class OrderModal {
         $('#edit-discount').val(currentOrder.discountAmount);
         $('#edit-total').val(currentOrder.totalAmount);
         $('#edit-status').val(currentOrder.status);
-        $('#edit-payment-status').val(currentOrder.paymentStatus);
+        $('#edit-payment-status').val(currentOrder.payment_status);
         $('#edit-expected-delivery').val(currentOrder.expectedDeliveryDate?.split('T')[0]);
         $('#edit-notes').val(currentOrder.notes);
         
