@@ -608,9 +608,7 @@
                                         <option value="pending">Pending</option>
                                         <option value="confirmed">Confirmed</option>
                                         <option value="in_production">In Production</option>
-                                        <option value="quality_check">Quality Check</option>
-                                        <option value="ready_for_delivery">Ready for Delivery</option>
-                                        <option value="delivered">Delivered</option>
+                                        <option value="completed">Completed</option>
                                         <option value="cancelled">Cancelled</option>
                                     </select>
                                 </div>
@@ -686,6 +684,62 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="submit" form="customerForm" class="btn btn-primary">Create Customer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusUpdateModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-sync-alt mr-2"></i>Update Order Status
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="statusUpdateForm">
+                    <input type="hidden" id="status-order-id" name="orderId">
+                    
+                    <!-- Current Status -->
+                    <div class="current-status mb-4">
+                        <label class="form-control-label">Current Status</label>
+                        <div class="current-status-badge" id="currentStatusBadge"></div>
+                    </div>
+
+                    <!-- New Status -->
+                    <div class="form-group">
+                        <label class="form-control-label" for="new-status">New Status</label>
+                        <select class="form-control" id="new-status" name="status" required>
+                            <option value="">Select New Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="in_production">In Production</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <!-- Additional Message -->
+                    <div class="form-group">
+                        <label class="form-control-label" for="status-message">Additional Message</label>
+                        <textarea class="form-control" id="status-message" name="additional_message" rows="3" placeholder="Enter any additional notes or comments about this status change..."></textarea>
+                    </div>
+
+                    <!-- Notification Option -->
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="send-notification" name="send_notification">
+                        <label class="custom-control-label" for="send-notification">Send notification to customer</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updateStatusBtn">Update Status</button>
             </div>
         </div>
     </div>
@@ -1090,5 +1144,52 @@
     height: 0.5rem;
     border-radius: 50%;
     margin-right: 0.5rem;
+}
+
+.current-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.current-status-badge i {
+    margin-right: 0.5rem;
+}
+
+#statusUpdateModal .modal-header {
+    background: #5e72e4;
+    color: white;
+}
+
+#statusUpdateModal .modal-header .close {
+    color: white;
+    opacity: 0.8;
+}
+
+#statusUpdateModal .modal-header .close:hover {
+    opacity: 1;
+}
+
+#statusUpdateModal .form-control-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #8898aa;
+}
+
+#statusUpdateModal .custom-switch {
+    padding-left: 2.75rem;
+}
+
+#statusUpdateModal .custom-control-label {
+    font-size: 0.875rem;
+    color: #525f7f;
+}
+
+#statusUpdateModal .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: #2dce89;
+    border-color: #2dce89;
 }
 </style> 

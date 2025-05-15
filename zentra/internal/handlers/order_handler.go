@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"zentra/internal/application"
 	"zentra/internal/domain/order"
 	"zentra/internal/infrastructure/whatsapp"
@@ -587,13 +588,11 @@ func UpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 
 		// Validate status
 		validStatuses := map[string]bool{
-			"pending":            true,
-			"confirmed":          true,
-			"in_production":      true,
-			"quality_check":      true,
-			"ready_for_delivery": true,
-			"delivered":          true,
-			"cancelled":          true,
+			"pending":       true,
+			"confirmed":     true,
+			"in_production": true,
+			"completed":     true,
+			"cancelled":     true,
 		}
 
 		if !validStatuses[req.Status] {
@@ -634,88 +633,95 @@ func UpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 	}
 }
 
-func sendWhatsAppNotification(order *order.Order, status string, additionalMessage string) error {
-	// Initialize WhatsApp client
-	whatsappClient := whatsapp.NewClient()
-
-	// Format additional message with order details
-	detailedMessage := additionalMessage
-	if additionalMessage == "" {
-		detailedMessage = fmt.Sprintf("Total Amount: Rp %.2f", order.TotalAmount)
-	}
-
-	// If there are order items, add their details
-	if len(order.OrderItems) > 0 {
-		detailedMessage += "\n\nOrder Items:"
-		for _, item := range order.OrderItems {
-			detailedMessage += fmt.Sprintf("\n- %s (Qty: %d, Size: %s, Color: %s)",
-				item.Product.Name,
-				item.Quantity,
-				item.Size,
-				item.Color)
-		}
-	}
-
-	// Get template name and parameters based on status
-	templateName, params := getTemplateParams(order, status, detailedMessage)
-
-	// Send message using template
-	return whatsappClient.SendMessage(order.Customer.Phone, templateName, params)
-}
-
 func getTemplateParams(order *order.Order, status string, additionalMessage string) (string, []string) {
+	// Map status to a more user-friendly display text
+	statusDisplay := map[string]string{
+		"pending":       "Pending",
+		"confirmed":     "Confirmed",
+		"in_production": "In Production",
+		"completed":     "Completed",
+		"cancelled":     "Cancelled",
+	}[status]
+
+	// If status not found in map, use capitalized version
+	if statusDisplay == "" {
+		statusDisplay = strings.Title(strings.ReplaceAll(status, "_", " "))
+	}
+
 	// Map status to template name and parameters
 	switch status {
 	case "pending":
 		return "order_pending", []string{
 			order.Customer.Name,
 			order.OrderNumber,
+			statusDisplay,
 			additionalMessage,
 		}
 	case "confirmed":
 		return "order_confirmed", []string{
 			order.Customer.Name,
 			order.OrderNumber,
+			statusDisplay,
 			additionalMessage,
 		}
 	case "in_production":
 		return "order_in_production", []string{
 			order.Customer.Name,
 			order.OrderNumber,
+			statusDisplay,
 			additionalMessage,
 		}
-	case "quality_check":
-		return "order_quality_check", []string{
+	case "completed":
+		return "order_completed", []string{
 			order.Customer.Name,
 			order.OrderNumber,
-			additionalMessage,
-		}
-	case "ready_for_delivery":
-		return "order_ready", []string{
-			order.Customer.Name,
-			order.OrderNumber,
-			additionalMessage,
-		}
-	case "delivered":
-		return "order_delivered", []string{
-			order.Customer.Name,
-			order.OrderNumber,
+			statusDisplay,
 			additionalMessage,
 		}
 	case "cancelled":
 		return "order_cancelled", []string{
 			order.Customer.Name,
 			order.OrderNumber,
+			statusDisplay,
 			additionalMessage,
 		}
 	default:
 		return "order_status_update", []string{
 			order.Customer.Name,
 			order.OrderNumber,
-			status,
+			statusDisplay,
 			additionalMessage,
 		}
 	}
+}
+
+func sendWhatsAppNotification(order *order.Order, status string, additionalMessage string) error {
+	// Initialize WhatsApp client
+	whatsappClient := whatsapp.NewClient()
+
+	// Format order items details
+	var itemDetails strings.Builder
+	for i, item := range order.OrderItems {
+		if i > 0 {
+			itemDetails.WriteString("\n")
+		}
+		itemDetails.WriteString(fmt.Sprintf("- %s (Qty: %d, Size: %s, Color: %s)",
+			item.Product.Name,
+			item.Quantity,
+			item.Size,
+			item.Color))
+	}
+
+	// Format additional message
+	messageDetails := fmt.Sprintf("%s\n\nOrder Items:\n%s",
+		additionalMessage,
+		itemDetails.String())
+
+	// Get template name and parameters
+	templateName, params := getTemplateParams(order, status, messageDetails)
+
+	// Send message using template
+	return whatsappClient.SendMessage(order.Customer.Phone, templateName, params)
 }
 
 // @Summary Bulk update order statuses
@@ -742,13 +748,11 @@ func BulkUpdateOrderStatus(service *application.OrderService) gin.HandlerFunc {
 
 		// Validate status
 		validStatuses := map[string]bool{
-			"pending":            true,
-			"confirmed":          true,
-			"in_production":      true,
-			"quality_check":      true,
-			"ready_for_delivery": true,
-			"delivered":          true,
-			"cancelled":          true,
+			"pending":       true,
+			"confirmed":     true,
+			"in_production": true,
+			"completed":     true,
+			"cancelled":     true,
 		}
 
 		if !validStatuses[req.Status] {

@@ -24,9 +24,7 @@ export class OrderGrid {
             pending: 'pending',
             confirmed: 'in-production',
             in_production: 'in-production',
-            quality_check: 'in-production',
-            ready_for_delivery: 'completed',
-            delivered: 'completed',
+            completed: 'completed',
             cancelled: 'cancelled'
         };
         return statusClasses[status] || 'pending';
@@ -37,9 +35,7 @@ export class OrderGrid {
             pending: 'fa-clock',
             confirmed: 'fa-check',
             in_production: 'fa-cogs',
-            quality_check: 'fa-clipboard-check',
-            ready_for_delivery: 'fa-box',
-            delivered: 'fa-truck',
+            completed: 'fa-check-circle',
             cancelled: 'fa-times'
         };
         return statusIcons[status] || 'fa-clock';

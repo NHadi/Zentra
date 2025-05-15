@@ -168,33 +168,77 @@ export class OrderPage {
             const order = this.currentOrder;
             if (!order) return;
             
-            // Prompt for new status
-            const newStatus = prompt("Enter new status (pending, confirmed, in_production, quality_check, ready_for_delivery, delivered, cancelled):", order.status);
-            if (newStatus === null) return; // User cancelled
-            
-            const additionalMessage = prompt("Enter additional message (optional):", "");
-            const sendNotification = confirm("Send notification to customer?");
-            
-            const statusData = {
-                status: newStatus,
-                send_notification: sendNotification,
-                additional_message: additionalMessage || ""
-            };
-            
-            // Update order status
-            await orderAPI.updateOrderStatus(order.id, statusData);
-            
-            // Refresh data
-            await this.loadData();
-            
-            // Show success message
-            console.log('Order status updated successfully!');
-            alert('Order status updated successfully!');
+            // Show status update modal
+            this.showStatusUpdateModal(order);
             
         } catch (error) {
             console.error('Update status error:', error);
-            alert(error.message || 'Failed to update order status. Please try again.');
+            gridUtils.handleGridError(error, 'updating order status');
         }
+    }
+
+    showStatusUpdateModal(order) {
+        // Set order ID
+        $('#status-order-id').val(order.id);
+        
+        // Update current status badge
+        const statusClass = this.orderGrid.getStatusClass(order.status);
+        const statusIcon = this.orderGrid.getStatusIcon(order.status);
+        $('#currentStatusBadge')
+            .removeClass()
+            .addClass(`current-status-badge ${statusClass}`)
+            .html(`
+                <i class="fas ${statusIcon}"></i>
+                ${order.status.replace(/_/g, ' ').toUpperCase()}
+            `);
+        
+        // Set current status in dropdown
+        $('#new-status').val(order.status);
+        
+        // Reset form
+        $('#status-message').val('');
+        $('#send-notification').prop('checked', true);
+        
+        // Show modal
+        $('#statusUpdateModal').modal('show');
+        
+        // Remove any existing click handler
+        $('#updateStatusBtn').off('click');
+        
+        // Add click handler for update button
+        $('#updateStatusBtn').on('click', async () => {
+            try {
+                // Validate form
+                const form = $('#statusUpdateForm')[0];
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                
+                const formData = new FormData(form);
+                const statusData = {
+                    status: formData.get('status'),
+                    send_notification: formData.get('send_notification') === 'on',
+                    additional_message: formData.get('additional_message')
+                };
+                
+                // Update order status
+                await orderAPI.updateOrderStatus(order.id, statusData);
+                
+                // Close modal
+                $('#statusUpdateModal').modal('hide');
+                
+                // Refresh data
+                await this.loadData();
+                
+                // Show success message
+                gridUtils.showSuccess('Order status updated successfully!');
+                
+            } catch (error) {
+                console.error('Update status error:', error);
+                gridUtils.handleGridError(error, 'updating order status');
+            }
+        });
     }
 
     printOrder() {
