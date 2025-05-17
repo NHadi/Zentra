@@ -1693,267 +1693,11 @@ export class TaskPage {
     }
 
     showFilterModal() {
-        // Store reference to TaskPage instance
         const self = this;
         
-        const modalContent = `
-            <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header bg-light">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-filter me-2 text-primary"></i>
-                                <h5 class="modal-title" id="filterModalLabel">Advanced Task Filters</h5>
-                            </div>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-            <div class="filter-form">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label class="form-label d-flex justify-content-between">
-                                                <span>Status</span>
-                                                <small class="text-muted" id="statusCount"></small>
-                                            </label>
-                                            <div class="status-filters">
-                                                <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" id="statusPending" value="pending">
-                                                    <label class="form-check-label" for="statusPending">
-                                                        <span class="status-dot bg-warning"></span> Pending
-                                                    </label>
-                </div>
-                                                <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" id="statusInProgress" value="in_progress">
-                                                    <label class="form-check-label" for="statusInProgress">
-                                                        <span class="status-dot bg-primary"></span> In Progress
-                                                    </label>
-                                                </div>
-                                                <div class="form-check form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" id="statusCompleted" value="completed">
-                                                    <label class="form-check-label" for="statusCompleted">
-                                                        <span class="status-dot bg-success"></span> Completed
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="form-group mb-3">
-                                            <label class="form-label d-flex justify-content-between">
-                                                <span>Task Type</span>
-                                                <small class="text-muted" id="typeCount"></small>
-                                            </label>
-                                            <div class="task-type-filters">
-                        ${this.taskTypes.map(type => `
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="type${type}" value="${type}">
-                                                        <label class="form-check-label" for="type${type}">
-                                                            <i class="fas ${this.getTaskTypeIcon(type)} me-2"></i>
-                                                            ${type}
-                                                        </label>
-                                                    </div>
-                        `).join('')}
-                </div>
-                </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">Assignment</label>
-                    <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-user"></i>
-                                                </span>
-                                                <input type="text" class="form-control" id="employeeFilter" placeholder="Employee ID or Name">
-                                                <button class="btn btn-outline-secondary" type="button" id="clearEmployee">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">Date Range</label>
-                                            <div class="date-range-group">
-                                                <div class="input-group mb-2">
-                                                    <span class="input-group-text">From</span>
-                        <input type="date" class="form-control" id="dateFrom">
-                                                    <button class="btn btn-outline-secondary" type="button" id="clearDateFrom">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                        </div>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">To</span>
-                        <input type="date" class="form-control" id="dateTo">
-                                                    <button class="btn btn-outline-secondary" type="button" id="clearDateTo">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group mb-3">
-                                            <label class="form-label">Quick Date Ranges</label>
-                                            <div class="quick-date-buttons">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="today">Today</button>
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="yesterday">Yesterday</button>
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="thisWeek">This Week</button>
-                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="lastWeek">Last Week</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="filter-summary mt-3 p-2 bg-light rounded">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="active-filters">
-                                            <span class="text-muted">Active Filters:</span>
-                                            <span id="activeFiltersCount" class="badge bg-primary ms-2">0</span>
-                                        </div>
-                                        <button type="button" class="btn btn-link btn-sm text-danger" id="clearAllFilters">
-                                            <i class="fas fa-trash-alt me-1"></i> Clear All
-                                        </button>
-                                    </div>
-                                    <div id="activeFiltersTags" class="mt-2"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-light">
-                            <div class="d-flex justify-content-between w-100">
-                                <div class="filter-stats">
-                                    <small class="text-muted">Matching Tasks: <span id="matchingTasksCount">0</span></small>
-                                </div>
-                                <div>
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-primary" id="applyFilters">
-                                        <i class="fas fa-check me-1"></i> Apply Filters
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Add filter modal styles
-        const filterStyles = `
-            .filter-form .status-dot {
-                display: inline-block;
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                margin-right: 4px;
-            }
-
-            .filter-form .task-type-filters {
-                max-height: 200px;
-                overflow-y: auto;
-                padding-right: 10px;
-            }
-
-            .filter-form .task-type-filters::-webkit-scrollbar {
-                width: 4px;
-            }
-
-            .filter-form .task-type-filters::-webkit-scrollbar-track {
-                background: #f1f1f1;
-                border-radius: 2px;
-            }
-
-            .filter-form .task-type-filters::-webkit-scrollbar-thumb {
-                background: #888;
-                border-radius: 2px;
-            }
-
-            .filter-form .quick-date-buttons {
-                display: flex;
-                gap: 0.5rem;
-                flex-wrap: wrap;
-            }
-
-            .filter-form .active-filter-tag {
-                display: inline-flex;
-                align-items: center;
-                background: #e9ecef;
-                padding: 2px 8px;
-                border-radius: 12px;
-                font-size: 0.875rem;
-                margin: 2px;
-            }
-
-            .filter-form .active-filter-tag .remove-filter {
-                margin-left: 4px;
-                cursor: pointer;
-                opacity: 0.6;
-            }
-
-            .filter-form .active-filter-tag .remove-filter:hover {
-                opacity: 1;
-            }
-
-            .date-range-group {
-                background: #f8f9fa;
-                padding: 10px;
-                border-radius: 4px;
-            }
-
-            .filter-form .form-group {
-                margin-bottom: 1rem;
-            }
-
-            .filter-form label {
-                display: block;
-                margin-bottom: 0.5rem;
-                color: #8898aa;
-                font-size: 0.875rem;
-                font-weight: 600;
-            }
-
-            .filter-form .form-control {
-                border: 1px solid #e9ecef;
-                border-radius: 6px;
-                padding: 0.75rem;
-                font-size: 0.875rem;
-                transition: all 0.2s ease;
-            }
-
-            .filter-form .form-control:focus {
-                border-color: #5e72e4;
-                box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
-            }
-
-            .filter-form .input-group {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .filter-form .input-group-text {
-                background: #f6f9fc;
-                border: 1px solid #e9ecef;
-                color: #8898aa;
-                padding: 0.75rem;
-                border-radius: 6px;
-            }
-        `;
-
-        // Remove existing modal and styles if any
-        $('#filterModal, #filterStyles').remove();
-        
-        // Add the modal and styles to the body
-        $('body').append(modalContent);
-        $('head').append(`<style id="filterStyles">${filterStyles}</style>`);
-        
-        // Initialize the modal
-        const filterModal = new bootstrap.Modal(document.getElementById('filterModal'), {
-            keyboard: true,
-            backdrop: true
-        });
-        
-        this.filterModal = filterModal;
-
         // Initialize filter state
         const filterState = {
+            searchText: '',
             status: [],
             types: [],
             employee: '',
@@ -1966,10 +1710,19 @@ export class TaskPage {
             const activeFilters = [];
             let count = 0;
 
+            if (filterState.searchText) {
+                activeFilters.push({
+                    type: 'Search',
+                    value: filterState.searchText,
+                    key: 'search'
+                });
+                count++;
+            }
+
             if (filterState.status.length > 0) {
                 activeFilters.push({
                     type: 'Status',
-                    value: filterState.status.join(', '),
+                    value: filterState.status.map(s => s.replace('_', ' ').toUpperCase()).join(', '),
                     key: 'status'
                 });
                 count++;
@@ -2017,8 +1770,287 @@ export class TaskPage {
             const matchingTasks = self.getFilteredTasks(filterState);
             $('#matchingTasksCount').text(matchingTasks.length);
         };
+        
+        const modalContent = `
+            <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-filter me-2"></i>
+                                <h5 class="modal-title" id="filterModalLabel">Advanced Task Filters</h5>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="filter-form">
+                                <!-- Search Section -->
+                                <div class="settings-section mb-4">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-title">
+                                            <i class="fas fa-search me-2"></i>
+                                            Search Tasks
+                                        </div>
+                                    </div>
+                                    <div class="search-container p-3">
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light">
+                                                <i class="fas fa-search"></i>
+                                            </span>
+                                            <input type="text" 
+                                                class="form-control" 
+                                                id="taskSearch" 
+                                                placeholder="Search in tasks (order number, product, size, notes, etc...)"
+                                                autocomplete="off">
+                                            <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div class="search-help text-muted mt-2">
+                                            <small>
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Search across order numbers, products, sizes, notes, and more
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Rest of existing filter sections -->
+                                ${this.getExistingFilterSections()}
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <div class="d-flex justify-content-between w-100">
+                                <div class="filter-stats">
+                                    <small class="text-muted">Matching Tasks: <span id="matchingTasksCount">0</span></small>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-1"></i>
+                                        Cancel
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="applyFilters">
+                                        <i class="fas fa-check me-1"></i>
+                                        Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const filterStyles = `
+            /* Search styles */
+            .search-container {
+                background: #fff;
+                border-radius: 8px;
+            }
+
+            .search-container .input-group {
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            }
+
+            .search-container .input-group-text {
+                border: none;
+                background: #f8f9fa;
+                color: #5e72e4;
+            }
+
+            .search-container .form-control {
+                border: none;
+                padding: 0.75rem;
+                font-size: 0.95rem;
+                box-shadow: none;
+            }
+
+            .search-container .form-control:focus {
+                box-shadow: none;
+                background: #f8f9fa;
+            }
+
+            .search-container .btn-outline-secondary {
+                border: none;
+                background: transparent;
+                color: #8898aa;
+            }
+
+            .search-container .btn-outline-secondary:hover {
+                background: #f8f9fa;
+                color: #5e72e4;
+            }
+
+            .search-help {
+                font-size: 0.85rem;
+                color: #8898aa;
+            }
+
+            /* Existing filter styles */
+            ${this.getExistingFilterStyles()}
+        `;
+
+        // Remove existing modal and styles
+        $('#filterModal, #filterStyles').remove();
+        
+        // Add the modal and styles to the body
+        $('body').append(modalContent);
+        $('head').append(`<style id="filterStyles">${filterStyles}</style>`);
+        
+        // Initialize the modal
+        const filterModal = new bootstrap.Modal(document.getElementById('filterModal'), {
+            keyboard: true,
+            backdrop: true
+        });
+        
+        this.filterModal = filterModal;
 
         // Bind event handlers
+        $(document).on('input', '#taskSearch', function() {
+            filterState.searchText = $(this).val();
+            updateActiveFilters();
+        });
+
+        $(document).on('click', '#clearSearch', function() {
+            $('#taskSearch').val('');
+            filterState.searchText = '';
+            updateActiveFilters();
+        });
+
+        // Bind existing filter handlers
+        this.bindExistingFilterHandlers(filterState, updateActiveFilters);
+
+        // Show the modal
+        filterModal.show();
+        
+        // Initial update of active filters
+        updateActiveFilters();
+    }
+
+    // Helper method to get existing filter sections HTML
+    getExistingFilterSections() {
+        return `
+            <div class="row">
+                <!-- Status Filters -->
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label d-flex justify-content-between">
+                            <span>Status</span>
+                            <small class="text-muted" id="statusCount"></small>
+                        </label>
+                        <div class="status-filters">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="statusPending" value="pending">
+                                <label class="form-check-label" for="statusPending">
+                                    <span class="status-dot bg-warning"></span> Pending
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="statusInProgress" value="in_progress">
+                                <label class="form-check-label" for="statusInProgress">
+                                    <span class="status-dot bg-primary"></span> In Progress
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="statusCompleted" value="completed">
+                                <label class="form-check-label" for="statusCompleted">
+                                    <span class="status-dot bg-success"></span> Completed
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label d-flex justify-content-between">
+                            <span>Task Type</span>
+                            <small class="text-muted" id="typeCount"></small>
+                        </label>
+                        <div class="task-type-filters">
+                            ${this.taskTypes.map(type => `
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="type${type}" value="${type}">
+                                    <label class="form-check-label" for="type${type}">
+                                        <i class="fas ${this.getTaskTypeIcon(type)} me-2"></i>
+                                        ${type}
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Assignment</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" class="form-control" id="employeeFilter" placeholder="Employee ID or Name">
+                            <button class="btn btn-outline-secondary" type="button" id="clearEmployee">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label">Date Range</label>
+                        <div class="date-range-group">
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">From</span>
+                                <input type="date" class="form-control" id="dateFrom">
+                                <button class="btn btn-outline-secondary" type="button" id="clearDateFrom">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-text">To</span>
+                                <input type="date" class="form-control" id="dateTo">
+                                <button class="btn btn-outline-secondary" type="button" id="clearDateTo">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-summary mt-3 p-2 bg-light rounded">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="active-filters">
+                        <span class="text-muted">Active Filters:</span>
+                        <span id="activeFiltersCount" class="badge bg-primary ms-2">0</span>
+                    </div>
+                    <button type="button" class="btn btn-link btn-sm text-danger" id="clearAllFilters">
+                        <i class="fas fa-trash-alt me-1"></i> Clear All
+                    </button>
+                </div>
+                <div id="activeFiltersTags" class="mt-2"></div>
+            </div>
+        `;
+    }
+
+    // Helper method to get existing filter styles
+    getExistingFilterStyles() {
+        return `
+            .filter-form .status-dot {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 4px;
+            }
+            /* ... rest of existing styles ... */
+        `;
+    }
+
+    // Helper method to bind existing filter handlers
+    bindExistingFilterHandlers(filterState, updateActiveFilters) {
+        const self = this;
+        
+        // Status filters
         $('.status-filters input[type="checkbox"]').on('change', function() {
             const status = $(this).val();
             const index = filterState.status.indexOf(status);
@@ -2032,6 +2064,7 @@ export class TaskPage {
             updateActiveFilters();
         });
 
+        // Task type filters
         $('.task-type-filters input[type="checkbox"]').on('change', function() {
             const type = $(this).val();
             const index = filterState.types.indexOf(type);
@@ -2045,24 +2078,27 @@ export class TaskPage {
             updateActiveFilters();
         });
 
+        // Employee filter
         $('#employeeFilter').on('input', function() {
             filterState.employee = $(this).val();
             updateActiveFilters();
         });
 
+        // Date filters
         $('#dateFrom, #dateTo').on('change', function() {
             const id = $(this).attr('id');
             filterState[id] = $(this).val();
             updateActiveFilters();
         });
 
-        // Clear all filters button handler
+        // Clear all filters
         $('#clearAllFilters').on('click', () => {
             // Reset all form inputs
             $('.filter-form input[type="checkbox"]').prop('checked', false);
             $('#employeeFilter').val('');
             $('#dateFrom').val('');
             $('#dateTo').val('');
+            $('#taskSearch').val('');
             
             // Reset filter state
             filterState.status = [];
@@ -2070,6 +2106,7 @@ export class TaskPage {
             filterState.employee = '';
             filterState.dateFrom = '';
             filterState.dateTo = '';
+            filterState.searchText = '';
             
             // Update UI
             updateActiveFilters();
@@ -2081,13 +2118,9 @@ export class TaskPage {
 
         // Apply filters button handler
         $('#applyFilters').on('click', () => {
-            self.applyFilters({
-                status: filterState.status,
-                types: filterState.types,
-                employee: filterState.employee,
-                dateFrom: filterState.dateFrom,
-                dateTo: filterState.dateTo
-            });
+            const filteredTasks = self.getFilteredTasks(filterState);
+            self.renderTasksByDivision(filteredTasks);
+            self.updateTaskStatistics(filteredTasks);
             
             // Hide the modal
             if (self.filterModal) {
@@ -2095,18 +2128,43 @@ export class TaskPage {
             } else {
                 $('#filterModal').modal('hide');
             }
-        });
 
-        // Show the modal
-        filterModal.show();
-        
-        // Initial update of active filters
-        updateActiveFilters();
+            // Show success notification
+            DevExpress.ui.notify({
+                message: `Showing ${filteredTasks.length} filtered tasks`,
+                type: 'success',
+                displayTime: 2000,
+                position: { at: 'top center', my: 'top center' }
+            });
+        });
     }
 
     // Helper method to get filtered tasks without applying them
     getFilteredTasks(filterState) {
         let filteredTasks = [...this.tasks];
+
+        // Text search filter
+        if (filterState.searchText) {
+            const searchLower = filterState.searchText.toLowerCase();
+            filteredTasks = filteredTasks.filter(task => {
+                // Search in task details
+                const searchableFields = [
+                    task.task_type,
+                    task.notes,
+                    task.order_item?.order?.order_number,
+                    task.order_item?.product_name,
+                    task.order_item?.size,
+                    task.order_item?.color,
+                    task.employee_name,
+                    `${task.order_item?.quantity} pcs`,
+                    task.status
+                ];
+                
+                return searchableFields.some(field => 
+                    field && field.toString().toLowerCase().includes(searchLower)
+                );
+            });
+        }
 
         // Filter by task type
         if (filterState.types && filterState.types.length > 0) {
@@ -2140,80 +2198,6 @@ export class TaskPage {
         }
 
         return filteredTasks;
-    }
-
-    // Update the applyFilters method to handle the new filter format
-    applyFilters(filters) {
-        let filteredTasks = this.getFilteredTasks(filters);
-        
-        // Update the UI with filtered tasks
-        this.renderTasksByDivision(filteredTasks);
-        this.updateTaskStatistics(filteredTasks);
-
-        // Update active filters display
-        this.updateActiveFilters(filters);
-    }
-
-    updateActiveFilters(filters) {
-        let count = 0;
-        const activeFilters = [];
-
-        // Add status filters
-        if (filters.status && filters.status.length > 0) {
-            activeFilters.push({
-                type: 'Status',
-                value: filters.status.map(s => s.replace('_', ' ').toUpperCase()).join(', '),
-                key: 'status'
-            });
-            count++;
-        }
-
-        // Add type filters
-        if (filters.types && filters.types.length > 0) {
-            activeFilters.push({
-                type: 'Types',
-                value: filters.types.join(', '),
-                key: 'types'
-            });
-            count++;
-        }
-
-        // Add employee filter
-        if (filters.employee) {
-            activeFilters.push({
-                type: 'Employee',
-                value: filters.employee,
-                key: 'employee'
-            });
-            count++;
-        }
-
-        // Add date range filter
-        if (filters.dateFrom || filters.dateTo) {
-            activeFilters.push({
-                type: 'Date Range',
-                value: `${filters.dateFrom || 'Any'} to ${filters.dateTo || 'Any'}`,
-                key: 'date'
-            });
-            count++;
-        }
-
-        // Update the filter count badge
-        $('#activeFiltersCount').text(count);
-
-        // Update the active filters tags
-        const tagsHtml = activeFilters.map(filter => `
-            <span class="active-filter-tag">
-                <strong>${filter.type}:</strong> ${filter.value}
-                <i class="fas fa-times remove-filter" data-filter-key="${filter.key}"></i>
-            </span>
-        `).join('');
-
-        $('#activeFiltersTags').html(tagsHtml);
-
-        // Update matching tasks count
-        const matchingTasks = this.getFilteredTasks(filters);
-        $('#matchingTasksCount').text(matchingTasks.length);
     }
 
     async showTaskDetails(task) {
