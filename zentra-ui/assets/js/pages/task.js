@@ -23,6 +23,20 @@ window.TaskPage = class {
         
         // Add styles
         this.addStyles();
+
+        // Initialize Bootstrap modal
+        this.initializeModal();
+    }
+
+    initializeModal() {
+        // Initialize the Bootstrap modal
+        const taskModal = new bootstrap.Modal(document.getElementById('taskDetailsModal'), {
+            keyboard: true,
+            backdrop: true
+        });
+
+        // Store modal instance
+        this.taskModal = taskModal;
     }
 
     dispose() {
@@ -35,45 +49,53 @@ window.TaskPage = class {
     }
 
     bindEvents() {
-        // Filter button click handler
-        $(document).on('click', '#filterTasks', () => {
-            this.showFilterModal();
-        });
-
-        // Task card click handler
+        // Task card click handler with improved event delegation
         $(document).on('click', '.task-card', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const taskId = $(e.currentTarget).data('task-id');
+            const taskCard = $(e.currentTarget);
+            const taskId = taskCard.data('task-id');
+            
+            // Prevent click if clicking on action buttons
+            if ($(e.target).closest('.task-actions').length) {
+                return;
+            }
+            
+            // Find the task and show details
             const task = this.tasks.find(t => t.id === taskId);
             if (task) {
+                e.preventDefault();
+                e.stopPropagation();
                 this.showTaskDetails(task);
             }
         });
 
-        // Task action buttons
-        $(document).on('click', '#startTask', () => {
+        // Task action buttons with improved event handling
+        $('#startTask').on('click', () => {
             if (this.currentTask) {
                 this.startTask(this.currentTask.id);
             }
         });
 
-        $(document).on('click', '#completeTask', () => {
+        $('#completeTask').on('click', () => {
             if (this.currentTask) {
                 this.completeTask(this.currentTask.id);
             }
         });
 
-        $(document).on('click', '#addNote', () => {
+        $('#addNoteBtn').on('click', () => {
             if (this.currentTask) {
                 this.addNoteToTask(this.currentTask.id);
             }
         });
 
-        $(document).on('click', '#reassignTask', () => {
+        $('#reassignTask').on('click', () => {
             if (this.currentTask) {
                 this.showReassignModal(this.currentTask.id);
             }
+        });
+
+        // Filter button click handler
+        $('#filterTasks').on('click', () => {
+            this.showFilterModal();
         });
     }
 
@@ -167,10 +189,32 @@ window.TaskPage = class {
         
         // Calculate completion rate
         const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-        $('#completionRate').html(`<i class="fa fa-arrow-up"></i> ${completionRate}%`);
         
-        // Calculate weekly growth (placeholder)
-        $('#tasksGrowth').html('<i class="fa fa-arrow-up"></i> 5%');
+        // Update circular progress
+        const circle = document.querySelector('.circular-chart .circle');
+        if (circle) {
+            circle.style.strokeDasharray = `${completionRate}, 100`;
+        }
+        $('.rate-text').text(`${completionRate}%`);
+        
+        // Update progress bar
+        const progressPercentage = totalTasks > 0 ? Math.round((inProgressTasks / totalTasks) * 100) : 0;
+        $('#progressPercentage').css('width', `${progressPercentage}%`);
+        $('#progressText').text(`${inProgressTasks} of ${totalTasks} tasks`);
+        
+        // Update pending breakdown
+        const highPriorityTasks = tasks.filter(task => {
+            const dueDate = task.order_item?.order?.expected_delivery_date;
+            return task.status === 'pending' && dueDate && new Date(dueDate) <= new Date(Date.now() + 24 * 60 * 60 * 1000);
+        }).length;
+        
+        const dueTodayTasks = tasks.filter(task => {
+            const dueDate = task.order_item?.order?.expected_delivery_date;
+            return task.status === 'pending' && dueDate && new Date(dueDate).toDateString() === new Date().toDateString();
+        }).length;
+        
+        $('#highPriorityCount').text(highPriorityTasks);
+        $('#dueTodayCount').text(dueTodayTasks);
     }
 
     renderTasksByDivision(tasks) {
@@ -581,58 +625,130 @@ window.TaskPage = class {
     }
 
     createTaskCard(task) {
-        // Create the card element
         const card = $('<div>')
             .addClass('task-card')
             .attr({
                 'draggable': 'true',
-                'data-task-id': task.id
+                'data-task-id': task.id,
+                'role': 'button',
+                'tabindex': '0'  // Make it focusable for accessibility
             });
         
         const statusClass = this.getStatusClass(task.status);
         const timeInfo = this.formatTaskTime(task);
+        const dueDate = new Date(task.order_item?.order?.expected_delivery_date);
+        const isOverdue = dueDate < new Date() && task.status !== 'completed';
+        const isPriority = dueDate <= new Date(Date.now() + 24 * 60 * 60 * 1000);
         
-        // Add card content
         card.html(`
             <div class="task-card-content">
                 <div class="task-header">
                     <div class="task-badges">
                         <span class="badge badge-${statusClass}">
-                            ${task.status === 'in_progress' ? 
-                                '<i class="fas fa-spinner fa-spin"></i>' : 
-                                '<i class="fas fa-circle"></i>'}
+                            ${this.getStatusIcon(task.status)}
                             ${task.status.replace('_', ' ').toUpperCase()}
                         </span>
-                        <span class="employee-badge" title="Assigned Employee">
-                            <i class="fas fa-user"></i>
-                            E${task.employee_id}
+                        ${isOverdue ? `
+                            <span class="badge badge-danger">
+                                <i class="fas fa-exclamation-triangle"></i> OVERDUE
                         </span>
+                        ` : ''}
+                        ${isPriority && !isOverdue ? `
+                            <span class="badge badge-warning">
+                                <i class="fas fa-bolt"></i> PRIORITY
+                            </span>
+                        ` : ''}
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-icon btn-sm" title="Quick Actions">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
                     </div>
                 </div>
                 
                 <div class="task-body">
-                    <div class="task-description">
-                        ${task.notes || 'No description provided'}
+                    <div class="task-info">
+                        <div class="task-type">
+                            <i class="fas ${this.getTaskTypeIcon(task.task_type)}"></i>
+                            <span>${task.task_type.toUpperCase()}</span>
                     </div>
                     <div class="task-meta">
-                        <span class="order-ref" title="Order Reference">
+                            <span class="meta-item" title="Order Reference">
                             <i class="fas fa-shopping-cart"></i>
-                            Order #${task.order_item_id}
+                                #${task.order_item.order.order_number}
+                            </span>
+                            <span class="meta-item" title="Product">
+                                <i class="fas fa-tshirt"></i>
+                                ${task.order_item.product_name}
                         </span>
                     </div>
+                    </div>
+                    <div class="task-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Quantity:</span>
+                            <span class="detail-value">${task.order_item.quantity} pcs</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Size/Color:</span>
+                            <span class="detail-value">${task.order_item.size} / ${task.order_item.color}</span>
+                        </div>
+                    </div>
+                    ${task.notes ? `
+                        <div class="task-notes">
+                            <i class="fas fa-comment-alt"></i>
+                            ${task.notes}
+                        </div>
+                    ` : ''}
                 </div>
                 
                 <div class="task-footer">
+                    <div class="assigned-to" title="Assigned Employee">
+                        <div class="employee-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span>${task.employee_name || 'Unassigned'}</span>
+                    </div>
                     <div class="task-time" title="${timeInfo.tooltip}">
                         <i class="${timeInfo.icon}"></i>
                         ${timeInfo.text}
                     </div>
                 </div>
             </div>
+            <div class="task-card-overlay">
+                <span class="view-details">
+                    <i class="fas fa-search"></i> View Details
+                </span>
+            </div>
         `);
 
-        // Add styles for clickable card
-        card.css('cursor', 'pointer');
+        // Add click handler for the entire card
+        card.on('click', (e) => {
+            // Prevent click if we're dragging
+            if (card.hasClass('dragging')) return;
+            
+            // Don't trigger click when clicking action buttons
+            if ($(e.target).closest('.task-actions').length) return;
+            
+            this.showTaskDetails(task);
+        });
+
+        // Add keyboard support for accessibility
+        card.on('keypress', (e) => {
+            if (e.which === 13 || e.which === 32) { // Enter or Space key
+                e.preventDefault();
+                this.showTaskDetails(task);
+            }
+        });
+
+        // Add hover effect styles
+        card.hover(
+            function() {
+                $(this).addClass('task-card-hover');
+            },
+            function() {
+                $(this).removeClass('task-card-hover');
+            }
+        );
         
         return card;
     }
@@ -899,23 +1015,87 @@ window.TaskPage = class {
             }
             
             .task-card {
-                background: white;
-                border-radius: 8px;
-                margin-bottom: 0.75rem;
-                border: 1px solid #e9ecef;
+                position: relative;
+                cursor: pointer;
                 transition: all 0.2s ease;
-                cursor: grab;
+                overflow: hidden;
             }
             
             .task-card:hover {
-                box-shadow: 0 4px 6px rgba(50, 50, 93, 0.1);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            
+            .task-card:active {
                 transform: translateY(-1px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            
+            .task-card:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px #4299e1;
+            }
+            
+            .task-card-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(66, 153, 225, 0.05);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.2s ease;
+            }
+            
+            .task-card:hover .task-card-overlay {
+                opacity: 1;
+            }
+            
+            .view-details {
+                background: rgba(255, 255, 255, 0.9);
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                color: #4299e1;
+                font-size: 0.875rem;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                transform: translateY(5px);
+                transition: transform 0.2s ease;
+            }
+            
+            .task-card:hover .view-details {
+                transform: translateY(0);
+            }
+            
+            .task-actions {
+                position: relative;
+                z-index: 2;
+            }
+            
+            .task-actions .btn-icon {
+                opacity: 0.7;
+                transition: opacity 0.2s ease;
+            }
+            
+            .task-actions .btn-icon:hover {
+                opacity: 1;
+                background: rgba(66, 153, 225, 0.1);
             }
             
             .task-card.dragging {
                 opacity: 0.9;
-                transform: rotate(2deg);
-                box-shadow: 0 8px 16px rgba(50, 50, 93, 0.15);
+                transform: rotate(2deg) scale(1.02);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+            
+            .task-card.dragging .task-card-overlay {
+                display: none;
             }
             
             .task-card-content {
@@ -1102,56 +1282,332 @@ window.TaskPage = class {
                 border-radius: 6px;
             }
 
-            /* Task Card Hover Effect */
-            .task-card {
-                transition: all 0.2s ease;
+            /* Task Modal Styles */
+            #taskDetailsModal .modal-content {
+                border: none;
+                border-radius: 0.75rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             }
 
-            .task-card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(50, 50, 93, 0.1);
+            #taskDetailsModal .modal-header {
+                background: #5e72e4;
+                color: white;
+                border-radius: 0.75rem 0.75rem 0 0;
+                padding: 1.5rem;
+                align-items: center;
             }
 
-            .task-card:active {
-                transform: translateY(0);
+            #taskDetailsModal .modal-title-wrapper {
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
             }
 
-            /* Task Detail Modal Improvements */
-            .task-detail-modal {
-                max-height: 80vh;
+            #taskDetailsModal .task-type-badge {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.1);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.25rem;
+            }
+
+            #taskDetailsModal .modal-title-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.375rem;
+            }
+
+            #taskDetailsModal .modal-title {
+                margin: 0;
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: white;
+            }
+
+            #taskDetailsModal .task-meta {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            #taskDetailsModal .task-id {
+                font-size: 0.875rem;
+                color: rgba(255, 255, 255, 0.8);
+                font-weight: 500;
+            }
+
+            #taskDetailsModal .btn-close {
+                color: white;
+                opacity: 0.8;
+                transition: opacity 0.2s;
+            }
+
+            #taskDetailsModal .btn-close:hover {
+                opacity: 1;
+            }
+
+            #taskDetailsModal .modal-body {
+                padding: 1.5rem;
+            }
+
+            #taskDetailsModal .task-details-grid {
+                display: grid;
+                gap: 1.5rem;
+            }
+
+            #taskDetailsModal .detail-section {
+                background: #fff;
+                border-radius: 12px;
+                padding: 1.5rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            }
+
+            #taskDetailsModal .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.25rem;
+            }
+
+            #taskDetailsModal .section-header h6 {
+                margin: 0;
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: #8898aa;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            #taskDetailsModal .section-badge {
+                padding: 0.5rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                background: rgba(94, 114, 228, 0.1);
+                color: #5e72e4;
+            }
+
+            #taskDetailsModal .info-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.25rem;
+            }
+
+            #taskDetailsModal .info-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            #taskDetailsModal .info-item .label {
+                font-size: 0.75rem;
+                color: #8898aa;
+                font-weight: 500;
+            }
+
+            #taskDetailsModal .info-item .value {
+                font-weight: 500;
+                color: #32325d;
+            }
+
+            #taskDetailsModal .timeline {
+                position: relative;
+                padding-left: 2rem;
+            }
+
+            #taskDetailsModal .timeline::before {
+                content: '';
+                position: absolute;
+                left: 8px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                background: #e9ecef;
+            }
+
+            #taskDetailsModal .timeline-item {
+                position: relative;
+                padding-bottom: 1.5rem;
+            }
+
+            #taskDetailsModal .timeline-item::before {
+                content: '';
+                position: absolute;
+                left: -2rem;
+                top: 0;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                border: 2px solid #fff;
+                background: #5e72e4;
+            }
+
+            #taskDetailsModal .timeline-item.started::before {
+                background: #fb6340;
+            }
+
+            #taskDetailsModal .timeline-item.completed::before {
+                background: #2dce89;
+            }
+
+            #taskDetailsModal .timeline-content {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 1rem;
+            }
+
+            #taskDetailsModal .timeline-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
+            }
+
+            #taskDetailsModal .timeline-action {
+                font-weight: 600;
+                color: #32325d;
+            }
+
+            #taskDetailsModal .timeline-time {
+                font-size: 0.75rem;
+                color: #8898aa;
+            }
+
+            #taskDetailsModal .timeline-details {
+                font-size: 0.875rem;
+                color: #525f7f;
+            }
+
+            #taskDetailsModal .notes-container {
+                max-height: 300px;
                 overflow-y: auto;
+                margin-bottom: 1rem;
             }
 
-            .task-detail-modal::-webkit-scrollbar {
-                width: 6px;
+            #taskDetailsModal .note-item {
+                background: #f8f9fa;
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 1rem;
             }
 
-            .task-detail-modal::-webkit-scrollbar-track {
-                background: #f1f1f1;
-                border-radius: 3px;
+            #taskDetailsModal .note-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.5rem;
             }
 
-            .task-detail-modal::-webkit-scrollbar-thumb {
-                background: #c1c1c1;
-                border-radius: 3px;
+            #taskDetailsModal .note-author {
+                font-weight: 500;
+                color: #32325d;
             }
 
-            .task-detail-modal::-webkit-scrollbar-thumb:hover {
-                background: #a8a8a8;
+            #taskDetailsModal .note-time {
+                font-size: 0.75rem;
+                color: #8898aa;
             }
 
-            /* Responsive Improvements */
+            #taskDetailsModal .note-content {
+                font-size: 0.875rem;
+                color: #525f7f;
+                line-height: 1.5;
+            }
+
+            #taskDetailsModal .modal-footer {
+                background: #f8f9fa;
+                border-top: 1px solid #e9ecef;
+                border-radius: 0 0 0.75rem 0.75rem;
+                padding: 1.25rem 1.5rem;
+                display: flex;
+                align-items: center;
+            }
+
+            #taskDetailsModal .footer-info {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                margin-right: auto;
+            }
+
+            #taskDetailsModal .status-indicator {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            #taskDetailsModal .status-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+            }
+
+            #taskDetailsModal .status-text {
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            #taskDetailsModal .time-info {
+                font-size: 0.875rem;
+                color: #8898aa;
+            }
+
+            #taskDetailsModal .action-buttons {
+                display: flex;
+                gap: 0.75rem;
+            }
+
+            #taskDetailsModal .action-buttons .btn {
+                padding: 0.625rem 1.25rem;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            #taskDetailsModal .action-buttons .btn i {
+                font-size: 0.875rem;
+            }
+
+            #taskDetailsModal .note-input-wrapper {
+                margin-top: 1rem;
+            }
+
+            #taskDetailsModal .note-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 0.5rem;
+                margin-top: 0.75rem;
+            }
+
             @media (max-width: 768px) {
-                .task-detail-modal {
-                    padding: 0.5rem;
+                #taskDetailsModal .task-details-grid {
+                    grid-template-columns: 1fr;
                 }
 
-                .task-detail-actions {
+                #taskDetailsModal .info-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                #taskDetailsModal .modal-footer {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                #taskDetailsModal .footer-info {
+                    width: 100%;
+                    justify-content: space-between;
+                }
+
+                #taskDetailsModal .action-buttons {
+                    width: 100%;
                     flex-wrap: wrap;
-                    gap: 0.5rem;
                 }
 
-                .task-detail-actions .btn {
+                #taskDetailsModal .action-buttons .btn {
                     flex: 1;
                     min-width: 120px;
                 }
@@ -1258,453 +1714,211 @@ window.TaskPage = class {
     showTaskDetails(task) {
         if (!task) return;
         
-        this.currentTask = task; // Store the current task
+        this.currentTask = task;
         
-        // Create modal content
-        const timeInfo = this.formatTaskTime(task);
+        // Update modal title and task type badge
+        $('#taskTypeBadge i').attr('class', `fas ${this.getTaskTypeIcon(task.task_type)}`);
+        $('#taskTitle').text(`${task.task_type.toUpperCase()} Task`);
+        $('#taskIdBadge').text(`#${task.id}`);
+        
+        // Update task status
         const statusClass = this.getStatusClass(task.status);
-        const orderItem = task.order_item || {};
-        const order = orderItem.order || {};
-        
-        const modalContent = `
-            <div class="task-detail-modal">
-                <div class="task-detail-header">
-                    <div class="status-section">
-                        <span class="badge badge-${statusClass} badge-lg">
-                            ${task.status === 'in_progress' ? 
-                                '<i class="fas fa-spinner fa-spin"></i>' : 
-                                '<i class="fas fa-circle"></i>'}
+        $('#taskStatus').html(`
+            <span class="badge badge-${statusClass}">
+                ${this.getStatusIcon(task.status)}
                             ${task.status.replace('_', ' ').toUpperCase()}
                         </span>
-                    </div>
-                    <div class="task-type-section">
-                        <span class="task-type-badge">
-                            <i class="fas fa-layer-group"></i>
-                            ${task.task_type}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="task-detail-body">
-                    <div class="detail-section">
-                        <h6 class="section-title">Order Information</h6>
-                        <div class="order-info">
-                            <div class="order-header">
-                                <div class="order-title">
-                                    <h5>Order #${order.order_number || 'N/A'}</h5>
-                                    <span class="badge badge-${this.getOrderStatusClass(order.status)}">
-                                        ${order.status?.replace('_', ' ').toUpperCase() || 'N/A'}
-                                    </span>
-                            </div>
-                                <div class="order-meta">
-                                    <span class="meta-item">
-                                        <i class="fas fa-calendar"></i>
-                                        Created: ${new Date(order.created_at).toLocaleDateString()}
-                                    </span>
-                                    <span class="meta-item">
-                                        <i class="fas fa-truck"></i>
-                                        Expected: ${order.expected_delivery_date || 'Not set'}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="order-details">
-                                <div class="detail-row">
-                                    <div class="detail-label">Customer</div>
-                                    <div class="detail-value">
-                                        <div class="customer-info">
-                                            <strong>${order.customer?.name || 'N/A'}</strong>
-                                            <div class="customer-contact">
-                                                <span><i class="fas fa-envelope"></i> ${order.customer?.email || 'N/A'}</span>
-                                                <span><i class="fas fa-phone"></i> ${order.customer?.phone || 'N/A'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Item Details</div>
-                                    <div class="detail-value">
-                                        <div class="item-info">
-                                            <div class="item-main">
-                                                ${orderItem.product_detail?.name || 'Custom Item'}
-                                            </div>
-                                            <div class="item-specs">
-                                                <span class="spec-item">
-                                                    <i class="fas fa-ruler"></i> Size: ${orderItem.size || 'N/A'}
-                                                </span>
-                                                <span class="spec-item">
-                                                    <i class="fas fa-palette"></i> Color: ${orderItem.color || 'N/A'}
-                                                </span>
-                                                <span class="spec-item">
-                                                    <i class="fas fa-box"></i> Quantity: ${orderItem.quantity || 'N/A'}
-                                                </span>
-                                            </div>
-                                            ${orderItem.customization ? `
-                                                <div class="customization-info">
-                                                    <div class="custom-title">Customization</div>
-                                                    <div class="custom-details">
-                                                        <span>Name: ${JSON.parse(orderItem.customization).name || 'N/A'}</span>
-                                                        <span>Number: ${JSON.parse(orderItem.customization).number || 'N/A'}</span>
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="detail-row">
-                                    <div class="detail-label">Production Status</div>
-                                    <div class="detail-value">
-                                        <div class="production-info">
-                                            <span class="badge badge-${this.getProductionStatusClass(orderItem.production_status)}">
-                                                ${orderItem.production_status?.replace('_', ' ').toUpperCase() || 'N/A'}
-                                            </span>
-                                            <div class="current-task">
-                                                Current Task: ${orderItem.current_task?.replace('_', ' ').toUpperCase() || 'None'}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="detail-section">
-                        <h6 class="section-title">Timeline</h6>
-                        <div class="timeline">
-                            <div class="timeline-item">
-                                <i class="fas fa-clock"></i>
-                                <div class="timeline-content">
-                                    <div class="event">Created</div>
-                                    <div class="time">${new Date(task.created_at).toLocaleString()}</div>
-                                </div>
-                            </div>
-                            ${task.started_at ? `
-                                <div class="timeline-item">
-                                    <i class="fas fa-play"></i>
-                                    <div class="timeline-content">
-                                        <div class="event">Started</div>
-                                        <div class="time">${new Date(task.started_at).toLocaleString()}</div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                            ${task.completed_at ? `
-                                <div class="timeline-item">
-                                    <i class="fas fa-check"></i>
-                                    <div class="timeline-content">
-                                        <div class="event">Completed</div>
-                                        <div class="time">${new Date(task.completed_at).toLocaleString()}</div>
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    </div>
-
-                    <div class="detail-section">
-                        <h6 class="section-title">Notes</h6>
-                        <div class="notes-section">
-                            <div class="note-content">
-                                ${task.notes || 'No notes available'}
-                            </div>
-                            <div class="add-note-form">
-                                <textarea id="newNote" class="form-control" placeholder="Add a note..."></textarea>
-                                <button class="btn btn-sm btn-primary mt-2" id="addNote">
-                                    Add Note
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="task-detail-actions">
-                    ${task.status === 'pending' ? `
-                        <button class="btn btn-primary" id="startTask">
-                            <i class="fas fa-play"></i> Start Task
-                        </button>
-                    ` : ''}
-                    ${task.status === 'in_progress' ? `
-                        <button class="btn btn-success" id="completeTask">
-                            <i class="fas fa-check"></i> Complete Task
-                        </button>
-                    ` : ''}
-                    <button class="btn btn-info" id="reassignTask">
-                        <i class="fas fa-user-edit"></i> Reassign
-                    </button>
-                </div>
-            </div>
-        `;
-
-        // Show modal using DevExpress dialog
-            DevExpress.ui.dialog.custom({
-                title: `Task Details - ${task.task_type}`,
-                content: modalContent,
-                buttons: [{
-                    text: 'Close',
-                    onClick: () => {
-                        this.currentTask = null;
-                        return true;
-                    }
-                }],
-            width: '800px',
-                height: 'auto',
-                dragEnabled: true,
-                showCloseButton: true,
-                onShown: () => {
-                    this.addTaskDetailStyles();
-                }
-            });
-    }
-
-    getOrderStatusClass(status) {
-        const classes = {
-            'pending': 'warning',
-            'confirmed': 'info',
-            'in_production': 'primary',
-            'quality_check': 'info',
-            'ready_for_delivery': 'primary',
-            'delivered': 'success',
-            'completed': 'success',
-            'cancelled': 'danger'
-        };
-        return classes[status] || 'secondary';
-    }
-
-    getProductionStatusClass(status) {
-        const classes = {
-            'pending': 'warning',
-            'in_progress': 'primary',
-            'completed': 'success',
-            'cancelled': 'danger'
-        };
-        return classes[status] || 'secondary';
-    }
-
-    addTaskDetailStyles() {
-        const styles = `
-            .task-detail-modal {
-                padding: 1rem;
-            }
-
-            .task-detail-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1.5rem;
-                padding-bottom: 1rem;
-                border-bottom: 1px solid #e9ecef;
-            }
-
-            .badge-lg {
-                padding: 0.75rem 1rem;
-                font-size: 0.875rem;
-            }
-
-            .task-type-badge {
-                padding: 0.5rem 1rem;
-                background: #f6f9fc;
-                border-radius: 6px;
-                color: #5e72e4;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .task-detail-body {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .detail-section {
-                background: #fff;
-                border-radius: 8px;
-                padding: 1.5rem;
-                border: 1px solid #e9ecef;
-            }
-
-            .section-title {
-                color: #8898aa;
-                font-size: 0.875rem;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 1.5rem;
-            }
-
-            .order-header {
-                margin-bottom: 1.5rem;
-            }
-
-            .order-title {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .order-title h5 {
-                margin: 0;
-                font-weight: 600;
-            }
-
-            .order-meta {
-                display: flex;
-                gap: 1.5rem;
-                color: #8898aa;
-                font-size: 0.875rem;
-            }
-
-            .meta-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .order-details {
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .detail-row {
-                display: grid;
-                grid-template-columns: 150px 1fr;
-                gap: 1rem;
-                align-items: start;
-            }
-
-            .detail-label {
-                color: #8898aa;
-                font-size: 0.875rem;
-                font-weight: 600;
-            }
-
-            .detail-value {
-                color: #525f7f;
-            }
-
-            .customer-info {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .customer-contact {
-                display: flex;
-                gap: 1rem;
-                font-size: 0.875rem;
-                color: #8898aa;
-            }
-
-            .customer-contact span {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .item-info {
-                display: flex;
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-
-            .item-main {
-                font-weight: 600;
-                color: #32325d;
-            }
-
-            .item-specs {
-                display: flex;
-                gap: 1rem;
-                flex-wrap: wrap;
-            }
-
-            .spec-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                font-size: 0.875rem;
-                color: #8898aa;
-                background: #f6f9fc;
-                padding: 0.5rem 0.75rem;
-                border-radius: 4px;
-            }
-
-            .customization-info {
-                background: #f6f9fc;
-                padding: 1rem;
-                border-radius: 6px;
-                margin-top: 0.75rem;
-            }
-
-            .custom-title {
-                font-weight: 600;
-                color: #32325d;
-                margin-bottom: 0.5rem;
-            }
-
-            .custom-details {
-                display: flex;
-                gap: 1rem;
-                font-size: 0.875rem;
-                color: #525f7f;
-            }
-
-            .production-info {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-            }
-
-            .current-task {
-                font-size: 0.875rem;
-                color: #8898aa;
-            }
-
-            .task-detail-actions {
-                display: flex;
-                gap: 1rem;
-                margin-top: 1.5rem;
-                padding-top: 1.5rem;
-                border-top: 1px solid #e9ecef;
-            }
-
-            .task-detail-actions .btn {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.75rem 1.25rem;
-                font-weight: 600;
-            }
-
-            @media (max-width: 768px) {
-                .detail-row {
-                    grid-template-columns: 1fr;
-                    gap: 0.5rem;
-                }
-
-                .detail-label {
-                    margin-bottom: 0.25rem;
-                }
-
-                .order-meta {
-                    flex-direction: column;
-                    gap: 0.75rem;
-                }
-
-                .item-specs {
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
-            }
-        `;
-
-        // Add styles to head if not already added
-        if (!document.querySelector('style[data-task-detail-styles]')) {
-            const styleElement = document.createElement('style');
-            styleElement.setAttribute('data-task-detail-styles', '');
-            styleElement.textContent = styles;
-            document.head.appendChild(styleElement);
+        `);
+        
+        // Update task information
+        $('#assignedTo').text(task.employee_name || 'Unassigned');
+        $('#sequenceNumber').text(`#${task.sequence_number}`);
+        $('#sequenceBadge').text(`Sequence ${task.sequence_number}`);
+        $('#createdAt').text(new Date(task.created_at).toLocaleString());
+        $('#updatedAt').text(new Date(task.updated_at).toLocaleString());
+        
+        // Update order information
+        const order = task.order_item.order;
+        $('#orderNumber').text(order.order_number);
+        $('#customerName').text(order.customer_name);
+        $('#productName').text(task.order_item.product_name);
+        $('#quantity').text(`${task.order_item.quantity} pcs`);
+        $('#dueDate').text(new Date(order.expected_delivery_date).toLocaleDateString());
+        
+        // Update timeline
+        this.updateTaskTimeline(task);
+        
+        // Update notes
+        this.updateTaskNotes(task);
+        
+        // Update footer info
+        this.updateFooterInfo(task);
+        
+        // Update action buttons based on status
+        this.updateActionButtons(task);
+        
+        // Show modal
+        if (this.taskModal) {
+            this.taskModal.show();
+        } else {
+            $('#taskDetailsModal').modal('show');
         }
+    }
+
+    updateFooterInfo(task) {
+        // Update status indicator
+        const statusClass = this.getStatusClass(task.status);
+        const statusColors = {
+            'warning': '#fb6340',
+            'primary': '#5e72e4',
+            'success': '#2dce89'
+        };
+        
+        $('#statusDot').css('background-color', statusColors[statusClass]);
+        $('#statusText').text(task.status.replace('_', ' ').toUpperCase());
+        
+        // Update time info
+        const timeInfo = this.formatTaskTime(task);
+        $('#timeInfo').html(`<i class="${timeInfo.icon}"></i> ${timeInfo.text}`);
+    }
+
+    updateTaskTimeline(task) {
+        const timeline = $('#taskTimeline');
+        timeline.empty();
+        
+        // Add creation event
+        timeline.append(`
+                            <div class="timeline-item">
+                                <div class="timeline-content">
+                    <div class="timeline-header">
+                        <span class="timeline-action">Task Created</span>
+                        <span class="timeline-time">${new Date(task.created_at).toLocaleString()}</span>
+                                </div>
+                    <div class="timeline-details">
+                        Created by ${task.created_by}
+                            </div>
+                                    </div>
+                                </div>
+        `);
+        
+        // Add started event if applicable
+        if (task.started_at) {
+            timeline.append(`
+                <div class="timeline-item started">
+                                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-action">Task Started</span>
+                            <span class="timeline-time">${new Date(task.started_at).toLocaleString()}</span>
+                                    </div>
+                        <div class="timeline-details">
+                            Started by ${task.employee_name}
+                                </div>
+                        </div>
+                    </div>
+            `);
+        }
+        
+        // Add completed event if applicable
+        if (task.completed_at) {
+            timeline.append(`
+                <div class="timeline-item completed">
+                    <div class="timeline-content">
+                        <div class="timeline-header">
+                            <span class="timeline-action">Task Completed</span>
+                            <span class="timeline-time">${new Date(task.completed_at).toLocaleString()}</span>
+                            </div>
+                        <div class="timeline-details">
+                            Completed by ${task.employee_name}
+                            </div>
+                        </div>
+                    </div>
+            `);
+        }
+    }
+
+    updateTaskNotes(task) {
+        const notesContainer = $('#taskNotes');
+        notesContainer.empty();
+        
+        if (task.notes) {
+            notesContainer.append(`
+                <div class="note-item">
+                    <div class="note-header">
+                        <span class="note-author">${task.employee_name || 'System'}</span>
+                        <span class="note-time">${new Date(task.updated_at).toLocaleString()}</span>
+                    </div>
+                    <div class="note-content">${task.notes}</div>
+                </div>
+            `);
+        } else {
+            notesContainer.append(`
+                <div class="empty-notes">
+                    <p class="text-muted text-center">No notes available</p>
+                </div>
+            `);
+        }
+
+        // Set up note input handlers
+        $('#addNoteBtn').off('click').on('click', () => {
+            $('.note-input-wrapper').slideDown();
+            $('#newNote').focus();
+        });
+
+        $('#cancelNote').off('click').on('click', () => {
+            $('.note-input-wrapper').slideUp();
+            $('#newNote').val('');
+        });
+
+        $('#saveNote').off('click').on('click', () => {
+            const noteText = $('#newNote').val().trim();
+            if (noteText) {
+                this.addNoteToTask(task.id, noteText);
+            }
+        });
+    }
+
+    updateActionButtons(task) {
+        const startBtn = $('#startTask');
+        const completeBtn = $('#completeTask');
+        const reassignBtn = $('#reassignTask');
+        
+        // Show/hide buttons based on task status
+        startBtn.toggle(task.status === 'pending');
+        completeBtn.toggle(task.status === 'in_progress');
+        reassignBtn.toggle(task.status !== 'completed');
+        
+        // Update button states and styles
+        if (task.status === 'completed') {
+            startBtn.prop('disabled', true).addClass('disabled');
+            completeBtn.prop('disabled', true).addClass('disabled');
+            reassignBtn.prop('disabled', true).addClass('disabled');
+        } else {
+            startBtn.prop('disabled', false).removeClass('disabled');
+            completeBtn.prop('disabled', false).removeClass('disabled');
+            reassignBtn.prop('disabled', false).removeClass('disabled');
+        }
+    }
+
+    getTaskTypeIcon(taskType) {
+        const icons = {
+            'layout': 'fa-object-group',
+            'printing': 'fa-print',
+            'cutting': 'fa-cut',
+            'sewing': 'fa-thread',
+            'pressing': 'fa-iron',
+            'finishing': 'fa-check-double',
+            'quality_check': 'fa-clipboard-check'
+        };
+        return icons[taskType.toLowerCase()] || 'fa-tasks';
+    }
+
+    getStatusIcon(status) {
+        const icons = {
+            'pending': '<i class="fas fa-clock"></i>',
+            'in_progress': '<i class="fas fa-spinner fa-spin"></i>',
+            'completed': '<i class="fas fa-check"></i>'
+        };
+        return icons[status] || '<i class="fas fa-circle"></i>';
     }
 
     async startTask(taskId) {
@@ -1729,13 +1943,7 @@ window.TaskPage = class {
         }
     }
 
-    async addNoteToTask(taskId) {
-        const noteText = $('#newNote').val().trim();
-        if (!noteText) {
-            DevExpress.ui.notify('Please enter a note', 'warning', 3000);
-            return;
-        }
-
+    async addNoteToTask(taskId, noteText) {
         try {
             await zentra.addTaskNote(taskId, noteText);
             await this.loadData();

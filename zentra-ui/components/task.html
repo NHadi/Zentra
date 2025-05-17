@@ -1,186 +1,905 @@
 <!-- Task Management Page -->
-<div class="container-fluid p-4">
+<div class="container-fluid task-management-page">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Task Management</h2>
-        <div class="actions">
-            <button id="filterTasks" class="btn btn-outline-primary mr-2">
-                <i class="fas fa-filter"></i> Filter
-            </button>
-            <button id="viewOptions" class="btn btn-outline-secondary">
-                <i class="fas fa-cog"></i> View Options
-            </button>
-        </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Total Tasks</h6>
-                    <h3 class="card-title mb-0" id="totalTasks">0</h3>
-                    <small class="text-success" id="tasksGrowth">
-                        <i class="fas fa-arrow-up"></i> 5% Since last week
-                    </small>
-                </div>
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h2>Task Management</h2>
+                <span class="subtitle">Track and manage production tasks</span>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">In Progress</h6>
-                    <h3 class="card-title mb-0" id="inProgressTasks">0</h3>
-                    <small class="text-info">Active Tasks</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Completed</h6>
-                    <h3 class="card-title mb-0" id="completedTasks">0</h3>
-                    <small class="text-success" id="completionRate">
-                        <i class="fas fa-arrow-up"></i> 0% Completion Rate
-                    </small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">Pending</h6>
-                    <h3 class="card-title mb-0" id="pendingTasks">0</h3>
-                    <small class="text-warning">Needs Attention</small>
+            <div class="header-actions">
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" id="filterTasks">
+                        <i class="fas fa-filter"></i>
+                        <span>Filter</span>
+                    </button>
+                    <button class="btn btn-outline-primary" id="viewOptions">
+                        <i class="fas fa-th-large"></i>
+                        <span>View</span>
+                    </button>
+                    <button class="btn btn-primary" id="refreshTasks">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div id="main-content">
-        <!-- Task divisions will be rendered here -->
+    <!-- Task Overview Cards -->
+    <div class="task-overview">
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+                <div class="overview-card total">
+                    <div class="card-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 id="totalTasks">0</h3>
+                        <p>Total Tasks</p>
+                        <div class="trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="tasksGrowth">5%</span>
+                            <span class="period">vs last week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="overview-card in-progress">
+                    <div class="card-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 id="inProgressTasks">0</h3>
+                        <p>In Progress</p>
+                        <div class="task-progress">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%" id="progressPercentage"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">0 of 0 tasks</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="overview-card completed">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 id="completedTasks">0</h3>
+                        <p>Completed</p>
+                        <div class="completion-rate" id="completionRate">
+                            <div class="rate-progress">
+                                <svg viewBox="0 0 36 36" class="circular-chart">
+                                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                </svg>
+                                <span class="rate-text">0%</span>
+                            </div>
+                            <span class="rate-label">Completion Rate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="overview-card pending">
+                    <div class="card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 id="pendingTasks">0</h3>
+                        <p>Pending</p>
+                        <div class="pending-breakdown">
+                            <div class="breakdown-item">
+                                <span class="item-label">High Priority</span>
+                                <span class="item-value" id="highPriorityCount">0</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="item-label">Due Today</span>
+                                <span class="item-value" id="dueTodayCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Board -->
+    <div class="task-board">
+        <div class="board-header">
+            <div class="board-title">
+                <h4>Production Tasks</h4>
+                <span class="task-count" id="filteredTaskCount">Showing all tasks</span>
+            </div>
+            <div class="board-actions">
+                <div class="view-options">
+                    <button class="btn btn-icon active" data-view="board">
+                        <i class="fas fa-columns"></i>
+                    </button>
+                    <button class="btn btn-icon" data-view="list">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button class="btn btn-icon" data-view="timeline">
+                        <i class="fas fa-stream"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="board-content" id="main-content">
+            <!-- Task content will be dynamically loaded here -->
+        </div>
     </div>
 </div>
 
 <!-- Task Details Modal -->
-<div class="modal fade" id="taskDetailsModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="taskDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="taskTitle"></h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="task-info mb-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Type:</strong> <span id="taskType"></span></p>
-                            <p><strong>Status:</strong> <span id="taskStatus"></span></p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>Assigned To:</strong> <span id="assignedTo"></span></p>
-                            <p><strong>Order:</strong> <span id="orderNumber"></span></p>
+                <div class="modal-title-wrapper">
+                    <div class="task-type-badge" id="taskTypeBadge">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="modal-title-group">
+                        <h5 class="modal-title" id="taskTitle"></h5>
+                        <div class="task-meta">
+                            <span class="task-id" id="taskIdBadge"></span>
+                            <span class="task-status" id="taskStatus"></span>
                         </div>
                     </div>
                 </div>
-                
-                <div class="task-timeline mb-4">
-                    <h6 class="mb-3">Timeline</h6>
-                    <div class="timeline"></div>
-                </div>
-                
-                <div class="task-notes">
-                    <h6 class="mb-3">Notes</h6>
-                    <div id="taskNotes"></div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="task-details-grid">
+                    <!-- Task Info Section -->
+                    <div class="detail-section task-info">
+                        <div class="section-header">
+                            <h6>Task Information</h6>
+                            <span class="section-badge" id="sequenceBadge"></span>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="label">Assigned To</span>
+                                <div class="value-wrapper">
+                                    <div class="employee-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="value" id="assignedTo"></span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Sequence</span>
+                                <span class="value" id="sequenceNumber"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Created</span>
+                                <span class="value" id="createdAt"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Last Updated</span>
+                                <span class="value" id="updatedAt"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Info Section -->
+                    <div class="detail-section order-info">
+                        <div class="section-header">
+                            <h6>Order Details</h6>
+                            <span class="order-number" id="orderNumber"></span>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="label">Customer</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-building"></i>
+                                    <span class="value" id="customerName"></span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Product</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-tshirt"></i>
+                                    <span class="value" id="productName"></span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Quantity</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-box"></i>
+                                    <span class="value" id="quantity"></span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Due Date</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="value" id="dueDate"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Section -->
+                    <div class="detail-section timeline-section">
+                        <div class="section-header">
+                            <h6>Task Timeline</h6>
+                            <div class="timeline-legend">
+                                <span class="legend-item">
+                                    <i class="fas fa-circle text-primary"></i> Created
+                                </span>
+                                <span class="legend-item">
+                                    <i class="fas fa-circle text-warning"></i> Started
+                                </span>
+                                <span class="legend-item">
+                                    <i class="fas fa-circle text-success"></i> Completed
+                                </span>
+                            </div>
+                        </div>
+                        <div class="timeline" id="taskTimeline">
+                            <!-- Timeline items will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="detail-section notes-section">
+                        <div class="section-header">
+                            <h6>Notes & Updates</h6>
+                            <button class="btn btn-sm btn-primary" id="addNoteBtn">
+                                <i class="fas fa-plus"></i> Add Note
+                            </button>
+                        </div>
+                        <div class="notes-container" id="taskNotes">
+                            <!-- Notes will be added here -->
+                        </div>
+                        <div class="note-input-wrapper" style="display: none;">
+                            <textarea class="form-control" id="newNote" rows="3" placeholder="Enter your note here..."></textarea>
+                            <div class="note-actions">
+                                <button class="btn btn-sm btn-secondary" id="cancelNote">Cancel</button>
+                                <button class="btn btn-sm btn-primary" id="saveNote">Save Note</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-warning" id="startTask">Start Task</button>
-                <button type="button" class="btn btn-success" id="completeTask">Complete Task</button>
-                <button type="button" class="btn btn-info" id="addNote">Add Note</button>
-                <button type="button" class="btn btn-primary" id="reassignTask">Reassign</button>
+                <div class="footer-info">
+                    <div class="status-indicator">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span class="status-text" id="statusText"></span>
+                    </div>
+                    <div class="time-info" id="timeInfo"></div>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" id="startTask">
+                        <i class="fas fa-play"></i> Start Task
+                    </button>
+                    <button type="button" class="btn btn-success" id="completeTask">
+                        <i class="fas fa-check"></i> Complete Task
+                    </button>
+                    <button type="button" class="btn btn-primary" id="reassignTask">
+                        <i class="fas fa-user-edit"></i> Reassign
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .task-timeline .timeline {
-        position: relative;
-        padding: 1rem 0;
+/* Page Layout */
+.task-management-page {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-title h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.header-title .subtitle {
+    color: #718096;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.header-actions .btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Overview Cards */
+.task-overview {
+    margin-bottom: 2rem;
+}
+
+.overview-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.overview-card.total .card-icon {
+    background: rgba(66, 153, 225, 0.1);
+    color: #4299e1;
+}
+
+.overview-card.in-progress .card-icon {
+    background: rgba(236, 201, 75, 0.1);
+    color: #ecc94b;
+}
+
+.overview-card.completed .card-icon {
+    background: rgba(72, 187, 120, 0.1);
+    color: #48bb78;
+}
+
+.overview-card.pending .card-icon {
+    background: rgba(237, 137, 54, 0.1);
+    color: #ed8936;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.card-content h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #2d3748;
+}
+
+.card-content p {
+    color: #718096;
+    margin: 0.25rem 0 1rem;
+    font-size: 0.875rem;
+}
+
+.trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.trend.positive {
+    color: #48bb78;
+}
+
+.trend.negative {
+    color: #f56565;
+}
+
+.period {
+    color: #718096;
+}
+
+/* Task Progress */
+.task-progress {
+    margin-top: 1rem;
+}
+
+.progress {
+    height: 6px;
+    background: #edf2f7;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+    background: #4299e1;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    color: #718096;
+}
+
+/* Completion Rate */
+.completion-rate {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.rate-progress {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto;
+}
+
+.circular-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.circle-bg {
+    fill: none;
+    stroke: #edf2f7;
+    stroke-width: 2;
+}
+
+.circle {
+    fill: none;
+    stroke: #48bb78;
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.3s ease;
+}
+
+.rate-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.rate-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #718096;
+    margin-top: 0.5rem;
+}
+
+/* Pending Breakdown */
+.pending-breakdown {
+    margin-top: 1rem;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.item-label {
+    color: #718096;
+}
+
+.item-value {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Task Board */
+.task-board {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.board-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.board-title h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.task-count {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.view-options {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: #718096;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover, .btn-icon.active {
+    background: #4299e1;
+    color: #fff;
+    border-color: #4299e1;
+}
+
+/* Task Details Modal */
+.modal-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.task-type-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(94, 114, 228, 0.1);
+    color: #5e72e4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.modal-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #32325d;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.task-id {
+    font-size: 0.875rem;
+    color: #8898aa;
+    font-weight: 500;
+}
+
+.task-status .badge {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.detail-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.section-header h6 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #8898aa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-item .label {
+    font-size: 0.75rem;
+    color: #8898aa;
+    font-weight: 500;
+}
+
+.value-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.value-wrapper i {
+    color: #5e72e4;
+    font-size: 1rem;
+}
+
+.info-item .value {
+    font-weight: 500;
+    color: #32325d;
+}
+
+.employee-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f6f9fc;
+    color: #5e72e4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background: #5e72e4;
+}
+
+.timeline-item.started::before {
+    background: #fb6340;
+}
+
+.timeline-item.completed::before {
+    background: #2dce89;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-action {
+    font-weight: 600;
+    color: #32325d;
+}
+
+.timeline-time {
+    font-size: 0.75rem;
+    color: #8898aa;
+}
+
+.timeline-details {
+    font-size: 0.875rem;
+    color: #525f7f;
+}
+
+.timeline-legend {
+    display: flex;
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #8898aa;
+}
+
+.legend-item i {
+    font-size: 0.625rem;
+}
+
+.notes-container {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+.note-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.note-author {
+    font-weight: 500;
+    color: #32325d;
+}
+
+.note-time {
+    font-size: 0.75rem;
+    color: #8898aa;
+}
+
+.note-content {
+    font-size: 0.875rem;
+    color: #525f7f;
+    line-height: 1.5;
+}
+
+.note-input-wrapper {
+    margin-top: 1rem;
+}
+
+.note-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.modal-footer {
+    padding: 1.25rem 1.5rem;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    border-radius: 0 0 12px 12px;
+}
+
+.footer-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-right: auto;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.time-info {
+    font-size: 0.875rem;
+    color: #8898aa;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.action-buttons .btn {
+    padding: 0.625rem 1.25rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-buttons .btn i {
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .task-details-grid {
+        grid-template-columns: 1fr;
     }
 
-    .timeline-item {
-        position: relative;
-        padding-left: 2rem;
-        margin-bottom: 1rem;
+    .info-grid {
+        grid-template-columns: 1fr;
     }
 
-    .timeline-badge {
-        position: absolute;
-        left: 0;
-        top: 0.25rem;
-        width: 1rem;
-        height: 1rem;
-        border-radius: 50%;
-        background: #007bff;
-        border: 2px solid #fff;
-        box-shadow: 0 0 0 2px #007bff;
+    .modal-footer {
+        flex-direction: column;
+        gap: 1rem;
     }
 
-    .timeline-content {
-        background: #f8f9fa;
-        padding: 0.75rem;
-        border-radius: 0.25rem;
-    }
-
-    .timeline-header {
-        display: flex;
+    .footer-info {
+        width: 100%;
         justify-content: space-between;
-        margin-bottom: 0.5rem;
     }
 
-    .timeline-time {
-        color: #6c757d;
-        font-size: 0.875rem;
+    .action-buttons {
+        width: 100%;
+        flex-wrap: wrap;
     }
 
-    .timeline-action {
-        font-weight: 600;
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 120px;
     }
-
-    .timeline-description {
-        margin: 0;
-        color: #495057;
-    }
-
-    .note-item {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 0.25rem;
-        margin-bottom: 1rem;
-    }
-
-    .note-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-
-    .note-author {
-        font-weight: 600;
-    }
-
-    .note-time {
-        color: #6c757d;
-        font-size: 0.875rem;
-    }
-
-    .note-content {
-        color: #495057;
-    }
+}
 </style> 
