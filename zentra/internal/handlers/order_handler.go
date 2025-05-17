@@ -217,7 +217,7 @@ func toOrderResponse(o *order.Order) OrderResponse {
 }
 
 func toOrderItemTaskResponse(t *order.OrderItemTask) TaskResponse {
-	return TaskResponse{
+	response := TaskResponse{
 		ID:             t.ID,
 		OrderItemID:    t.OrderItemID,
 		TaskType:       t.TaskType,
@@ -233,6 +233,13 @@ func toOrderItemTaskResponse(t *order.OrderItemTask) TaskResponse {
 		UpdatedBy:      t.UpdatedBy,
 		TenantID:       t.TenantID,
 	}
+
+	// Add employee name if employee exists
+	if t.Employee != nil {
+		response.EmployeeName = t.Employee.Name
+	}
+
+	return response
 }
 
 // @Summary Create a new order

@@ -44,17 +44,23 @@ export const taskAPI = {
 
     async updateTaskStatus(taskId, status, notes = '') {
         try {
-            const response = await fetch(`${config.baseUrl}/tasks/${taskId}/status`, {
+            const task = await this.getTask(taskId);
+            if (!task) {
+                throw new Error('Task not found');
+            }
+
+            const response = await fetch(`${config.baseUrl}/tasks/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     ...getAuthHeaders(),
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    ...task,
                     status,
                     notes,
-                    started_at: status === 'in_progress' ? new Date().toISOString() : undefined,
-                    completed_at: status === 'completed' ? new Date().toISOString() : undefined
+                    started_at: status === 'in_progress' ? new Date().toISOString() : task.started_at,
+                    completed_at: status === 'completed' ? new Date().toISOString() : task.completed_at
                 })
             });
 
@@ -72,13 +78,21 @@ export const taskAPI = {
 
     async addTaskNote(taskId, note) {
         try {
-            const response = await fetch(`${config.baseUrl}/tasks/${taskId}/notes`, {
+            const task = await this.getTask(taskId);
+            if (!task) {
+                throw new Error('Task not found');
+            }
+
+            const response = await fetch(`${config.baseUrl}/tasks/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     ...getAuthHeaders(),
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ notes: note })
+                body: JSON.stringify({
+                    ...task,
+                    notes: note
+                })
             });
 
             if (!response.ok) {
@@ -148,6 +162,70 @@ export const taskAPI = {
             return await response.json();
         } catch (error) {
             console.error('Get tasks by order item error:', error);
+            throw error;
+        }
+    },
+
+    async startTask(taskId) {
+        try {
+            const task = await this.getTask(taskId);
+            if (!task) {
+                throw new Error('Task not found');
+            }
+
+            const response = await fetch(`${config.baseUrl}/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...task,
+                    status: 'in_progress',
+                    started_at: new Date().toISOString()
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to start task');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Start task error:', error);
+            throw error;
+        }
+    },
+
+    async completeTask(taskId) {
+        try {
+            const task = await this.getTask(taskId);
+            if (!task) {
+                throw new Error('Task not found');
+            }
+
+            const response = await fetch(`${config.baseUrl}/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ...task,
+                    status: 'completed',
+                    completed_at: new Date().toISOString()
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to complete task');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Complete task error:', error);
             throw error;
         }
     }

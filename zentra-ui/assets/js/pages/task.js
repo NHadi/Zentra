@@ -30,13 +30,28 @@ window.TaskPage = class {
 
     initializeModal() {
         // Initialize the Bootstrap modal
-        const taskModal = new bootstrap.Modal(document.getElementById('taskDetailsModal'), {
+        const modalElement = document.getElementById('taskDetailsModal');
+        
+        // Clean up any existing event listeners
+        modalElement.removeEventListener('hidden.bs.modal', this.handleModalHidden);
+        
+        // Create new modal instance
+        this.taskModal = new bootstrap.Modal(modalElement, {
             keyboard: true,
             backdrop: true
         });
 
-        // Store modal instance
-        this.taskModal = taskModal;
+        // Add event listener for modal hidden event
+        modalElement.addEventListener('hidden.bs.modal', this.handleModalHidden.bind(this));
+    }
+
+    handleModalHidden() {
+        // Reset modal state when hidden
+        this.currentTask = null;
+        $('#taskDetailsModal .modal-body').html('');
+        $('#taskTitle').text('');
+        $('#taskIdBadge').text('');
+        $('#taskStatus').html('');
     }
 
     dispose() {
@@ -458,17 +473,16 @@ window.TaskPage = class {
             title = `${type.replace('_', ' ').toUpperCase()} Tasks`;
         }
 
-        // Show task details in a modal or side panel
-        DevExpress.ui.dialog.custom({
-            title: title,
-            content: this.createTaskSummaryContent(filteredTasks),
-            buttons: [{
-                text: 'Close',
-                onClick: () => true
-            }],
-            width: '800px',
-            height: '600px'
-        });
+        // Update the task details modal with summary content
+        $('#taskTitle').text(title);
+        $('#taskDetailsModal .modal-body').html(this.createTaskSummaryContent(filteredTasks));
+        
+        // Show the Bootstrap modal
+        if (this.taskModal) {
+            this.taskModal.show();
+        } else {
+            $('#taskDetailsModal').modal('show');
+        }
     }
 
     createTaskSummaryContent(tasks) {
@@ -804,12 +818,35 @@ window.TaskPage = class {
 
     async updateTaskStatus(taskId, newStatus) {
         try {
+            const loadingNotification = DevExpress.ui.notify({
+                message: 'Updating task status...',
+                type: 'info',
+                displayTime: 1000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
             await zentra.updateTaskStatus(taskId, newStatus);
-            await this.loadData(); // Refresh the view
-            DevExpress.ui.notify('Task status updated successfully', 'success', 3000);
+            
+            // Refresh the view
+            await this.loadData();
+            
+            DevExpress.ui.notify({
+                message: 'Task status updated successfully',
+                type: 'success',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
         } catch (error) {
             console.error('Error updating task status:', error);
-            DevExpress.ui.notify('Failed to update task status', 'error', 3000);
+            DevExpress.ui.notify({
+                message: 'Failed to update task status: ' + (error.message || 'Unknown error'),
+                type: 'error',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+            
+            // Refresh the view to revert any UI changes
+            await this.loadData();
         }
     }
 
@@ -1289,6 +1326,50 @@ window.TaskPage = class {
                 box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             }
 
+            #taskDetailsModal .modal-dialog {
+                max-width: 90%;
+                margin: 1.75rem auto;
+            }
+
+            #taskDetailsModal .modal-body {
+                padding: 1.5rem;
+                max-height: calc(90vh - 210px);
+                overflow-y: auto;
+            }
+
+            #taskDetailsModal .task-details-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            #taskDetailsModal .detail-section.task-info {
+                grid-column: 1 / -1;
+            }
+
+            #taskDetailsModal .detail-section.timeline-section {
+                grid-column: 1 / 2;
+            }
+
+            #taskDetailsModal .detail-section.notes-section {
+                grid-column: 2 / 3;
+            }
+
+            @media (max-width: 1200px) {
+                #taskDetailsModal .modal-dialog {
+                    max-width: 95%;
+                }
+                
+                #taskDetailsModal .task-details-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                #taskDetailsModal .detail-section.timeline-section,
+                #taskDetailsModal .detail-section.notes-section {
+                    grid-column: 1 / -1;
+                }
+            }
+
             #taskDetailsModal .modal-header {
                 background: #5e72e4;
                 color: white;
@@ -1347,22 +1428,6 @@ window.TaskPage = class {
 
             #taskDetailsModal .btn-close:hover {
                 opacity: 1;
-            }
-
-            #taskDetailsModal .modal-body {
-                padding: 1.5rem;
-            }
-
-            #taskDetailsModal .task-details-grid {
-                display: grid;
-                gap: 1.5rem;
-            }
-
-            #taskDetailsModal .detail-section {
-                background: #fff;
-                border-radius: 12px;
-                padding: 1.5rem;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
             }
 
             #taskDetailsModal .section-header {
@@ -1595,7 +1660,7 @@ window.TaskPage = class {
                 #taskDetailsModal .modal-footer {
                     flex-direction: column;
                     gap: 1rem;
-                }
+            }
 
                 #taskDetailsModal .footer-info {
                     width: 100%;
@@ -1711,57 +1776,186 @@ window.TaskPage = class {
         this.updateTaskStatistics(filteredTasks);
     }
 
-    showTaskDetails(task) {
+    async showTaskDetails(task) {
         if (!task) return;
         
-        this.currentTask = task;
+        try {
+            // Show loading state
+            const modalBody = $('#taskDetailsModal .modal-body');
+            modalBody.html(`
+                <div class="d-flex justify-content-center align-items-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            `);
         
-        // Update modal title and task type badge
-        $('#taskTypeBadge i').attr('class', `fas ${this.getTaskTypeIcon(task.task_type)}`);
-        $('#taskTitle').text(`${task.task_type.toUpperCase()} Task`);
-        $('#taskIdBadge').text(`#${task.id}`);
+            // Show modal with loading state
+            if (this.taskModal) {
+                this.taskModal.show();
+            } else {
+                $('#taskDetailsModal').modal('show');
+            }
+
+            // Fetch fresh task data
+            const freshTask = await zentra.getTask(task.id);
+            if (!freshTask) {
+                throw new Error('Task not found');
+            }
+            
+            this.currentTask = freshTask;
+            
+            // Update header content
+            $('#taskTypeBadge i').attr('class', `fas ${this.getTaskTypeIcon(freshTask.task_type)}`);
+            $('#taskTitle').text(`${freshTask.task_type.toUpperCase()} Task`);
+            $('#taskIdBadge').text(`#${freshTask.id}`);
         
-        // Update task status
-        const statusClass = this.getStatusClass(task.status);
+            const statusClass = this.getStatusClass(freshTask.status);
         $('#taskStatus').html(`
             <span class="badge badge-${statusClass}">
-                ${this.getStatusIcon(task.status)}
-                            ${task.status.replace('_', ' ').toUpperCase()}
+                    ${this.getStatusIcon(freshTask.status)}
+                    ${freshTask.status.replace('_', ' ').toUpperCase()}
                         </span>
         `);
         
-        // Update task information
-        $('#assignedTo').text(task.employee_name || 'Unassigned');
-        $('#sequenceNumber').text(`#${task.sequence_number}`);
-        $('#sequenceBadge').text(`Sequence ${task.sequence_number}`);
-        $('#createdAt').text(new Date(task.created_at).toLocaleString());
-        $('#updatedAt').text(new Date(task.updated_at).toLocaleString());
+            // Build the main content
+            const mainContent = `
+                <div class="task-details-grid">
+                    <!-- Task Info Section -->
+                    <div class="detail-section task-info">
+                        <div class="section-header">
+                            <h6>Task Information</h6>
+                            <span class="section-badge" id="sequenceBadge">Sequence ${freshTask.sequence_number}</span>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="label">Assigned To</span>
+                                <div class="value-wrapper">
+                                    <div class="employee-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="value">${freshTask.employee_name || 'Unassigned'}</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Sequence</span>
+                                <span class="value">#${freshTask.sequence_number}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Created</span>
+                                <span class="value">${new Date(freshTask.created_at).toLocaleString()}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Last Updated</span>
+                                <span class="value">${new Date(freshTask.updated_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Info Section -->
+                    <div class="detail-section order-info">
+                        <div class="section-header">
+                            <h6>Order Details</h6>
+                            <span class="order-number">${freshTask.order_item?.order?.order_number || 'N/A'}</span>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="label">Customer</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-building"></i>
+                                    <span class="value">${freshTask.order_item?.order?.customer_name || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Product</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-tshirt"></i>
+                                    <span class="value">${freshTask.order_item?.product_name || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Quantity</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-box"></i>
+                                    <span class="value">${freshTask.order_item?.quantity || 0} pcs</span>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Due Date</span>
+                                <div class="value-wrapper">
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="value">${freshTask.order_item?.order?.expected_delivery_date ? new Date(freshTask.order_item.order.expected_delivery_date).toLocaleDateString() : 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Section -->
+                    <div class="detail-section timeline-section">
+                        <div class="section-header">
+                            <h6>Task Timeline</h6>
+                            <div class="timeline-legend">
+                                <span class="legend-item">
+                                    <i class="fas fa-circle text-primary"></i> Created
+                                </span>
+                                <span class="legend-item">
+                                    <i class="fas fa-circle text-warning"></i> Started
+                                </span>
+                                <span class="legend-item">
+                                    <i class="fas fa-circle text-success"></i> Completed
+                                </span>
+                            </div>
+                        </div>
+                        <div class="timeline" id="taskTimeline">
+                            <!-- Timeline items will be added here -->
+                        </div>
+                    </div>
+
+                    <!-- Notes Section -->
+                    <div class="detail-section notes-section">
+                        <div class="section-header">
+                            <h6>Notes & Updates</h6>
+                            <button class="btn btn-sm btn-primary" id="addNoteBtn">
+                                <i class="fas fa-plus"></i> Add Note
+                            </button>
+                        </div>
+                        <div class="notes-container" id="taskNotes">
+                            <!-- Notes will be added here -->
+                        </div>
+                        <div class="note-input-wrapper" style="display: none;">
+                            <textarea class="form-control" id="newNote" rows="3" placeholder="Enter your note here..."></textarea>
+                            <div class="note-actions">
+                                <button class="btn btn-sm btn-secondary" id="cancelNote">Cancel</button>
+                                <button class="btn btn-sm btn-primary" id="saveNote">Save Note</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         
-        // Update order information
-        const order = task.order_item.order;
-        $('#orderNumber').text(order.order_number);
-        $('#customerName').text(order.customer_name);
-        $('#productName').text(task.order_item.product_name);
-        $('#quantity').text(`${task.order_item.quantity} pcs`);
-        $('#dueDate').text(new Date(order.expected_delivery_date).toLocaleDateString());
+            // Update modal content
+            modalBody.html(mainContent);
+
+            // Update the dynamic sections
+            this.updateTaskTimeline(freshTask);
+            this.updateTaskNotes(freshTask);
+            this.updateFooterInfo(freshTask);
+            this.updateActionButtons(freshTask);
         
-        // Update timeline
-        this.updateTaskTimeline(task);
-        
-        // Update notes
-        this.updateTaskNotes(task);
-        
-        // Update footer info
-        this.updateFooterInfo(task);
-        
-        // Update action buttons based on status
-        this.updateActionButtons(task);
-        
-        // Show modal
+        } catch (error) {
+            console.error('Error showing task details:', error);
+            DevExpress.ui.notify({
+                message: 'Failed to load task details: ' + (error.message || 'Unknown error'),
+                type: 'error',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+            
         if (this.taskModal) {
-            this.taskModal.show();
+                this.taskModal.hide();
         } else {
-            $('#taskDetailsModal').modal('show');
+                $('#taskDetailsModal').modal('hide');
+            }
         }
     }
 
@@ -1880,22 +2074,107 @@ window.TaskPage = class {
     updateActionButtons(task) {
         const startBtn = $('#startTask');
         const completeBtn = $('#completeTask');
-        const reassignBtn = $('#reassignTask');
         
         // Show/hide buttons based on task status
         startBtn.toggle(task.status === 'pending');
         completeBtn.toggle(task.status === 'in_progress');
-        reassignBtn.toggle(task.status !== 'completed');
         
-        // Update button states and styles
-        if (task.status === 'completed') {
-            startBtn.prop('disabled', true).addClass('disabled');
-            completeBtn.prop('disabled', true).addClass('disabled');
-            reassignBtn.prop('disabled', true).addClass('disabled');
-        } else {
-            startBtn.prop('disabled', false).removeClass('disabled');
-            completeBtn.prop('disabled', false).removeClass('disabled');
-            reassignBtn.prop('disabled', false).removeClass('disabled');
+        // Update button states
+        startBtn.prop('disabled', task.status === 'completed');
+        completeBtn.prop('disabled', task.status === 'completed');
+
+        // Add click handlers
+        startBtn.off('click').on('click', () => this.handleStartTask(task.id));
+        completeBtn.off('click').on('click', () => this.handleCompleteTask(task.id));
+    }
+
+    async handleStartTask(taskId) {
+        try {
+            // Disable buttons and show loading state
+            const startBtn = $('#startTask');
+            const originalText = startBtn.html();
+            startBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Starting...');
+
+            // Show loading notification
+            DevExpress.ui.notify({
+                message: 'Starting task...',
+                type: 'info',
+                displayTime: 1000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
+            // Call API to start task
+            await zentra.startTask(taskId);
+            
+            // Refresh data and show success message
+            await this.loadData();
+            
+            DevExpress.ui.notify({
+                message: 'Task started successfully',
+                type: 'success',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
+            // Refresh modal content with updated task
+            const updatedTask = await zentra.getTask(taskId);
+            if (updatedTask) {
+                this.showTaskDetails(updatedTask);
+            }
+
+        } catch (error) {
+            console.error('Error starting task:', error);
+            DevExpress.ui.notify({
+                message: 'Failed to start task: ' + (error.message || 'Unknown error'),
+                type: 'error',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+        }
+    }
+
+    async handleCompleteTask(taskId) {
+        try {
+            // Disable buttons and show loading state
+            const completeBtn = $('#completeTask');
+            const originalText = completeBtn.html();
+            completeBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Completing...');
+
+            // Show loading notification
+            DevExpress.ui.notify({
+                message: 'Completing task...',
+                type: 'info',
+                displayTime: 1000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
+            // Call API to complete task
+            await zentra.completeTask(taskId);
+            
+            // Refresh data and show success message
+            await this.loadData();
+            
+            DevExpress.ui.notify({
+                message: 'Task completed successfully',
+                type: 'success',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
+            // Refresh modal content with updated task
+            const updatedTask = await zentra.getTask(taskId);
+            if (updatedTask) {
+                this.showTaskDetails(updatedTask);
+            }
+
+        } catch (error) {
+            console.error('Error completing task:', error);
+            DevExpress.ui.notify({
+                message: 'Failed to complete task: ' + (error.message || 'Unknown error'),
+                type: 'error',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
         }
     }
 
@@ -1921,37 +2200,54 @@ window.TaskPage = class {
         return icons[status] || '<i class="fas fa-circle"></i>';
     }
 
-    async startTask(taskId) {
-        try {
-            await zentra.updateTaskStatus(taskId, 'in_progress');
-            await this.loadData();
-            DevExpress.ui.notify('Task started successfully', 'success', 3000);
-        } catch (error) {
-            console.error('Error starting task:', error);
-            DevExpress.ui.notify('Failed to start task', 'error', 3000);
-        }
-    }
-
-    async completeTask(taskId) {
-        try {
-            await zentra.updateTaskStatus(taskId, 'completed');
-            await this.loadData();
-            DevExpress.ui.notify('Task completed successfully', 'success', 3000);
-        } catch (error) {
-            console.error('Error completing task:', error);
-            DevExpress.ui.notify('Failed to complete task', 'error', 3000);
-        }
-    }
-
     async addNoteToTask(taskId, noteText) {
         try {
+            // Show loading state
+            const saveButton = $('#saveNote');
+            const originalText = saveButton.html();
+            saveButton.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+
+            // Show loading notification
+            DevExpress.ui.notify({
+                message: 'Adding note...',
+                type: 'info',
+                displayTime: 1000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
             await zentra.addTaskNote(taskId, noteText);
+            
+            // Refresh the data
             await this.loadData();
-            DevExpress.ui.notify('Note added successfully', 'success', 3000);
+            
+            // Reset the note input
             $('#newNote').val('');
+            $('.note-input-wrapper').slideUp();
+            
+            // Show success notification
+            DevExpress.ui.notify({
+                message: 'Note added successfully',
+                type: 'success',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
+            // If we're in the task details modal, refresh the notes section
+            if (this.currentTask && this.currentTask.id === taskId) {
+                this.showTaskDetails(this.currentTask);
+            }
         } catch (error) {
             console.error('Error adding note:', error);
-            DevExpress.ui.notify('Failed to add note', 'error', 3000);
+            DevExpress.ui.notify({
+                message: 'Failed to add note: ' + (error.message || 'Unknown error'),
+                type: 'error',
+                displayTime: 3000,
+                position: { at: 'top center', my: 'top center' }
+            });
+        } finally {
+            // Reset the save button
+            const saveButton = $('#saveNote');
+            saveButton.prop('disabled', false).html(originalText);
         }
     }
 
@@ -1965,26 +2261,37 @@ window.TaskPage = class {
             </div>
         `;
 
-        DevExpress.ui.dialog.custom({
-            title: 'Reassign Task',
-            content: content,
-            buttons: [{
-                text: 'Cancel',
-                onClick: () => true
-            }, {
-                text: 'Reassign',
-                onClick: () => {
+        // Update the task details modal for reassignment
+        $('#taskTitle').text('Reassign Task');
+        $('#taskDetailsModal .modal-body').html(content);
+        
+        // Update footer buttons
+        $('#taskDetailsModal .action-buttons').html(`
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="confirmReassign">Reassign</button>
+        `);
+
+        // Bind reassign button click
+        $('#confirmReassign').on('click', () => {
                     const employeeId = $('#employeeId').val();
                     if (employeeId) {
                         this.reassignTask(taskId, employeeId);
-                        return true;
+                if (this.taskModal) {
+                    this.taskModal.hide();
+                } else {
+                    $('#taskDetailsModal').modal('hide');
                     }
+            } else {
                     DevExpress.ui.notify('Please enter an employee ID', 'warning', 3000);
-                    return false;
-                }
-            }],
-            width: '400px'
+            }
         });
+
+        // Show the Bootstrap modal
+        if (this.taskModal) {
+            this.taskModal.show();
+        } else {
+            $('#taskDetailsModal').modal('show');
+        }
     }
 
     async reassignTask(taskId, employeeId) {

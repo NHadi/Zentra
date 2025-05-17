@@ -38,7 +38,7 @@ type UpdateTaskRequest struct {
 }
 
 func toTaskResponse(t *task.Task) TaskResponse {
-	return TaskResponse{
+	response := TaskResponse{
 		ID:             t.ID,
 		OrderItemID:    t.OrderItemID,
 		TaskType:       t.TaskType,
@@ -54,6 +54,13 @@ func toTaskResponse(t *task.Task) TaskResponse {
 		UpdatedBy:      t.UpdatedBy,
 		TenantID:       t.TenantID,
 	}
+
+	// Add employee name if employee exists
+	if t.Employee != nil {
+		response.EmployeeName = t.Employee.Name
+	}
+
+	return response
 }
 
 // @Summary Create a new task
