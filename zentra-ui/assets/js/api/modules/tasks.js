@@ -5,8 +5,8 @@ export const taskAPI = {
     async getTasks(orderItemId = null) {
         try {
             const url = orderItemId 
-                ? `${config.baseUrl}/tasks?order_item_id=${orderItemId}`
-                : `${config.baseUrl}/tasks`;
+                ? `${config.baseUrl}/tasks?order_item_id=${orderItemId}&include=order_item,order`
+                : `${config.baseUrl}/tasks?include=order_item,order`;
                 
             const response = await fetch(url, {
                 headers: getAuthHeaders()
@@ -26,7 +26,7 @@ export const taskAPI = {
 
     async getTask(taskId) {
         try {
-            const response = await fetch(`${config.baseUrl}/tasks/${taskId}`, {
+            const response = await fetch(`${config.baseUrl}/tasks/${taskId}?include=order_item,order`, {
                 headers: getAuthHeaders()
             });
             

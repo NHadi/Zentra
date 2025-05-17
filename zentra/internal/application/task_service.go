@@ -91,3 +91,13 @@ func (s *TaskService) FindByStatus(status string, ctx context.Context) ([]task.T
 func (s *TaskService) FindByTaskType(taskType string, ctx context.Context) ([]task.Task, error) {
 	return s.repo.FindByTaskType(taskType, ctx)
 }
+
+// FindByIDWithRelations retrieves a task by its ID with all related data
+func (s *TaskService) FindByIDWithRelations(id int, ctx context.Context) (*task.Task, error) {
+	return s.repo.FindByIDWithRelations(id, ctx)
+}
+
+// FindAllWithRelations retrieves all tasks with related data
+func (s *TaskService) FindAllWithRelations(ctx context.Context) ([]task.Task, error) {
+	return s.repo.FindAllWithRelations(ctx)
+}

@@ -164,7 +164,7 @@ func toOrderItemResponse(item *order.OrderItem) OrderItemResponse {
 	if len(item.Tasks) > 0 {
 		response.Tasks = make([]TaskResponse, len(item.Tasks))
 		for i, t := range item.Tasks {
-			response.Tasks[i] = ToTaskResponse(&t)
+			response.Tasks[i] = toOrderItemTaskResponse(&t)
 		}
 	}
 
@@ -214,6 +214,25 @@ func toOrderResponse(o *order.Order) OrderResponse {
 	}
 
 	return response
+}
+
+func toOrderItemTaskResponse(t *order.OrderItemTask) TaskResponse {
+	return TaskResponse{
+		ID:             t.ID,
+		OrderItemID:    t.OrderItemID,
+		TaskType:       t.TaskType,
+		SequenceNumber: t.SequenceNumber,
+		EmployeeID:     t.EmployeeID,
+		Status:         t.Status,
+		StartedAt:      t.StartedAt,
+		CompletedAt:    t.CompletedAt,
+		Notes:          t.Notes,
+		CreatedAt:      t.CreatedAt.String(),
+		CreatedBy:      t.CreatedBy,
+		UpdatedAt:      t.UpdatedAt.String(),
+		UpdatedBy:      t.UpdatedBy,
+		TenantID:       t.TenantID,
+	}
 }
 
 // @Summary Create a new order

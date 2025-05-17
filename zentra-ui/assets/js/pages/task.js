@@ -1263,6 +1263,8 @@ window.TaskPage = class {
         // Create modal content
         const timeInfo = this.formatTaskTime(task);
         const statusClass = this.getStatusClass(task.status);
+        const orderItem = task.order_item || {};
+        const order = orderItem.order || {};
         
         const modalContent = `
             <div class="task-detail-modal">
@@ -1287,13 +1289,80 @@ window.TaskPage = class {
                     <div class="detail-section">
                         <h6 class="section-title">Order Information</h6>
                         <div class="order-info">
-                            <div class="info-item">
-                                <span class="label">Order ID:</span>
-                                <span class="value">#${task.order_item_id}</span>
+                            <div class="order-header">
+                                <div class="order-title">
+                                    <h5>Order #${order.order_number || 'N/A'}</h5>
+                                    <span class="badge badge-${this.getOrderStatusClass(order.status)}">
+                                        ${order.status?.replace('_', ' ').toUpperCase() || 'N/A'}
+                                    </span>
                             </div>
-                            <div class="info-item">
-                                <span class="label">Assigned To:</span>
-                                <span class="value">Employee ${task.employee_id}</span>
+                                <div class="order-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-calendar"></i>
+                                        Created: ${new Date(order.created_at).toLocaleDateString()}
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="fas fa-truck"></i>
+                                        Expected: ${order.expected_delivery_date || 'Not set'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="order-details">
+                                <div class="detail-row">
+                                    <div class="detail-label">Customer</div>
+                                    <div class="detail-value">
+                                        <div class="customer-info">
+                                            <strong>${order.customer?.name || 'N/A'}</strong>
+                                            <div class="customer-contact">
+                                                <span><i class="fas fa-envelope"></i> ${order.customer?.email || 'N/A'}</span>
+                                                <span><i class="fas fa-phone"></i> ${order.customer?.phone || 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Item Details</div>
+                                    <div class="detail-value">
+                                        <div class="item-info">
+                                            <div class="item-main">
+                                                ${orderItem.product_detail?.name || 'Custom Item'}
+                                            </div>
+                                            <div class="item-specs">
+                                                <span class="spec-item">
+                                                    <i class="fas fa-ruler"></i> Size: ${orderItem.size || 'N/A'}
+                                                </span>
+                                                <span class="spec-item">
+                                                    <i class="fas fa-palette"></i> Color: ${orderItem.color || 'N/A'}
+                                                </span>
+                                                <span class="spec-item">
+                                                    <i class="fas fa-box"></i> Quantity: ${orderItem.quantity || 'N/A'}
+                                                </span>
+                                            </div>
+                                            ${orderItem.customization ? `
+                                                <div class="customization-info">
+                                                    <div class="custom-title">Customization</div>
+                                                    <div class="custom-details">
+                                                        <span>Name: ${JSON.parse(orderItem.customization).name || 'N/A'}</span>
+                                                        <span>Number: ${JSON.parse(orderItem.customization).number || 'N/A'}</span>
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Production Status</div>
+                                    <div class="detail-value">
+                                        <div class="production-info">
+                                            <span class="badge badge-${this.getProductionStatusClass(orderItem.production_status)}">
+                                                ${orderItem.production_status?.replace('_', ' ').toUpperCase() || 'N/A'}
+                                            </span>
+                                            <div class="current-task">
+                                                Current Task: ${orderItem.current_task?.replace('_', ' ').toUpperCase() || 'None'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1364,7 +1433,6 @@ window.TaskPage = class {
         `;
 
         // Show modal using DevExpress dialog
-        try {
             DevExpress.ui.dialog.custom({
                 title: `Task Details - ${task.task_type}`,
                 content: modalContent,
@@ -1375,51 +1443,38 @@ window.TaskPage = class {
                         return true;
                     }
                 }],
-                width: '600px',
+            width: '800px',
                 height: 'auto',
                 dragEnabled: true,
                 showCloseButton: true,
                 onShown: () => {
-                    console.log('Modal shown successfully');
-                    // Add styles if not already added
                     this.addTaskDetailStyles();
                 }
             });
-        } catch (error) {
-            console.error('Error showing task details:', error);
-            // Fallback to bootstrap modal if DevExpress dialog fails
-            const bootstrapModal = `
-                <div class="modal fade" id="taskDetailModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog modal-lg" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Task Details - ${task.task_type}</h5>
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span>&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                ${modalContent}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Remove existing modal if any
-            $('#taskDetailModal').remove();
-            
-            // Add new modal to body
-            $('body').append(bootstrapModal);
-            
-            // Show the modal
-            $('#taskDetailModal').modal('show');
-            
-            // Handle modal hidden event
-            $('#taskDetailModal').on('hidden.bs.modal', () => {
-                this.currentTask = null;
-            });
-        }
+    }
+
+    getOrderStatusClass(status) {
+        const classes = {
+            'pending': 'warning',
+            'confirmed': 'info',
+            'in_production': 'primary',
+            'quality_check': 'info',
+            'ready_for_delivery': 'primary',
+            'delivered': 'success',
+            'completed': 'success',
+            'cancelled': 'danger'
+        };
+        return classes[status] || 'secondary';
+    }
+
+    getProductionStatusClass(status) {
+        const classes = {
+            'pending': 'warning',
+            'in_progress': 'primary',
+            'completed': 'success',
+            'cancelled': 'danger'
+        };
+        return classes[status] || 'secondary';
     }
 
     addTaskDetailStyles() {
@@ -1462,7 +1517,7 @@ window.TaskPage = class {
             .detail-section {
                 background: #fff;
                 border-radius: 8px;
-                padding: 1rem;
+                padding: 1.5rem;
                 border: 1px solid #e9ecef;
             }
 
@@ -1472,89 +1527,137 @@ window.TaskPage = class {
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                margin-bottom: 1rem;
+                margin-bottom: 1.5rem;
             }
 
-            .order-info {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 1rem;
+            .order-header {
+                margin-bottom: 1.5rem;
             }
 
-            .info-item {
-                display: flex;
-                flex-direction: column;
-                gap: 0.25rem;
-            }
-
-            .info-item .label {
-                color: #8898aa;
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .info-item .value {
-                color: #32325d;
-                font-weight: 600;
-            }
-
-            .timeline {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .timeline-item {
-                display: flex;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .timeline-item i {
-                width: 24px;
-                height: 24px;
-                background: #f6f9fc;
-                border-radius: 50%;
+            .order-title {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                color: #5e72e4;
+                gap: 1rem;
+                margin-bottom: 0.75rem;
             }
 
-            .timeline-content {
-                flex: 1;
-            }
-
-            .timeline-content .event {
+            .order-title h5 {
+                margin: 0;
                 font-weight: 600;
-                color: #32325d;
-                margin-bottom: 0.25rem;
             }
 
-            .timeline-content .time {
+            .order-meta {
+                display: flex;
+                gap: 1.5rem;
+                color: #8898aa;
+                font-size: 0.875rem;
+            }
+
+            .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .order-details {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .detail-row {
+                display: grid;
+                grid-template-columns: 150px 1fr;
+                gap: 1rem;
+                align-items: start;
+            }
+
+            .detail-label {
+                color: #8898aa;
+                font-size: 0.875rem;
+                font-weight: 600;
+            }
+
+            .detail-value {
+                color: #525f7f;
+            }
+
+            .customer-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .customer-contact {
+                display: flex;
+                gap: 1rem;
                 font-size: 0.875rem;
                 color: #8898aa;
             }
 
-            .notes-section {
+            .customer-contact span {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .item-info {
                 display: flex;
                 flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .item-main {
+                font-weight: 600;
+                color: #32325d;
+            }
+
+            .item-specs {
+                display: flex;
+                gap: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .spec-item {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                font-size: 0.875rem;
+                color: #8898aa;
+                background: #f6f9fc;
+                padding: 0.5rem 0.75rem;
+                border-radius: 4px;
+            }
+
+            .customization-info {
+                background: #f6f9fc;
+                padding: 1rem;
+                border-radius: 6px;
+                margin-top: 0.75rem;
+            }
+
+            .custom-title {
+                font-weight: 600;
+                color: #32325d;
+                margin-bottom: 0.5rem;
+            }
+
+            .custom-details {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.875rem;
+                color: #525f7f;
+            }
+
+            .production-info {
+                display: flex;
+                align-items: center;
                 gap: 1rem;
             }
 
-            .note-content {
-                color: #525f7f;
-                line-height: 1.5;
-                margin-bottom: 1rem;
-            }
-
-            .add-note-form textarea {
-                border: 1px solid #e9ecef;
-                border-radius: 6px;
-                padding: 0.75rem;
-                resize: vertical;
-                min-height: 80px;
+            .current-task {
+                font-size: 0.875rem;
+                color: #8898aa;
             }
 
             .task-detail-actions {
@@ -1571,6 +1674,27 @@ window.TaskPage = class {
                 gap: 0.5rem;
                 padding: 0.75rem 1.25rem;
                 font-weight: 600;
+            }
+
+            @media (max-width: 768px) {
+                .detail-row {
+                    grid-template-columns: 1fr;
+                    gap: 0.5rem;
+                }
+
+                .detail-label {
+                    margin-bottom: 0.25rem;
+                }
+
+                .order-meta {
+                    flex-direction: column;
+                    gap: 0.75rem;
+                }
+
+                .item-specs {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
             }
         `;
 

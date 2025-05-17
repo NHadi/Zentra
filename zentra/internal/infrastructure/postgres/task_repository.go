@@ -107,3 +107,39 @@ func (r *taskRepository) FindByTaskType(taskType string, ctx context.Context) ([
 	}
 	return tasks, nil
 }
+
+// FindByIDWithRelations retrieves a task by its ID with all related data
+func (r *taskRepository) FindByIDWithRelations(id int, ctx context.Context) (*task.Task, error) {
+	var task task.Task
+	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
+	err := r.db.WithContext(ctx).
+		Preload("Employee").
+		Preload("OrderItem").
+		Preload("OrderItem.Product").
+		Preload("OrderItem.Order").
+		Preload("OrderItem.Order.Customer").
+		Where("production_tasks.id = ? AND production_tasks.tenant_id = ?", id, userCtx.TenantID).
+		First(&task).Error
+	if err != nil {
+		return nil, err
+	}
+	return &task, nil
+}
+
+// FindAllWithRelations retrieves all tasks with related data
+func (r *taskRepository) FindAllWithRelations(ctx context.Context) ([]task.Task, error) {
+	var tasks []task.Task
+	userCtx := ctx.Value(appcontext.UserContextKey).(*appcontext.UserContext)
+	err := r.db.WithContext(ctx).
+		Preload("Employee").
+		Preload("OrderItem").
+		Preload("OrderItem.Product").
+		Preload("OrderItem.Order").
+		Preload("OrderItem.Order.Customer").
+		Where("production_tasks.tenant_id = ?", userCtx.TenantID).
+		Find(&tasks).Error
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
+}

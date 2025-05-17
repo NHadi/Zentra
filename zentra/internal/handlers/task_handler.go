@@ -3,7 +3,9 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"zentra/internal/application"
+	"zentra/internal/domain/models"
 	"zentra/internal/domain/task"
 
 	"github.com/gin-gonic/gin"
@@ -77,14 +79,16 @@ func CreateTask(service *application.TaskService) gin.HandlerFunc {
 		}
 
 		task := &task.Task{
-			OrderItemID:    req.OrderItemID,
-			TaskType:       req.TaskType,
-			SequenceNumber: req.SequenceNumber,
-			EmployeeID:     req.EmployeeID,
-			Status:         req.Status,
-			StartedAt:      req.StartedAt,
-			CompletedAt:    req.CompletedAt,
-			Notes:          req.Notes,
+			Task: models.Task{
+				OrderItemID:    req.OrderItemID,
+				TaskType:       req.TaskType,
+				SequenceNumber: req.SequenceNumber,
+				EmployeeID:     req.EmployeeID,
+				Status:         req.Status,
+				StartedAt:      req.StartedAt,
+				CompletedAt:    req.CompletedAt,
+				Notes:          req.Notes,
+			},
 		}
 
 		if err := service.Create(task, c); err != nil {
@@ -110,7 +114,8 @@ func CreateTask(service *application.TaskService) gin.HandlerFunc {
 // @Security BearerAuth
 // @Param X-Tenant-ID header string true "Tenant ID"
 // @Param id path int true "Task ID"
-// @Success 200 {object} TaskResponse
+// @Param include query string false "Include related data (order_item,order)" example:"order_item,order"
+// @Success 200 {object} EnhancedTaskResponse
 // @Failure 400 {object} ErrorResponse "Invalid request parameters"
 // @Failure 401 {object} ErrorResponse "Unauthorized"
 // @Failure 403 {object} ErrorResponse "Forbidden"
@@ -125,13 +130,24 @@ func GetTask(service *application.TaskService) gin.HandlerFunc {
 			return
 		}
 
-		task, err := service.FindByID(id, c)
+		include := c.Query("include")
+		var task *task.Task
+		if include != "" && (strings.Contains(include, "order_item") || strings.Contains(include, "order")) {
+			task, err = service.FindByIDWithRelations(id, c)
+		} else {
+			task, err = service.FindByID(id, c)
+		}
+
 		if err != nil {
 			c.JSON(http.StatusNotFound, ErrorResponse{Error: "Task not found"})
 			return
 		}
 
-		c.JSON(http.StatusOK, toTaskResponse(task))
+		if include != "" && (strings.Contains(include, "order_item") || strings.Contains(include, "order")) {
+			c.JSON(http.StatusOK, ToEnhancedTaskResponse(task, nil, nil)) // The repository already joins the data
+		} else {
+			c.JSON(http.StatusOK, ToTaskResponse(task))
+		}
 	}
 }
 
@@ -141,7 +157,8 @@ func GetTask(service *application.TaskService) gin.HandlerFunc {
 // @Produce json
 // @Security BearerAuth
 // @Param X-Tenant-ID header string true "Tenant ID"
-// @Success 200 {array} TaskResponse
+// @Param include query string false "Include related data (order_item,order)" example:"order_item,order"
+// @Success 200 {array} EnhancedTaskResponse
 // @Failure 400 {object} ErrorResponse "Invalid request parameters"
 // @Failure 401 {object} ErrorResponse "Unauthorized"
 // @Failure 403 {object} ErrorResponse "Forbidden"
@@ -149,18 +166,34 @@ func GetTask(service *application.TaskService) gin.HandlerFunc {
 // @Router /tasks [get]
 func GetAllTasks(service *application.TaskService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tasks, err := service.FindAll(c)
+		include := c.Query("include")
+		var tasks []task.Task
+		var err error
+
+		if include != "" && (strings.Contains(include, "order_item") || strings.Contains(include, "order")) {
+			tasks, err = service.FindAllWithRelations(c)
+		} else {
+			tasks, err = service.FindAll(c)
+		}
+
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})
 			return
 		}
 
-		response := make([]TaskResponse, len(tasks))
-		for i, t := range tasks {
-			response[i] = toTaskResponse(&t)
+		if include != "" && (strings.Contains(include, "order_item") || strings.Contains(include, "order")) {
+			response := make([]EnhancedTaskResponse, len(tasks))
+			for i, t := range tasks {
+				response[i] = ToEnhancedTaskResponse(&t, nil, nil) // The repository already joins the data
+			}
+			c.JSON(http.StatusOK, response)
+		} else {
+			response := make([]TaskResponse, len(tasks))
+			for i, t := range tasks {
+				response[i] = ToTaskResponse(&t)
+			}
+			c.JSON(http.StatusOK, response)
 		}
-
-		c.JSON(http.StatusOK, response)
 	}
 }
 
@@ -221,7 +254,7 @@ func UpdateTask(service *application.TaskService) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, toTaskResponse(updatedTask))
+		c.JSON(http.StatusOK, ToTaskResponse(updatedTask))
 	}
 }
 
@@ -285,7 +318,7 @@ func GetTasksByOrderItemID(service *application.TaskService) gin.HandlerFunc {
 
 		response := make([]TaskResponse, len(tasks))
 		for i, t := range tasks {
-			response[i] = toTaskResponse(&t)
+			response[i] = ToTaskResponse(&t)
 		}
 
 		c.JSON(http.StatusOK, response)
@@ -321,7 +354,7 @@ func GetTasksByEmployeeID(service *application.TaskService) gin.HandlerFunc {
 
 		response := make([]TaskResponse, len(tasks))
 		for i, t := range tasks {
-			response[i] = toTaskResponse(&t)
+			response[i] = ToTaskResponse(&t)
 		}
 
 		c.JSON(http.StatusOK, response)
@@ -357,7 +390,7 @@ func GetTasksByStatus(service *application.TaskService) gin.HandlerFunc {
 
 		response := make([]TaskResponse, len(tasks))
 		for i, t := range tasks {
-			response[i] = toTaskResponse(&t)
+			response[i] = ToTaskResponse(&t)
 		}
 
 		c.JSON(http.StatusOK, response)
@@ -393,7 +426,7 @@ func GetTasksByTaskType(service *application.TaskService) gin.HandlerFunc {
 
 		response := make([]TaskResponse, len(tasks))
 		for i, t := range tasks {
-			response[i] = toTaskResponse(&t)
+			response[i] = ToTaskResponse(&t)
 		}
 
 		c.JSON(http.StatusOK, response)
