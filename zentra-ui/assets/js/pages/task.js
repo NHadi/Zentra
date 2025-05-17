@@ -1,6 +1,6 @@
 import { zentra } from '../api/index.js';
 
-window.TaskPage = class {
+export class TaskPage {
     constructor() {
         this.tasks = [];
         this.currentTask = null;
@@ -109,7 +109,7 @@ window.TaskPage = class {
         });
 
         // Filter button click handler
-        $('#filterTasks').on('click', () => {
+        $(document).on('click', '#viewFilters', () => {
             this.showFilterModal();
         });
     }
@@ -117,6 +117,7 @@ window.TaskPage = class {
     initialize() {
         this.loadData();
         this.initializeDragAndDrop();
+        this.initializeSettings();
     }
 
     initializeDragAndDrop() {
@@ -299,17 +300,23 @@ window.TaskPage = class {
         // Add styles specific to the dashboard
         this.addDashboardStyles();
         
-        // Rest of the existing code...
+        // Group tasks by type and filter based on visibility
         const tasksByType = this.groupTasksByType(tasks);
         const divisionsWrapper = container.find('.divisions-wrapper');
         
         this.taskTypes.forEach(type => {
-            const divisionTasks = tasksByType[type] || [];
-            const divisionSection = this.createDivisionSection(type, divisionTasks);
-            divisionsWrapper.append(divisionSection);
+            // Check if type is visible in settings
+            if (this.getTypeVisibility(type)) {
+                const divisionTasks = tasksByType[type] || [];
+                const divisionSection = this.createDivisionSection(type, divisionTasks);
+                divisionsWrapper.append(divisionSection);
+            }
         });
         
         $('#main-content').append(container);
+
+        // Apply current settings
+        this.applySettings();
     }
 
     addDashboardStyles() {
@@ -1686,94 +1693,527 @@ window.TaskPage = class {
     }
 
     showFilterModal() {
-        const content = `
-            <div class="filter-form">
-                <div class="form-group">
-                    <label>Status</label>
-                    <select class="form-control" id="statusFilter">
-                        <option value="">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Task Type</label>
-                    <select class="form-control" id="typeFilter">
-                        <option value="">All Types</option>
-                        ${this.taskTypes.map(type => `
-                            <option value="${type}">${type}</option>
-                        `).join('')}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Assigned To</label>
-                    <input type="text" class="form-control" id="employeeFilter" placeholder="Employee ID">
-                </div>
-                <div class="form-group">
-                    <label>Date Range</label>
-                    <div class="input-group">
-                        <input type="date" class="form-control" id="dateFrom">
-                        <div class="input-group-append">
-                            <span class="input-group-text">to</span>
+        // Store reference to TaskPage instance
+        const self = this;
+        
+        const modalContent = `
+            <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-light">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-filter me-2 text-primary"></i>
+                                <h5 class="modal-title" id="filterModalLabel">Advanced Task Filters</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
+                        <div class="modal-body">
+            <div class="filter-form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label d-flex justify-content-between">
+                                                <span>Status</span>
+                                                <small class="text-muted" id="statusCount"></small>
+                                            </label>
+                                            <div class="status-filters">
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="statusPending" value="pending">
+                                                    <label class="form-check-label" for="statusPending">
+                                                        <span class="status-dot bg-warning"></span> Pending
+                                                    </label>
+                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="statusInProgress" value="in_progress">
+                                                    <label class="form-check-label" for="statusInProgress">
+                                                        <span class="status-dot bg-primary"></span> In Progress
+                                                    </label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" id="statusCompleted" value="completed">
+                                                    <label class="form-check-label" for="statusCompleted">
+                                                        <span class="status-dot bg-success"></span> Completed
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group mb-3">
+                                            <label class="form-label d-flex justify-content-between">
+                                                <span>Task Type</span>
+                                                <small class="text-muted" id="typeCount"></small>
+                                            </label>
+                                            <div class="task-type-filters">
+                        ${this.taskTypes.map(type => `
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="type${type}" value="${type}">
+                                                        <label class="form-check-label" for="type${type}">
+                                                            <i class="fas ${this.getTaskTypeIcon(type)} me-2"></i>
+                                                            ${type}
+                                                        </label>
+                                                    </div>
+                        `).join('')}
+                </div>
+                </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Assignment</label>
+                    <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-user"></i>
+                                                </span>
+                                                <input type="text" class="form-control" id="employeeFilter" placeholder="Employee ID or Name">
+                                                <button class="btn btn-outline-secondary" type="button" id="clearEmployee">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Date Range</label>
+                                            <div class="date-range-group">
+                                                <div class="input-group mb-2">
+                                                    <span class="input-group-text">From</span>
+                        <input type="date" class="form-control" id="dateFrom">
+                                                    <button class="btn btn-outline-secondary" type="button" id="clearDateFrom">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                        </div>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">To</span>
                         <input type="date" class="form-control" id="dateTo">
+                                                    <button class="btn btn-outline-secondary" type="button" id="clearDateTo">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Quick Date Ranges</label>
+                                            <div class="quick-date-buttons">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="today">Today</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="yesterday">Yesterday</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="thisWeek">This Week</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" data-range="lastWeek">Last Week</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="filter-summary mt-3 p-2 bg-light rounded">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="active-filters">
+                                            <span class="text-muted">Active Filters:</span>
+                                            <span id="activeFiltersCount" class="badge bg-primary ms-2">0</span>
+                                        </div>
+                                        <button type="button" class="btn btn-link btn-sm text-danger" id="clearAllFilters">
+                                            <i class="fas fa-trash-alt me-1"></i> Clear All
+                                        </button>
+                                    </div>
+                                    <div id="activeFiltersTags" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <div class="d-flex justify-content-between w-100">
+                                <div class="filter-stats">
+                                    <small class="text-muted">Matching Tasks: <span id="matchingTasksCount">0</span></small>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="applyFilters">
+                                        <i class="fas fa-check me-1"></i> Apply Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
 
-        DevExpress.ui.dialog.custom({
-            title: 'Filter Tasks',
-            content: content,
-            buttons: [{
-                text: 'Cancel',
-                onClick: () => true
-            }, {
-                text: 'Apply Filters',
-                onClick: () => {
-                    const filters = {
-                        status: $('#statusFilter').val(),
-                        type: $('#typeFilter').val(),
-                        employeeId: $('#employeeFilter').val(),
-                        dateFrom: $('#dateFrom').val(),
-                        dateTo: $('#dateTo').val()
-                    };
-                    this.applyFilters(filters);
-                    return true;
-                }
-            }],
-            width: '500px'
+        // Add filter modal styles
+        const filterStyles = `
+            .filter-form .status-dot {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 4px;
+            }
+
+            .filter-form .task-type-filters {
+                max-height: 200px;
+                overflow-y: auto;
+                padding-right: 10px;
+            }
+
+            .filter-form .task-type-filters::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .filter-form .task-type-filters::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 2px;
+            }
+
+            .filter-form .task-type-filters::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 2px;
+            }
+
+            .filter-form .quick-date-buttons {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+            }
+
+            .filter-form .active-filter-tag {
+                display: inline-flex;
+                align-items: center;
+                background: #e9ecef;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 0.875rem;
+                margin: 2px;
+            }
+
+            .filter-form .active-filter-tag .remove-filter {
+                margin-left: 4px;
+                cursor: pointer;
+                opacity: 0.6;
+            }
+
+            .filter-form .active-filter-tag .remove-filter:hover {
+                opacity: 1;
+            }
+
+            .date-range-group {
+                background: #f8f9fa;
+                padding: 10px;
+                border-radius: 4px;
+            }
+
+            .filter-form .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .filter-form label {
+                display: block;
+                margin-bottom: 0.5rem;
+                color: #8898aa;
+                font-size: 0.875rem;
+                font-weight: 600;
+            }
+
+            .filter-form .form-control {
+                border: 1px solid #e9ecef;
+                border-radius: 6px;
+                padding: 0.75rem;
+                font-size: 0.875rem;
+                transition: all 0.2s ease;
+            }
+
+            .filter-form .form-control:focus {
+                border-color: #5e72e4;
+                box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
+            }
+
+            .filter-form .input-group {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .filter-form .input-group-text {
+                background: #f6f9fc;
+                border: 1px solid #e9ecef;
+                color: #8898aa;
+                padding: 0.75rem;
+                border-radius: 6px;
+            }
+        `;
+
+        // Remove existing modal and styles if any
+        $('#filterModal, #filterStyles').remove();
+        
+        // Add the modal and styles to the body
+        $('body').append(modalContent);
+        $('head').append(`<style id="filterStyles">${filterStyles}</style>`);
+        
+        // Initialize the modal
+        const filterModal = new bootstrap.Modal(document.getElementById('filterModal'), {
+            keyboard: true,
+            backdrop: true
         });
+        
+        this.filterModal = filterModal;
+
+        // Initialize filter state
+        const filterState = {
+            status: [],
+            types: [],
+            employee: '',
+            dateFrom: '',
+            dateTo: ''
+        };
+
+        // Helper function to update active filters display
+        const updateActiveFilters = () => {
+            const activeFilters = [];
+            let count = 0;
+
+            if (filterState.status.length > 0) {
+                activeFilters.push({
+                    type: 'Status',
+                    value: filterState.status.join(', '),
+                    key: 'status'
+                });
+                count++;
+            }
+
+            if (filterState.types.length > 0) {
+                activeFilters.push({
+                    type: 'Types',
+                    value: filterState.types.join(', '),
+                    key: 'types'
+                });
+                count++;
+            }
+
+            if (filterState.employee) {
+                activeFilters.push({
+                    type: 'Employee',
+                    value: filterState.employee,
+                    key: 'employee'
+                });
+                count++;
+            }
+
+            if (filterState.dateFrom || filterState.dateTo) {
+                activeFilters.push({
+                    type: 'Date Range',
+                    value: `${filterState.dateFrom || 'Any'} to ${filterState.dateTo || 'Any'}`,
+                    key: 'date'
+                });
+                count++;
+            }
+
+            $('#activeFiltersCount').text(count);
+            
+            const tagsHtml = activeFilters.map(filter => `
+                <span class="active-filter-tag">
+                    <strong>${filter.type}:</strong> ${filter.value}
+                    <i class="fas fa-times remove-filter" data-filter-key="${filter.key}"></i>
+                </span>
+            `).join('');
+            
+            $('#activeFiltersTags').html(tagsHtml);
+
+            // Update matching tasks count
+            const matchingTasks = self.getFilteredTasks(filterState);
+            $('#matchingTasksCount').text(matchingTasks.length);
+        };
+
+        // Bind event handlers
+        $('.status-filters input[type="checkbox"]').on('change', function() {
+            const status = $(this).val();
+            const index = filterState.status.indexOf(status);
+            
+            if (this.checked && index === -1) {
+                filterState.status.push(status);
+            } else if (!this.checked && index > -1) {
+                filterState.status.splice(index, 1);
+            }
+            
+            updateActiveFilters();
+        });
+
+        $('.task-type-filters input[type="checkbox"]').on('change', function() {
+            const type = $(this).val();
+            const index = filterState.types.indexOf(type);
+            
+            if (this.checked && index === -1) {
+                filterState.types.push(type);
+            } else if (!this.checked && index > -1) {
+                filterState.types.splice(index, 1);
+            }
+            
+            updateActiveFilters();
+        });
+
+        $('#employeeFilter').on('input', function() {
+            filterState.employee = $(this).val();
+            updateActiveFilters();
+        });
+
+        $('#dateFrom, #dateTo').on('change', function() {
+            const id = $(this).attr('id');
+            filterState[id] = $(this).val();
+            updateActiveFilters();
+        });
+
+        // Clear all filters button handler
+        $('#clearAllFilters').on('click', () => {
+            // Reset all form inputs
+            $('.filter-form input[type="checkbox"]').prop('checked', false);
+            $('#employeeFilter').val('');
+            $('#dateFrom').val('');
+            $('#dateTo').val('');
+            
+            // Reset filter state
+            filterState.status = [];
+            filterState.types = [];
+            filterState.employee = '';
+            filterState.dateFrom = '';
+            filterState.dateTo = '';
+            
+            // Update UI
+            updateActiveFilters();
+            
+            // Show all tasks
+            self.renderTasksByDivision(self.tasks);
+            self.updateTaskStatistics(self.tasks);
+        });
+
+        // Apply filters button handler
+        $('#applyFilters').on('click', () => {
+            self.applyFilters({
+                status: filterState.status,
+                types: filterState.types,
+                employee: filterState.employee,
+                dateFrom: filterState.dateFrom,
+                dateTo: filterState.dateTo
+            });
+            
+            // Hide the modal
+            if (self.filterModal) {
+                self.filterModal.hide();
+            } else {
+                $('#filterModal').modal('hide');
+            }
+        });
+
+        // Show the modal
+        filterModal.show();
+        
+        // Initial update of active filters
+        updateActiveFilters();
     }
 
-    applyFilters(filters) {
+    // Helper method to get filtered tasks without applying them
+    getFilteredTasks(filterState) {
         let filteredTasks = [...this.tasks];
 
-        if (filters.status) {
-            filteredTasks = filteredTasks.filter(task => task.status === filters.status);
+        // Filter by task type
+        if (filterState.types && filterState.types.length > 0) {
+            filteredTasks = filteredTasks.filter(task => filterState.types.includes(task.task_type));
         }
 
-        if (filters.type) {
-            filteredTasks = filteredTasks.filter(task => task.task_type === filters.type);
+        // Filter by status
+        if (filterState.status && filterState.status.length > 0) {
+            filteredTasks = filteredTasks.filter(task => filterState.status.includes(task.status));
         }
 
-        if (filters.employeeId) {
-            filteredTasks = filteredTasks.filter(task => task.employee_id === parseInt(filters.employeeId));
+        // Filter by employee
+        if (filterState.employee) {
+            const employeeSearch = filterState.employee.toLowerCase();
+            filteredTasks = filteredTasks.filter(task => 
+                (task.employee_id && task.employee_id.toString().includes(employeeSearch)) ||
+                (task.employee_name && task.employee_name.toLowerCase().includes(employeeSearch))
+            );
         }
 
-        if (filters.dateFrom) {
-            const fromDate = new Date(filters.dateFrom);
+        // Filter by date range
+        if (filterState.dateFrom) {
+            const fromDate = new Date(filterState.dateFrom);
             filteredTasks = filteredTasks.filter(task => new Date(task.created_at) >= fromDate);
         }
 
-        if (filters.dateTo) {
-            const toDate = new Date(filters.dateTo);
+        if (filterState.dateTo) {
+            const toDate = new Date(filterState.dateTo);
+            toDate.setHours(23, 59, 59, 999); // End of day
             filteredTasks = filteredTasks.filter(task => new Date(task.created_at) <= toDate);
         }
 
+        return filteredTasks;
+    }
+
+    // Update the applyFilters method to handle the new filter format
+    applyFilters(filters) {
+        let filteredTasks = this.getFilteredTasks(filters);
+        
+        // Update the UI with filtered tasks
         this.renderTasksByDivision(filteredTasks);
         this.updateTaskStatistics(filteredTasks);
+
+        // Update active filters display
+        this.updateActiveFilters(filters);
+    }
+
+    updateActiveFilters(filters) {
+        let count = 0;
+        const activeFilters = [];
+
+        // Add status filters
+        if (filters.status && filters.status.length > 0) {
+            activeFilters.push({
+                type: 'Status',
+                value: filters.status.map(s => s.replace('_', ' ').toUpperCase()).join(', '),
+                key: 'status'
+            });
+            count++;
+        }
+
+        // Add type filters
+        if (filters.types && filters.types.length > 0) {
+            activeFilters.push({
+                type: 'Types',
+                value: filters.types.join(', '),
+                key: 'types'
+            });
+            count++;
+        }
+
+        // Add employee filter
+        if (filters.employee) {
+            activeFilters.push({
+                type: 'Employee',
+                value: filters.employee,
+                key: 'employee'
+            });
+            count++;
+        }
+
+        // Add date range filter
+        if (filters.dateFrom || filters.dateTo) {
+            activeFilters.push({
+                type: 'Date Range',
+                value: `${filters.dateFrom || 'Any'} to ${filters.dateTo || 'Any'}`,
+                key: 'date'
+            });
+            count++;
+        }
+
+        // Update the filter count badge
+        $('#activeFiltersCount').text(count);
+
+        // Update the active filters tags
+        const tagsHtml = activeFilters.map(filter => `
+            <span class="active-filter-tag">
+                <strong>${filter.type}:</strong> ${filter.value}
+                <i class="fas fa-times remove-filter" data-filter-key="${filter.key}"></i>
+            </span>
+        `).join('');
+
+        $('#activeFiltersTags').html(tagsHtml);
+
+        // Update matching tasks count
+        const matchingTasks = this.getFilteredTasks(filters);
+        $('#matchingTasksCount').text(matchingTasks.length);
     }
 
     async showTaskDetails(task) {
@@ -2304,9 +2744,454 @@ window.TaskPage = class {
             DevExpress.ui.notify('Failed to reassign task', 'error', 3000);
         }
     }
-};
+
+    initializeSettings() {
+        // Bind settings button click
+        $(document).on('click', '#viewSettings', () => {
+            this.showSettingsModal();
+        });
+    }
+
+    showSettingsModal() {
+        const self = this;
+        
+        const modalContent = `
+            <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="settingsModalLabel">
+                                <i class="fas fa-cog me-2"></i>
+                                Task Board Settings
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="settings-form">
+                                <!-- Task Types Section -->
+                                <div class="settings-section mb-4">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-title">
+                                            <i class="fas fa-layer-group me-2"></i>
+                                            Task Types Visibility
+                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm" id="toggleAllTypes">
+                                            <i class="fas fa-check-double me-1"></i>
+                                            Toggle All
+                                        </button>
+                                    </div>
+                                    <div class="task-types-list">
+                                        ${this.taskTypes.map(type => `
+                                            <div class="task-type-item">
+                                                <label class="custom-checkbox">
+                                                    <input type="checkbox" 
+                                                        id="show${type}" 
+                                                        value="${type}" 
+                                                        ${this.getTypeVisibility(type) ? 'checked' : ''}>
+                                                    <span class="checkmark"></span>
+                                                    <span class="type-icon">
+                                                        <i class="fas ${this.getTaskTypeIcon(type)}"></i>
+                                                    </span>
+                                                    <span class="type-label">${type}</span>
+                                                </label>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Display Options Section -->
+                                <div class="settings-section mb-4">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-title">
+                                            <i class="fas fa-desktop me-2"></i>
+                                            Display Options
+                                        </div>
+                                    </div>
+                                    <div class="display-options">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="showCompletedTasks" 
+                                                ${this.getSettingValue('showCompletedTasks', true) ? 'checked' : ''}>
+                                            <span class="checkmark"></span>
+                                            <span class="option-icon">
+                                                <i class="fas fa-check-circle"></i>
+                                            </span>
+                                            <span class="option-label">Show Completed Tasks</span>
+                                        </label>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="showTaskCounts" 
+                                                ${this.getSettingValue('showTaskCounts', true) ? 'checked' : ''}>
+                                            <span class="checkmark"></span>
+                                            <span class="option-icon">
+                                                <i class="fas fa-hashtag"></i>
+                                            </span>
+                                            <span class="option-label">Show Task Counts</span>
+                                        </label>
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" id="enableAnimations" 
+                                                ${this.getSettingValue('enableAnimations', true) ? 'checked' : ''}>
+                                            <span class="checkmark"></span>
+                                            <span class="option-icon">
+                                                <i class="fas fa-magic"></i>
+                                            </span>
+                                            <span class="option-label">Enable Animations</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Auto Refresh Section -->
+                                <div class="settings-section">
+                                    <div class="settings-section-header">
+                                        <div class="settings-section-title">
+                                            <i class="fas fa-sync-alt me-2"></i>
+                                            Auto Refresh
+                                        </div>
+                                    </div>
+                                    <div class="refresh-option">
+                                        <select class="form-select" id="refreshInterval">
+                                            <option value="0" ${this.getSettingValue('refreshInterval', '0') === '0' ? 'selected' : ''}>
+                                                <i class="fas fa-clock"></i> Manual Refresh
+                                            </option>
+                                            <option value="30" ${this.getSettingValue('refreshInterval', '0') === '30' ? 'selected' : ''}>Every 30 seconds</option>
+                                            <option value="60" ${this.getSettingValue('refreshInterval', '0') === '60' ? 'selected' : ''}>Every minute</option>
+                                            <option value="300" ${this.getSettingValue('refreshInterval', '0') === '300' ? 'selected' : ''}>Every 5 minutes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>
+                                Cancel
+                            </button>
+                            <button type="button" class="btn btn-primary" id="saveSettings">
+                                <i class="fas fa-save me-1"></i>
+                                Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const settingsStyles = `
+            .settings-form {
+                padding: 0.5rem;
+            }
+
+            .settings-section {
+                background: #fff;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            }
+
+            .settings-section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .settings-section-title {
+                font-size: 1rem;
+                font-weight: 600;
+                color: #32325d;
+                display: flex;
+                align-items: center;
+            }
+
+            .settings-section-title i {
+                color: #5e72e4;
+                font-size: 1.1rem;
+            }
+
+            .task-types-list {
+                max-height: 200px;
+                overflow-y: auto;
+                padding: 0.75rem;
+            }
+
+            .task-type-item {
+                padding: 0.5rem;
+                border-radius: 6px;
+                transition: background-color 0.2s;
+            }
+
+            .task-type-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .custom-checkbox {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem;
+                cursor: pointer;
+                user-select: none;
+                border-radius: 6px;
+                transition: all 0.2s;
+            }
+
+            .custom-checkbox:hover {
+                background: #f8f9fa;
+            }
+
+            .custom-checkbox input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .checkmark {
+                position: relative;
+                height: 20px;
+                width: 20px;
+                background-color: #fff;
+                border: 2px solid #e9ecef;
+                border-radius: 4px;
+                margin-right: 12px;
+                transition: all 0.2s;
+            }
+
+            .custom-checkbox:hover .checkmark {
+                border-color: #5e72e4;
+            }
+
+            .custom-checkbox input:checked ~ .checkmark {
+                background-color: #5e72e4;
+                border-color: #5e72e4;
+            }
+
+            .checkmark:after {
+                content: "";
+                position: absolute;
+                display: none;
+                left: 6px;
+                top: 2px;
+                width: 5px;
+                height: 10px;
+                border: solid white;
+                border-width: 0 2px 2px 0;
+                transform: rotate(45deg);
+            }
+
+            .custom-checkbox input:checked ~ .checkmark:after {
+                display: block;
+            }
+
+            .type-icon, .option-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 24px;
+                background: rgba(94, 114, 228, 0.1);
+                border-radius: 6px;
+                margin-right: 12px;
+                color: #5e72e4;
+            }
+
+            .type-label, .option-label {
+                color: #525f7f;
+                font-weight: 500;
+            }
+
+            .display-options {
+                padding: 0.75rem;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .refresh-option {
+                padding: 0.75rem;
+            }
+
+            .form-select {
+                border: 1px solid #e9ecef;
+                border-radius: 6px;
+                padding: 0.75rem;
+                font-size: 0.875rem;
+                color: #525f7f;
+                background-color: #fff;
+                transition: all 0.2s;
+            }
+
+            .form-select:focus {
+                border-color: #5e72e4;
+                box-shadow: 0 0 0 0.2rem rgba(94, 114, 228, 0.25);
+            }
+
+            .modal-header {
+                border-bottom: 0;
+            }
+
+            .modal-header .modal-title {
+                font-size: 1.1rem;
+                font-weight: 600;
+            }
+
+            .modal-footer {
+                border-top: 1px solid #e9ecef;
+            }
+
+            .btn-outline-primary {
+                color: #5e72e4;
+                border-color: #5e72e4;
+                background: transparent;
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+                transition: all 0.2s;
+            }
+
+            .btn-outline-primary:hover {
+                color: #fff;
+                background: #5e72e4;
+            }
+
+            /* Custom scrollbar for task types list */
+            .task-types-list::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .task-types-list::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 3px;
+            }
+
+            .task-types-list::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 3px;
+            }
+
+            .task-types-list::-webkit-scrollbar-thumb:hover {
+                background: #a8a8a8;
+            }
+
+            /* Animation for modal */
+            .modal.fade .modal-dialog {
+                transform: scale(0.95);
+                transition: transform 0.2s ease-out;
+            }
+
+            .modal.show .modal-dialog {
+                transform: scale(1);
+            }
+        `;
+
+        // Remove existing modal and styles if any
+        $('#settingsModal, #settingsStyles').remove();
+
+        // Add modal and styles to the page
+        $('body').append(modalContent);
+        $('head').append(`<style id="settingsStyles">${settingsStyles}</style>`);
+
+        // Initialize Bootstrap modal
+        const modal = new bootstrap.Modal(document.getElementById('settingsModal'), {
+            keyboard: true,
+            backdrop: true
+        });
+
+        // Toggle all types handler
+        $('#toggleAllTypes').on('click', function() {
+            const checkboxes = $('.task-types-list input[type="checkbox"]');
+            const allChecked = checkboxes.length === checkboxes.filter(':checked').length;
+            checkboxes.prop('checked', !allChecked);
+        });
+
+        // Save settings handler
+        $('#saveSettings').on('click', () => {
+            // Save task type visibility
+            const visibleTypes = {};
+            $('.task-types-list input[type="checkbox"]').each(function() {
+                visibleTypes[$(this).val()] = $(this).is(':checked');
+            });
+            localStorage.setItem('taskTypeVisibility', JSON.stringify(visibleTypes));
+
+            // Save other settings
+            const settings = {
+                showCompletedTasks: $('#showCompletedTasks').is(':checked'),
+                showTaskCounts: $('#showTaskCounts').is(':checked'),
+                enableAnimations: $('#enableAnimations').is(':checked'),
+                refreshInterval: $('#refreshInterval').val()
+            };
+            localStorage.setItem('taskBoardSettings', JSON.stringify(settings));
+
+            // Apply settings
+            this.applySettings();
+
+            // Hide modal
+            modal.hide();
+
+            // Show success message
+            DevExpress.ui.notify({
+                message: 'Settings saved successfully',
+                type: 'success',
+                displayTime: 2000,
+                position: { at: 'top center', my: 'top center' }
+            });
+
+            // Refresh the view
+            this.loadData();
+        });
+
+        // Show the modal
+        modal.show();
+    }
+
+    getTypeVisibility(type) {
+        const visibility = localStorage.getItem('taskTypeVisibility');
+        if (visibility) {
+            const visibleTypes = JSON.parse(visibility);
+            return visibleTypes[type] !== false; // Default to true if not set
+        }
+        return true; // Default visibility is true
+    }
+
+    getSettingValue(key, defaultValue) {
+        const settings = localStorage.getItem('taskBoardSettings');
+        if (settings) {
+            const parsedSettings = JSON.parse(settings);
+            return parsedSettings[key] !== undefined ? parsedSettings[key] : defaultValue;
+        }
+        return defaultValue;
+    }
+
+    applySettings() {
+        // Apply animations setting
+        if (this.getSettingValue('enableAnimations', true)) {
+            $('body').removeClass('no-animations');
+        } else {
+            $('body').addClass('no-animations');
+        }
+
+        // Apply task counts visibility
+        if (this.getSettingValue('showTaskCounts', true)) {
+            $('.task-count').show();
+        } else {
+            $('.task-count').hide();
+        }
+
+        // Apply completed tasks visibility
+        if (!this.getSettingValue('showCompletedTasks', true)) {
+            $('.status-column[data-status="completed"]').hide();
+        } else {
+            $('.status-column[data-status="completed"]').show();
+        }
+
+        // Handle auto-refresh
+        const interval = parseInt(this.getSettingValue('refreshInterval', '0'));
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+        }
+        if (interval > 0) {
+            this.refreshInterval = setInterval(() => this.loadData(), interval * 1000);
+        }
+    }
+}
 
 // Initialize only if DevExtreme is loaded
-if (typeof DevExpress !== 'undefined' && !window.taskPageInstance) {
-    window.taskPageInstance = new window.TaskPage();
+if (typeof DevExpress !== 'undefined') {
+    window.taskPageInstance = new TaskPage();
 }
