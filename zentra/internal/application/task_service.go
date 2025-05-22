@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"zentra/internal/domain/audit"
+	"zentra/internal/domain/models"
 	"zentra/internal/domain/task"
 )
 
@@ -100,4 +101,36 @@ func (s *TaskService) FindByIDWithRelations(id int, ctx context.Context) (*task.
 // FindAllWithRelations retrieves all tasks with related data
 func (s *TaskService) FindAllWithRelations(ctx context.Context) ([]task.Task, error) {
 	return s.repo.FindAllWithRelations(ctx)
+}
+
+// CreateTasksForOrderItem creates a sequence of tasks for a given order item
+func (s *TaskService) CreateTasksForOrderItem(orderItemID int, ctx context.Context) error {
+	// Define task types in sequence
+	taskTypes := []string{
+		"LAYOUT",
+		"PRINTING",
+		"PREPARING",
+		"PRESSING",
+		"CUTTING",
+		"SEWING",
+		"FINISHING",
+	}
+
+	// Create tasks in sequence
+	for i, taskType := range taskTypes {
+		task := &task.Task{
+			Task: models.Task{
+				OrderItemID:    orderItemID,
+				TaskType:       taskType,
+				SequenceNumber: i + 1,
+				Status:         "pending",
+			},
+		}
+
+		if err := s.Create(task, ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -18,22 +18,32 @@ type OrderService struct {
 	auditSvc       *audit.Service
 	customerSvc    *CustomerService
 	PaymentService *PaymentService
+	taskService    *TaskService
 }
 
 // NewOrderService creates a new order service instance
-func NewOrderService(repo order.Repository, auditSvc *audit.Service, customerSvc *CustomerService, paymentSvc *PaymentService) *OrderService {
+func NewOrderService(repo order.Repository, auditSvc *audit.Service, customerSvc *CustomerService, paymentSvc *PaymentService, taskSvc *TaskService) *OrderService {
 	return &OrderService{
 		repo:           repo,
 		auditSvc:       auditSvc,
 		customerSvc:    customerSvc,
 		PaymentService: paymentSvc,
+		taskService:    taskSvc,
 	}
 }
 
 // Create creates a new order
 func (s *OrderService) Create(o *order.Order, ctx context.Context) error {
+	// Create the order first
 	if err := s.repo.Create(o, ctx); err != nil {
 		return err
+	}
+
+	// Create tasks for each order item
+	for _, item := range o.OrderItems {
+		if err := s.taskService.CreateTasksForOrderItem(item.ID, ctx); err != nil {
+			return err
+		}
 	}
 
 	// Log the create action
