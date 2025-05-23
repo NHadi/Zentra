@@ -41,7 +41,7 @@ export const orderAPI = {
     async createOrder(orderData) {
         try {
             // Extract order items from the request
-            const { OrderItems, ...orderRequest } = orderData;
+            const { OrderItems, Label, ...orderRequest } = orderData;
 
             // Ensure all required fields are present and properly formatted
             const createOrderRequest = {
@@ -67,6 +67,9 @@ export const orderAPI = {
                     production_status: 'pending'
                 }))
             };
+            if (Label) {
+                createOrderRequest.label = Label;
+            }
 
             console.log('Sending order request:', createOrderRequest);
 
@@ -105,6 +108,9 @@ export const orderAPI = {
                 expected_delivery_date: orderData.ExpectedDeliveryDate,
                 notes: orderData.Notes
             };
+            if (orderData.Label) {
+                updateOrderRequest.label = orderData.Label;
+            }
 
             const response = await fetch(`${config.baseUrl}/orders/${orderId}`, {
                 method: 'PUT',

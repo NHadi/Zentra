@@ -21,6 +21,7 @@ type Order struct {
 	PaymentStatus        string             `gorm:"type:varchar(20);not null;default:'unpaid'" json:"payment_status"` // unpaid, partial, paid, refunded
 	ExpectedDeliveryDate string             `gorm:"type:date" json:"expected_delivery_date"`
 	Notes                string             `gorm:"type:text" json:"notes"`
+	Label                string             `gorm:"type:varchar(100)" json:"label"`
 	OrderItems           []OrderItem        `gorm:"foreignKey:OrderID" json:"order_items,omitempty"`
 	Payments             []payment.Payment  `gorm:"foreignKey:OrderID" json:"payments,omitempty"`
 	common.TenantModel

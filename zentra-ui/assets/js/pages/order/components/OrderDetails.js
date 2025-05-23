@@ -371,6 +371,9 @@ export class OrderDetails {
         $('#subtotal').text(this.orderPage.formatIDR(order.subtotal || 0));
         $('#discount').text(`-${this.orderPage.formatIDR(order.discount_amount || 0)}`);
         $('#totalAmount').text(this.orderPage.formatIDR(order.total_amount || 0));
+
+        // Update order label
+        $('#orderLabel').text(order.label || '');
     }
 
     updateItemsTab(order) {

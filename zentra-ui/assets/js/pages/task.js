@@ -702,6 +702,7 @@ export class TaskPage {
                                 <i class="fas fa-tshirt"></i>
                                 ${task.order_item.product_name}
                         </span>
+                        ${task.order_item?.order?.label ? `<span class="meta-item order-label-badge" title="Order Label"><i class="fas fa-tag"></i> ${task.order_item.order.label}</span>` : ''}
                     </div>
                     </div>
                     <div class="task-details">
@@ -3178,4 +3179,10 @@ export class TaskPage {
 // Initialize only if DevExtreme is loaded
 if (typeof DevExpress !== 'undefined') {
     window.taskPageInstance = new TaskPage();
+}
+
+// At the end of the file, after the current initialization block, add:
+globalThis.TaskPage = TaskPage;
+if (typeof DevExpress !== 'undefined' && !globalThis.taskPageInstance) {
+    globalThis.taskPageInstance = new globalThis.TaskPage();
 }

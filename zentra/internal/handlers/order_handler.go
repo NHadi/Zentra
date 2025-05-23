@@ -63,6 +63,7 @@ type OrderResponse struct {
 	PaymentStatus        string              `json:"payment_status" example:"unpaid"`
 	ExpectedDeliveryDate string              `json:"expected_delivery_date" example:"2024-03-25"`
 	Notes                string              `json:"notes" example:"Please deliver in the morning"`
+	Label                string              `json:"label" example:"VIP"`
 	OrderItems           []OrderItemResponse `json:"order_items,omitempty"`
 	Payments             []PaymentResponse   `json:"payments,omitempty"`
 	CreatedAt            string              `json:"created_at" example:"2024-03-24T21:41:49Z"`
@@ -97,6 +98,7 @@ type CreateOrderRequest struct {
 	PaymentStatus        string                   `json:"payment_status" binding:"required" example:"unpaid"`
 	ExpectedDeliveryDate string                   `json:"expected_delivery_date" example:"2024-03-25"`
 	Notes                string                   `json:"notes" example:"Please deliver in the morning"`
+	Label                string                   `json:"label" example:"VIP"`
 	OrderItems           []CreateOrderItemRequest `json:"order_items"`
 }
 
@@ -112,6 +114,7 @@ type UpdateOrderRequest struct {
 	PaymentStatus        string  `json:"payment_status" binding:"required" example:"unpaid"`
 	ExpectedDeliveryDate string  `json:"expected_delivery_date" example:"2024-03-25"`
 	Notes                string  `json:"notes" example:"Please deliver in the morning"`
+	Label                string  `json:"label" example:"VIP"`
 }
 
 // UpdateOrderStatusRequest represents the request structure for updating order status
@@ -184,6 +187,7 @@ func toOrderResponse(o *order.Order) OrderResponse {
 		PaymentStatus:        o.PaymentStatus,
 		ExpectedDeliveryDate: o.ExpectedDeliveryDate,
 		Notes:                o.Notes,
+		Label:                o.Label,
 		CreatedAt:            o.CreatedAt.String(),
 		CreatedBy:            o.CreatedBy,
 		UpdatedAt:            o.UpdatedAt.String(),
@@ -283,6 +287,7 @@ func CreateOrder(service *application.OrderService) gin.HandlerFunc {
 			PaymentStatus:        req.PaymentStatus,
 			ExpectedDeliveryDate: req.ExpectedDeliveryDate,
 			Notes:                req.Notes,
+			Label:                req.Label,
 		}
 
 		// Create order items
@@ -426,6 +431,7 @@ func UpdateOrder(service *application.OrderService) gin.HandlerFunc {
 		order.PaymentStatus = req.PaymentStatus
 		order.ExpectedDeliveryDate = req.ExpectedDeliveryDate
 		order.Notes = req.Notes
+		order.Label = req.Label
 
 		if err := service.Update(order, c); err != nil {
 			c.JSON(http.StatusInternalServerError, ErrorResponse{Error: err.Error()})

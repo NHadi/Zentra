@@ -1074,6 +1074,7 @@ export class OrderModal {
                 Status: formData.get('status') || 'pending',
                 PaymentStatus: formData.get('paymentStatus') || 'unpaid',
                 Notes: formData.get('notes'),
+                Label: formData.get('label'),
                 OrderItems: this.orderItems
             };
 
@@ -1117,6 +1118,7 @@ export class OrderModal {
                 Status: formData.get('status'),
                 PaymentStatus: formData.get('paymentStatus'),
                 Notes: formData.get('notes'),
+                Label: formData.get('label'),
                 OrderItems: this.orderItems
             };
             

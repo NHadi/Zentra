@@ -100,6 +100,14 @@ export class OrderGrid {
                     }
                 },
                 {
+                    dataField: 'label',
+                    caption: 'Label',
+                    width: 120,
+                    cellTemplate: (container, options) => {
+                        $("<span>").addClass('order-label').text(options.value || '').appendTo(container);
+                    }
+                },
+                {
                     dataField: 'customer',
                     caption: 'Customer',
                     cellTemplate: (container, options) => {

@@ -158,6 +158,10 @@
                         <label>Expected Delivery</label>
                         <div class="value" id="expectedDelivery"></div>
                     </div>
+                    <div class="info-group">
+                        <label>Label</label>
+                        <div class="value" id="orderLabel"></div>
+                    </div>
                 </div>
 
                 <!-- Order Summary -->
@@ -486,6 +490,12 @@
                         <label>Notes</label>
                         <textarea class="form-control" name="notes" rows="3"></textarea>
                     </div>
+
+                    <!-- Label -->
+                    <div class="form-group">
+                        <label for="orderLabel">Label</label>
+                        <input type="text" class="form-control" id="orderLabelInput" name="label" placeholder="Enter label (optional)">
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -632,6 +642,12 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Label -->
+                    <div class="form-group">
+                        <label for="orderLabel">Label</label>
+                        <input type="text" class="form-control" id="orderLabelInput" name="label" placeholder="Enter label (optional)">
                     </div>
                 </form>
             </div>
