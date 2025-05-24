@@ -1,0 +1,1590 @@
+<!-- Task Calendar Page -->
+<div class="row">
+    <!-- Statistics Row -->
+    <div class="col-12 mb-4">
+        <div class="row">
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats hover-shadow-lg">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted mb-2 card-title">Total Tasks</h6>
+                                <span class="h1 font-weight-bold mb-0 gradient-text" id="totalTasks">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-primary text-white rounded-lg shadow-primary">
+                                    <i class="ni ni-collection"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="badge badge-soft-primary">Production Overview</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats hover-shadow-lg">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted mb-2 card-title">Completed</h6>
+                                <span class="h1 font-weight-bold mb-0 gradient-text-success" id="completedTasks">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-success text-white rounded-lg shadow-success">
+                                    <i class="ni ni-check-bold"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-success mr-2" id="completionRate">0%</span>
+                            <span class="badge badge-soft-success">Completion Rate</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats hover-shadow-lg">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted mb-2 card-title">In Progress</h6>
+                                <span class="h1 font-weight-bold mb-0 gradient-text-warning" id="inProgressTasks">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-warning text-white rounded-lg shadow-warning">
+                                    <i class="ni ni-time-alarm"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-warning mr-2" id="progressRate">0%</span>
+                            <span class="badge badge-soft-warning">Active Tasks</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-stats hover-shadow-lg">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h6 class="text-uppercase text-muted mb-2 card-title">Pending</h6>
+                                <span class="h1 font-weight-bold mb-0 gradient-text-danger" id="pendingTasks">0</span>
+                            </div>
+                            <div class="col-auto">
+                                <div class="icon icon-shape bg-gradient-danger text-white rounded-lg shadow-danger">
+                                    <i class="ni ni-calendar-grid-58"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-3 mb-0 text-sm">
+                            <span class="text-danger mr-2" id="delayRate">0%</span>
+                            <span class="badge badge-soft-danger">Awaiting Start</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="col-12">
+        <div class="card shadow-lg">
+            <div class="card-header bg-white border-0">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h3 class="mb-0">Task Schedule</h3>
+                        <p class="text-sm text-muted mb-0">Production Management Overview</p>
+                    </div>
+                    <div class="col text-right">
+                        <div class="btn-group view-toggle">
+                            <button class="btn btn-primary active" id="viewCalendar">
+                                <i class="fas fa-calendar-alt mr-2"></i>Calendar
+                            </button>
+                            <button class="btn btn-primary" id="viewKanban">
+                                <i class="fas fa-columns mr-2"></i>Kanban
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <!-- View Container -->
+                <div class="view-container">
+                    <!-- Calendar View -->
+                    <div id="calendarView" class="view-section active">
+                        <div id="taskCalendar" class="calendar-container"></div>
+                    </div>
+
+                    <!-- Kanban View -->
+                    <div id="kanbanView" class="view-section">
+                        <div class="kanban-container">
+                            <div class="kanban-column" data-type="layout">
+                                <div class="kanban-header bg-gradient-primary">
+                                    <h6 class="text-white mb-0">Layout</h6>
+                                    <span class="badge badge-white task-count">0</span>
+                                </div>
+                                <div class="kanban-body" id="layoutTasks"></div>
+                            </div>
+                            <div class="kanban-column" data-type="printing">
+                                <div class="kanban-header bg-gradient-info">
+                                    <h6 class="text-white mb-0">Printing</h6>
+                                    <span class="badge badge-white task-count">0</span>
+                                </div>
+                                <div class="kanban-body" id="printingTasks"></div>
+                            </div>
+                            <div class="kanban-column" data-type="cutting">
+                                <div class="kanban-header bg-gradient-warning">
+                                    <h6 class="text-white mb-0">Cutting</h6>
+                                    <span class="badge badge-white task-count">0</span>
+                                </div>
+                                <div class="kanban-body" id="cuttingTasks"></div>
+                            </div>
+                            <div class="kanban-column" data-type="sewing">
+                                <div class="kanban-header bg-gradient-danger">
+                                    <h6 class="text-white mb-0">Sewing</h6>
+                                    <span class="badge badge-white task-count">0</span>
+                                </div>
+                                <div class="kanban-body" id="sewingTasks"></div>
+                            </div>
+                            <div class="kanban-column" data-type="finishing">
+                                <div class="kanban-header bg-gradient-success">
+                                    <h6 class="text-white mb-0">Finishing</h6>
+                                    <span class="badge badge-white task-count">0</span>
+                                </div>
+                                <div class="kanban-body" id="finishingTasks"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Details Modal -->
+<div class="modal fade" id="taskDetailsModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-tasks mr-2"></i>
+                    <span id="taskTitle">Task Details</span>
+                    <div class="task-type-badge">
+                        <i class="fas" id="taskTypeIcon"></i>
+                        <span id="taskType"></span>
+                    </div>
+                </div>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Task Type Description -->
+                <div class="task-type-description" id="taskTypeDescription">
+                    <!-- Will be filled dynamically -->
+                </div>
+
+                <!-- Task Info Section -->
+                <div class="task-info-section">
+                    <div class="task-info-header">
+                        <div>
+                            <div class="task-info-title" id="taskProductName"></div>
+                            <div class="task-info-subtitle" id="taskOrderNumber"></div>
+                        </div>
+                        <div class="task-status-badge" id="taskStatus">
+                            <i class="fas fa-circle"></i>
+                            <span class="status"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Progress Section -->
+                <div class="task-progress-section">
+                    <div class="progress-header">
+                        <div class="progress-title">Task Progress</div>
+                        <div class="progress-percentage" id="taskProgress">0%</div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Task Details Grid -->
+                <div class="task-details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Assigned To</div>
+                        <div class="detail-value">
+                            <i class="fas fa-user"></i>
+                            <span id="assignedTo">Unassigned</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Due Date</div>
+                        <div class="detail-value">
+                            <i class="fas fa-calendar"></i>
+                            <span id="dueDate">Not set</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Quantity</div>
+                        <div class="detail-value">
+                            <i class="fas fa-box"></i>
+                            <span id="taskQuantity">0</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Created By</div>
+                        <div class="detail-value">
+                            <i class="fas fa-user-plus"></i>
+                            <span id="taskCreatedBy">Unknown</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Notes -->
+                <div class="task-info-section">
+                    <h6 class="heading-small text-muted mb-4">Notes</h6>
+                    <div id="taskNotes" class="text-sm">No notes available</div>
+                </div>
+
+                <!-- Task Timeline -->
+                <div class="task-timeline"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        Actions
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item action-btn" href="#" id="startTask">
+                            <i class="fas fa-play"></i>Start Task
+                        </a>
+                        <a class="dropdown-item action-btn" href="#" id="completeTask">
+                            <i class="fas fa-check"></i>Complete Task
+                        </a>
+                        <a class="dropdown-item action-btn" href="#" id="reassignTask">
+                            <i class="fas fa-user-edit"></i>Reassign Task
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item action-btn" href="#" id="addNote">
+                            <i class="fas fa-sticky-note"></i>Add Note
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Modern UI Styles */
+:root {
+    --primary: #5e72e4;
+    --success: #2dce89;
+    --info: #11cdef;
+    --warning: #fb6340;
+    --danger: #f5365c;
+    --light: #f6f9fc;
+    --dark: #344767;
+    --neutral: #8898aa;
+}
+
+/* Card Enhancements */
+.card {
+    border: 0;
+    transition: all 0.2s ease;
+}
+
+.hover-shadow-lg:hover {
+    transform: translateY(-5px);
+}
+
+.card-stats .card-body {
+    padding: 1.5rem;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, var(--primary), #825ee4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-success {
+    background: linear-gradient(45deg, var(--success), #2dcecc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-warning {
+    background: linear-gradient(45deg, var(--warning), #fbb140);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-danger {
+    background: linear-gradient(45deg, var(--danger), #f56036);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Icon Styles */
+.icon-shape {
+    padding: 12px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.icon-shape i {
+    font-size: 1.25rem;
+}
+
+.shadow-primary { box-shadow: 0 4px 20px 0 rgba(94, 114, 228, 0.3); }
+.shadow-success { box-shadow: 0 4px 20px 0 rgba(45, 206, 137, 0.3); }
+.shadow-warning { box-shadow: 0 4px 20px 0 rgba(251, 99, 64, 0.3); }
+.shadow-danger { box-shadow: 0 4px 20px 0 rgba(245, 54, 92, 0.3); }
+
+/* Badge Styles */
+.badge-soft-primary {
+    color: var(--primary);
+    background-color: rgba(94, 114, 228, 0.1);
+}
+
+.badge-soft-success {
+    color: var(--success);
+    background-color: rgba(45, 206, 137, 0.1);
+}
+
+.badge-soft-warning {
+    color: var(--warning);
+    background-color: rgba(251, 99, 64, 0.1);
+}
+
+.badge-soft-danger {
+    color: var(--danger);
+    background-color: rgba(245, 54, 92, 0.1);
+}
+
+/* View Container Styles */
+.view-container {
+    position: relative;
+    min-height: calc(100vh - 400px);
+    background: var(--light);
+}
+
+.view-section {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.view-section.active {
+    display: block;
+}
+
+/* Calendar Specific Styles */
+.calendar-container {
+    padding: 2rem;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 0 2rem 0 rgba(136,152,170,.1);
+}
+
+/* Calendar Navigation */
+.dx-calendar-navigator {
+    background: linear-gradient(45deg, var(--primary), #825ee4);
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+}
+
+.dx-calendar-navigator .dx-button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    border-radius: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+.dx-calendar-navigator .dx-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.dx-calendar-caption-button {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Week Names Header */
+.dx-calendar-names-table {
+    background: var(--light);
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.dx-calendar-name-cell {
+    color: var(--dark);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem !important;
+    text-align: center;
+    background: linear-gradient(to bottom, rgba(94, 114, 228, 0.05), rgba(94, 114, 228, 0.02));
+}
+
+/* Calendar Grid */
+.dx-calendar-body {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: var(--light);
+    padding: 0.5rem;
+}
+
+.dx-calendar-cell {
+    position: relative;
+    height: 180px !important;
+    padding: 1rem !important;
+    vertical-align: top;
+    border: 1px solid rgba(0,0,0,0.05);
+    background: white;
+    transition: all 0.2s ease;
+    border-radius: 0.5rem;
+    margin: 0.25rem;
+}
+
+.dx-calendar-cell:hover {
+    background: rgba(94, 114, 228, 0.02);
+    border-color: rgba(94, 114, 228, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.04);
+}
+
+/* Today Cell Styling */
+.calendar-cell-today {
+    background: rgba(94, 114, 228, 0.05) !important;
+    border: 2px solid var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(94, 114, 228, 0.1);
+}
+
+/* Date Display */
+.calendar-date {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.calendar-date::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, var(--primary), transparent);
+    opacity: 0.2;
+}
+
+/* Task Items in Calendar */
+.calendar-task-item {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.75rem;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Task Type Indicators - Left Border with Gradient */
+.calendar-task-item.layout {
+    border-left: none;
+    background: linear-gradient(to right, var(--primary) 4px, white 4px);
+}
+
+.calendar-task-item.printing {
+    border-left: none;
+    background: linear-gradient(to right, var(--info) 4px, white 4px);
+}
+
+.calendar-task-item.cutting {
+    border-left: none;
+    background: linear-gradient(to right, var(--warning) 4px, white 4px);
+}
+
+.calendar-task-item.sewing {
+    border-left: none;
+    background: linear-gradient(to right, var(--danger) 4px, white 4px);
+}
+
+.calendar-task-item.finishing {
+    border-left: none;
+    background: linear-gradient(to right, var(--success) 4px, white 4px);
+}
+
+/* Task Status Indicators */
+.task-status-indicator {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.task-status-indicator.completed {
+    background: var(--success);
+    box-shadow: 0 0 0 2px rgba(45,206,137,0.2);
+}
+
+.task-status-indicator.in_progress {
+    background: var(--warning);
+    box-shadow: 0 0 0 2px rgba(251,99,64,0.2);
+}
+
+.task-status-indicator.pending {
+    background: var(--neutral);
+    box-shadow: 0 0 0 2px rgba(136,152,170,0.2);
+}
+
+.task-status-indicator.overdue {
+    background: var(--danger);
+    box-shadow: 0 0 0 2px rgba(245,54,92,0.2);
+    animation: pulse 2s infinite;
+}
+
+/* Task Progress Bar */
+.task-progress {
+    position: absolute;
+    bottom: 0;
+    left: 4px; /* Account for type indicator */
+    right: 0;
+    height: 3px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 0 0 0.75rem 0;
+    overflow: hidden;
+}
+
+.task-progress-bar {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s ease;
+}
+
+/* Task Content */
+.task-content {
+    padding-right: 1rem;
+}
+
+.task-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.task-subtitle {
+    font-size: 0.75rem;
+    color: var(--neutral);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* Status Counts with Icons */
+.status-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.5rem;
+}
+
+.status-item {
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(0,0,0,0.03);
+    color: var(--dark);
+}
+
+/* Deadline Indicators */
+.deadline-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0 0.75rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.deadline-indicator.overdue {
+    background: rgba(245,54,92,0.1);
+    color: var(--danger);
+}
+
+.deadline-indicator.due-soon {
+    background: rgba(251,99,64,0.1);
+    color: var(--warning);
+}
+
+.deadline-indicator.on-track {
+    background: rgba(45,206,137,0.1);
+    color: var(--success);
+}
+
+/* Pulse Animation for Overdue Tasks */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(245,54,92,0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(245,54,92,0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(245,54,92,0);
+    }
+}
+
+/* Task Card States */
+.calendar-task-item.overdue {
+    background-color: rgba(245,54,92,0.02);
+    border-color: rgba(245,54,92,0.2);
+}
+
+.calendar-task-item.due-soon {
+    background-color: rgba(251,99,64,0.02);
+    border-color: rgba(251,99,64,0.2);
+}
+
+.calendar-task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(50,50,93,.1);
+    z-index: 1;
+}
+
+.calendar-task-item.overdue:hover {
+    box-shadow: 0 4px 6px rgba(245,54,92,0.1);
+}
+
+.calendar-task-item.due-soon:hover {
+    box-shadow: 0 4px 6px rgba(251,99,64,0.1);
+}
+
+/* Task Meta Information */
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--neutral);
+}
+
+.task-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.task-meta-item i {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* Compact View for Multiple Tasks */
+.calendar-tasks.has-multiple .calendar-task-item {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.calendar-tasks.has-multiple .task-meta {
+    display: none;
+}
+
+.calendar-tasks.has-multiple .status-counts {
+    margin-top: 0.25rem;
+    gap: 0.25rem;
+}
+
+/* Task Count Badge */
+.task-count-badge {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 4px rgba(94,114,228,0.2);
+}
+
+/* Day Status Indicator */
+.day-status {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 0.25rem;
+}
+
+.day-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.day-status-dot.has-overdue {
+    background: var(--danger);
+    animation: pulse 2s infinite;
+}
+
+.day-status-dot.has-due-soon {
+    background: var(--warning);
+}
+
+.day-status-dot.has-ongoing {
+    background: var(--primary);
+}
+
+/* Empty State */
+.calendar-empty-state {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--neutral);
+    opacity: 0.5;
+    transition: all 0.2s ease;
+}
+
+.calendar-empty-state:hover {
+    opacity: 0.7;
+}
+
+.calendar-empty-state i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(45deg, var(--primary), #825ee4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.calendar-empty-state span {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Other Month Days */
+.dx-calendar-other-month {
+    opacity: 0.5;
+}
+
+.dx-calendar-other-month:hover {
+    opacity: 0.7;
+}
+
+/* Weekend Days */
+.dx-calendar-weekend {
+    background: rgba(94, 114, 228, 0.02);
+}
+
+/* Responsive Calendar */
+@media (max-width: 1200px) {
+    .dx-calendar-cell {
+        height: 160px !important;
+    }
+    
+    .calendar-date {
+        font-size: 1.125rem;
+        margin-bottom: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 1rem;
+    }
+    
+    .dx-calendar-navigator {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .dx-calendar-caption-button {
+        font-size: 1.25rem;
+    }
+    
+    .dx-calendar-cell {
+        height: 140px !important;
+        padding: 0.75rem !important;
+    }
+    
+    .calendar-date {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .status-counts {
+        flex-direction: column;
+    }
+    
+    .status-item {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .calendar-container {
+        box-shadow: none;
+        padding: 0;
+    }
+    
+    .dx-calendar-navigator {
+        background: none;
+        color: black;
+        box-shadow: none;
+        border-bottom: 2px solid var(--primary);
+    }
+    
+    .dx-calendar-cell {
+        border: 1px solid rgba(0,0,0,0.1);
+        box-shadow: none;
+    }
+    
+    .calendar-task-item {
+        break-inside: avoid;
+        border: 1px solid rgba(0,0,0,0.1);
+        box-shadow: none;
+    }
+}
+
+/* View Toggle Enhancement */
+.view-toggle {
+    background: var(--light);
+    padding: 0.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.view-toggle .btn {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.view-toggle .btn:not(.active) {
+    background: transparent;
+    color: var(--dark);
+}
+
+.view-toggle .btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+}
+
+/* Kanban Styles */
+.kanban-container {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    overflow-x: auto;
+    min-height: calc(100vh - 400px);
+    background: var(--light);
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 320px;
+    background: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.kanban-header {
+    padding: 1.25rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.kanban-header h6 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.kanban-header .task-count {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.kanban-body {
+    padding: 1.25rem;
+    flex: 1;
+    overflow-y: auto;
+    background: rgba(255,255,255,0.5);
+    border-radius: 0 0 0.75rem 0.75rem;
+}
+
+.kanban-task-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.kanban-task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(50,50,93,.1);
+    border-color: var(--primary);
+}
+
+.kanban-task-card:last-child {
+    margin-bottom: 0;
+}
+
+.task-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.task-title-group {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.task-title {
+    font-weight: 600;
+    color: var(--dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.task-id {
+    font-size: 0.75rem;
+    color: var(--neutral);
+    font-weight: normal;
+}
+
+.task-subtitle {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.task-card-body {
+    margin-bottom: 1rem;
+}
+
+.task-info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--neutral);
+}
+
+.task-info-row:last-child {
+    margin-bottom: 0;
+}
+
+.task-info-row i {
+    font-size: 0.875rem;
+    width: 1rem;
+    text-align: center;
+    color: var(--primary);
+}
+
+.task-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+    font-size: 0.875rem;
+    color: var(--neutral);
+}
+
+/* Kanban Column Colors */
+.kanban-column[data-type="layout"] .kanban-header {
+    background: linear-gradient(45deg, var(--primary), #825ee4);
+}
+
+.kanban-column[data-type="printing"] .kanban-header {
+    background: linear-gradient(45deg, var(--info), #1171ef);
+}
+
+.kanban-column[data-type="cutting"] .kanban-header {
+    background: linear-gradient(45deg, var(--warning), #fbb140);
+}
+
+.kanban-column[data-type="sewing"] .kanban-header {
+    background: linear-gradient(45deg, var(--danger), #f56036);
+}
+
+.kanban-column[data-type="finishing"] .kanban-header {
+    background: linear-gradient(45deg, var(--success), #2dcecc);
+}
+
+/* Kanban Scrollbar */
+.kanban-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.kanban-body::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 2px;
+}
+
+.kanban-body::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 2px;
+}
+
+.kanban-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+/* Kanban Container Scrollbar */
+.kanban-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.kanban-container::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+}
+
+.kanban-container::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+.kanban-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+/* Task Status Badges */
+.task-status {
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.task-status i {
+    font-size: 0.75rem;
+}
+
+.task-status.completed { 
+    background: rgba(45,206,137,0.1);
+    color: var(--success);
+}
+
+.task-status.in_progress { 
+    background: rgba(251,99,64,0.1);
+    color: var(--warning);
+}
+
+.task-status.pending { 
+    background: rgba(245,54,92,0.1);
+    color: var(--danger);
+}
+
+/* Responsive Kanban */
+@media (max-width: 768px) {
+    .kanban-container {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .kanban-column {
+        min-width: 280px;
+    }
+
+    .kanban-header {
+        padding: 1rem;
+    }
+
+    .kanban-body {
+        padding: 1rem;
+    }
+
+    .kanban-task-card {
+        padding: 1rem;
+    }
+}
+
+/* Task Details Modal Enhancements */
+.modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 0 2rem 0 rgba(136,152,170,.3);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Task Type Headers */
+.modal-header.layout {
+    background: linear-gradient(45deg, var(--primary), #825ee4);
+    color: white;
+}
+
+.modal-header.printing {
+    background: linear-gradient(45deg, var(--info), #1171ef);
+    color: white;
+}
+
+.modal-header.cutting {
+    background: linear-gradient(45deg, var(--warning), #fbb140);
+    color: white;
+}
+
+.modal-header.sewing {
+    background: linear-gradient(45deg, var(--danger), #f56036);
+    color: white;
+}
+
+.modal-header.finishing {
+    background: linear-gradient(45deg, var(--success), #2dcecc);
+    color: white;
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.25rem;
+}
+
+.task-type-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.task-type-badge i {
+    font-size: 1rem;
+}
+
+.modal-header .close {
+    color: white;
+    text-shadow: none;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+/* Task Info Section */
+.task-info-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.task-info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.task-info-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+}
+
+.task-info-subtitle {
+    color: var(--neutral);
+    font-size: 0.875rem;
+}
+
+.task-status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.task-status-badge.completed {
+    background: rgba(45,206,137,0.1);
+    color: var(--success);
+}
+
+.task-status-badge.in_progress {
+    background: rgba(251,99,64,0.1);
+    color: var(--warning);
+}
+
+.task-status-badge.pending {
+    background: rgba(136,152,170,0.1);
+    color: var(--neutral);
+}
+
+.task-status-badge.overdue {
+    background: rgba(245,54,92,0.1);
+    color: var(--danger);
+    animation: pulse 2s infinite;
+}
+
+/* Task Progress Section */
+.task-progress-section {
+    padding: 1.5rem;
+    background: var(--light);
+    border-radius: 0.75rem;
+    margin: 1.5rem;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.progress-title {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.progress-percentage {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.progress {
+    height: 0.5rem;
+    border-radius: 0.25rem;
+    background: rgba(0,0,0,0.05);
+}
+
+.progress-bar {
+    border-radius: 0.25rem;
+    transition: width 0.3s ease;
+}
+
+/* Task Details Grid */
+.task-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+}
+
+.detail-item {
+    padding: 1rem;
+    background: var(--light);
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.detail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(50,50,93,.1);
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: var(--neutral);
+    margin-bottom: 0.5rem;
+}
+
+.detail-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-value i {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+/* Timeline Section */
+.task-timeline {
+    padding: 1.5rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 2rem;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--light);
+}
+
+.timeline-point {
+    position: absolute;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.timeline-content {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.timeline-title {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-info {
+    font-size: 0.875rem;
+    color: var(--neutral);
+}
+
+/* Action Buttons */
+.modal-footer {
+    border-top: none;
+    padding: 1.5rem;
+}
+
+.action-btn {
+    padding: 0.675rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn i {
+    font-size: 1rem;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Task Type Description */
+.task-type-description {
+    padding: 1rem;
+    margin: 1.5rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.task-type-description.layout {
+    background: rgba(94,114,228,0.05);
+    border-left: 4px solid var(--primary);
+}
+
+.task-type-description.printing {
+    background: rgba(17,113,239,0.05);
+    border-left: 4px solid var(--info);
+}
+
+.task-type-description.cutting {
+    background: rgba(251,177,64,0.05);
+    border-left: 4px solid var(--warning);
+}
+
+.task-type-description.sewing {
+    background: rgba(245,96,54,0.05);
+    border-left: 4px solid var(--danger);
+}
+
+.task-type-description.finishing {
+    background: rgba(45,206,137,0.05);
+    border-left: 4px solid var(--success);
+}
+
+/* Calendar Cell Scrolling */
+.calendar-cell-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-date {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.calendar-tasks {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    max-height: calc(100% - 2.5rem);
+}
+
+/* Scrollbar Styling */
+.calendar-tasks::-webkit-scrollbar {
+    width: 4px;
+}
+
+.calendar-tasks::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 2px;
+}
+
+.calendar-tasks::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.1);
+    border-radius: 2px;
+}
+
+.calendar-tasks::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+/* Task Count Indicator */
+.task-count-indicator {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(94,114,228,0.1);
+    color: var(--primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.task-count-indicator i {
+    font-size: 0.75rem;
+}
+
+/* More Tasks Indicator */
+.more-tasks-indicator {
+    text-align: center;
+    padding: 0.5rem;
+    color: var(--primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
+    background: rgba(94,114,228,0.05);
+}
+
+.more-tasks-indicator:hover {
+    background: rgba(94,114,228,0.1);
+    transform: translateY(-1px);
+}
+
+/* Adjust calendar cell height */
+.dx-calendar-cell {
+    height: 200px !important;
+    max-height: 200px !important;
+    overflow: hidden;
+}
+</style>

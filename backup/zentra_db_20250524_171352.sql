@@ -1,9 +1,11 @@
-﻿--
+--
 -- PostgreSQL database dump
 --
 
 -- Dumped from database version 15.4
 -- Dumped by pg_dump version 15.4
+
+-- Started on 2025-05-24 10:13:54 UTC
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -16,356 +18,8 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY public.work_orders DROP CONSTRAINT IF EXISTS work_orders_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_orders DROP CONSTRAINT IF EXISTS work_orders_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_orders DROP CONSTRAINT IF EXISTS work_orders_assigned_to_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_tasks DROP CONSTRAINT IF EXISTS work_order_tasks_work_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_tasks DROP CONSTRAINT IF EXISTS work_order_tasks_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_tasks DROP CONSTRAINT IF EXISTS work_order_tasks_assigned_to_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_items DROP CONSTRAINT IF EXISTS work_order_items_work_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_items DROP CONSTRAINT IF EXISTS work_order_items_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_items DROP CONSTRAINT IF EXISTS work_order_items_item_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.transaction_categories DROP CONSTRAINT IF EXISTS transaction_categories_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.task_history DROP CONSTRAINT IF EXISTS task_history_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.task_history DROP CONSTRAINT IF EXISTS task_history_task_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.task_history DROP CONSTRAINT IF EXISTS task_history_employee_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.stock_opname DROP CONSTRAINT IF EXISTS stock_opname_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.stock_opname_detail DROP CONSTRAINT IF EXISTS stock_opname_detail_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.stock_opname_detail DROP CONSTRAINT IF EXISTS stock_opname_detail_stock_opname_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.stock_opname_detail DROP CONSTRAINT IF EXISTS stock_opname_detail_item_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.sales_payments DROP CONSTRAINT IF EXISTS sales_payments_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.sales_payments DROP CONSTRAINT IF EXISTS sales_payments_invoice_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.sales_invoices DROP CONSTRAINT IF EXISTS sales_invoices_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.sales_invoices DROP CONSTRAINT IF EXISTS sales_invoices_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.role_permissions DROP CONSTRAINT IF EXISTS role_permissions_role_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.role_permissions DROP CONSTRAINT IF EXISTS role_permissions_permission_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.role_menus DROP CONSTRAINT IF EXISTS role_menus_role_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.role_menus DROP CONSTRAINT IF EXISTS role_menus_menu_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_orders DROP CONSTRAINT IF EXISTS purchase_orders_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_orders DROP CONSTRAINT IF EXISTS purchase_orders_supplier_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_order_items DROP CONSTRAINT IF EXISTS purchase_order_items_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_order_items DROP CONSTRAINT IF EXISTS purchase_order_items_purchase_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_order_items DROP CONSTRAINT IF EXISTS purchase_order_items_item_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.production_tasks DROP CONSTRAINT IF EXISTS production_tasks_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.production_tasks DROP CONSTRAINT IF EXISTS production_tasks_order_item_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.production_tasks DROP CONSTRAINT IF EXISTS production_tasks_employee_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.product_images DROP CONSTRAINT IF EXISTS product_images_product_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.payments DROP CONSTRAINT IF EXISTS payments_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.payments DROP CONSTRAINT IF EXISTS payments_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS orders_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS orders_office_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS orders_customer_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.order_items DROP CONSTRAINT IF EXISTS order_items_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.order_items DROP CONSTRAINT IF EXISTS order_items_product_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.order_items DROP CONSTRAINT IF EXISTS order_items_order_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_zone DROP CONSTRAINT IF EXISTS master_zone_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_zone DROP CONSTRAINT IF EXISTS master_zone_region_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_user_menu DROP CONSTRAINT IF EXISTS master_user_menu_menu_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_supplier DROP CONSTRAINT IF EXISTS master_supplier_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_role DROP CONSTRAINT IF EXISTS master_role_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_region DROP CONSTRAINT IF EXISTS master_region_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_product DROP CONSTRAINT IF EXISTS master_product_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_product_category DROP CONSTRAINT IF EXISTS master_product_category_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_product DROP CONSTRAINT IF EXISTS master_product_category_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_permission DROP CONSTRAINT IF EXISTS master_permission_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_office DROP CONSTRAINT IF EXISTS master_office_zone_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_office DROP CONSTRAINT IF EXISTS master_office_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_menu DROP CONSTRAINT IF EXISTS master_menu_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_menu DROP CONSTRAINT IF EXISTS master_menu_parent_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_item DROP CONSTRAINT IF EXISTS master_item_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_employee DROP CONSTRAINT IF EXISTS master_employee_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_employee DROP CONSTRAINT IF EXISTS master_employee_division_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_division DROP CONSTRAINT IF EXISTS master_division_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.master_customer DROP CONSTRAINT IF EXISTS master_customer_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.item_stock_movement DROP CONSTRAINT IF EXISTS item_stock_movement_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.item_stock_movement DROP CONSTRAINT IF EXISTS item_stock_movement_item_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.petty_cash DROP CONSTRAINT IF EXISTS fk_petty_cash_tenant;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_tenant;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_petty_cash;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_office;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_employee;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_division;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_channel;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS fk_petty_cash_requests_category;
-ALTER TABLE IF EXISTS ONLY public.petty_cash DROP CONSTRAINT IF EXISTS fk_petty_cash_office;
-ALTER TABLE IF EXISTS ONLY public.petty_cash DROP CONSTRAINT IF EXISTS fk_petty_cash_division;
-ALTER TABLE IF EXISTS ONLY public.petty_cash DROP CONSTRAINT IF EXISTS fk_petty_cash_channel;
-ALTER TABLE IF EXISTS ONLY public.cash_flow DROP CONSTRAINT IF EXISTS cash_flow_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.cash_flow DROP CONSTRAINT IF EXISTS cash_flow_payment_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.cash_flow DROP CONSTRAINT IF EXISTS cash_flow_office_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.cash_flow DROP CONSTRAINT IF EXISTS cash_flow_category_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.backup DROP CONSTRAINT IF EXISTS backup_tenant_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.audit_trail DROP CONSTRAINT IF EXISTS audit_trail_tenant_id_fkey;
-DROP TRIGGER IF EXISTS tr_update_petty_cash_balance ON public.petty_cash_requests;
-DROP INDEX IF EXISTS public.idx_zone_tenant;
-DROP INDEX IF EXISTS public.idx_work_orders_tenant;
-DROP INDEX IF EXISTS public.idx_work_orders_status;
-DROP INDEX IF EXISTS public.idx_work_orders_order_id;
-DROP INDEX IF EXISTS public.idx_work_orders_assigned_to;
-DROP INDEX IF EXISTS public.idx_work_order_tasks_work_order;
-DROP INDEX IF EXISTS public.idx_work_order_tasks_tenant;
-DROP INDEX IF EXISTS public.idx_work_order_tasks_status;
-DROP INDEX IF EXISTS public.idx_work_order_tasks_assigned_to;
-DROP INDEX IF EXISTS public.idx_work_order_items_work_order;
-DROP INDEX IF EXISTS public.idx_work_order_items_tenant;
-DROP INDEX IF EXISTS public.idx_work_order_items_item;
-DROP INDEX IF EXISTS public.idx_users_tenant;
-DROP INDEX IF EXISTS public.idx_task_history_tenant;
-DROP INDEX IF EXISTS public.idx_task_history_task;
-DROP INDEX IF EXISTS public.idx_task_history_employee;
-DROP INDEX IF EXISTS public.idx_stock_opname_tenant;
-DROP INDEX IF EXISTS public.idx_stock_opname_status;
-DROP INDEX IF EXISTS public.idx_stock_opname_detail_tenant;
-DROP INDEX IF EXISTS public.idx_stock_opname_detail_opname;
-DROP INDEX IF EXISTS public.idx_stock_opname_detail_item;
-DROP INDEX IF EXISTS public.idx_stock_opname_date;
-DROP INDEX IF EXISTS public.idx_sales_payments_tenant;
-DROP INDEX IF EXISTS public.idx_sales_payments_invoice;
-DROP INDEX IF EXISTS public.idx_sales_payments_date;
-DROP INDEX IF EXISTS public.idx_sales_invoices_tenant;
-DROP INDEX IF EXISTS public.idx_sales_invoices_status;
-DROP INDEX IF EXISTS public.idx_sales_invoices_order;
-DROP INDEX IF EXISTS public.idx_sales_invoices_number;
-DROP INDEX IF EXISTS public.idx_role_tenant;
-DROP INDEX IF EXISTS public.idx_region_tenant;
-DROP INDEX IF EXISTS public.idx_purchase_orders_tenant;
-DROP INDEX IF EXISTS public.idx_purchase_orders_supplier;
-DROP INDEX IF EXISTS public.idx_purchase_orders_status;
-DROP INDEX IF EXISTS public.idx_purchase_orders_number;
-DROP INDEX IF EXISTS public.idx_purchase_order_items_tenant;
-DROP INDEX IF EXISTS public.idx_purchase_order_items_po;
-DROP INDEX IF EXISTS public.idx_purchase_order_items_item;
-DROP INDEX IF EXISTS public.idx_production_tasks_type;
-DROP INDEX IF EXISTS public.idx_production_tasks_tenant;
-DROP INDEX IF EXISTS public.idx_production_tasks_status;
-DROP INDEX IF EXISTS public.idx_production_tasks_order_item;
-DROP INDEX IF EXISTS public.idx_production_tasks_employee;
-DROP INDEX IF EXISTS public.idx_product_tenant;
-DROP INDEX IF EXISTS public.idx_product_status;
-DROP INDEX IF EXISTS public.idx_product_images_tenant_id;
-DROP INDEX IF EXISTS public.idx_product_images_product_id;
-DROP INDEX IF EXISTS public.idx_product_code;
-DROP INDEX IF EXISTS public.idx_product_category_tenant;
-DROP INDEX IF EXISTS public.idx_product_category_code;
-DROP INDEX IF EXISTS public.idx_product_category;
-DROP INDEX IF EXISTS public.idx_petty_cash_requests_petty_cash;
-DROP INDEX IF EXISTS public.idx_petty_cash_requests_office;
-DROP INDEX IF EXISTS public.idx_petty_cash_requests_employee;
-DROP INDEX IF EXISTS public.idx_petty_cash_requests_division;
-DROP INDEX IF EXISTS public.idx_petty_cash_requests_channel;
-DROP INDEX IF EXISTS public.idx_petty_cash_office;
-DROP INDEX IF EXISTS public.idx_petty_cash_division;
-DROP INDEX IF EXISTS public.idx_petty_cash_channel;
-DROP INDEX IF EXISTS public.idx_permission_tenant;
-DROP INDEX IF EXISTS public.idx_permission_code;
-DROP INDEX IF EXISTS public.idx_payments_tenant;
-DROP INDEX IF EXISTS public.idx_payments_status;
-DROP INDEX IF EXISTS public.idx_payments_order;
-DROP INDEX IF EXISTS public.idx_orders_tenant;
-DROP INDEX IF EXISTS public.idx_orders_status;
-DROP INDEX IF EXISTS public.idx_orders_payment_status;
-DROP INDEX IF EXISTS public.idx_orders_number;
-DROP INDEX IF EXISTS public.idx_order_items_tenant;
-DROP INDEX IF EXISTS public.idx_order_items_status;
-DROP INDEX IF EXISTS public.idx_order_items_product;
-DROP INDEX IF EXISTS public.idx_order_items_order;
-DROP INDEX IF EXISTS public.idx_order_items_current_task;
-DROP INDEX IF EXISTS public.idx_menu_tenant;
-DROP INDEX IF EXISTS public.idx_master_supplier_tenant;
-DROP INDEX IF EXISTS public.idx_master_supplier_code;
-DROP INDEX IF EXISTS public.idx_master_item_tenant;
-DROP INDEX IF EXISTS public.idx_master_item_code;
-DROP INDEX IF EXISTS public.idx_master_item_category;
-DROP INDEX IF EXISTS public.idx_item_stock_movement_type;
-DROP INDEX IF EXISTS public.idx_item_stock_movement_tenant;
-DROP INDEX IF EXISTS public.idx_item_stock_movement_reference;
-DROP INDEX IF EXISTS public.idx_item_stock_movement_item;
-DROP INDEX IF EXISTS public.idx_employee_tenant;
-DROP INDEX IF EXISTS public.idx_division_tenant;
-DROP INDEX IF EXISTS public.idx_cash_flow_type;
-DROP INDEX IF EXISTS public.idx_cash_flow_tenant;
-DROP INDEX IF EXISTS public.idx_cash_flow_payment;
-DROP INDEX IF EXISTS public.idx_cash_flow_date;
-DROP INDEX IF EXISTS public.idx_cash_flow_category;
-DROP INDEX IF EXISTS public.idx_backup_tenant;
-DROP INDEX IF EXISTS public.idx_backup_created_at;
-DROP INDEX IF EXISTS public.idx_audit_trail_tenant;
-DROP INDEX IF EXISTS public.idx_audit_trail_entity;
-DROP INDEX IF EXISTS public.idx_audit_trail_created_at;
-ALTER TABLE IF EXISTS ONLY public.work_orders DROP CONSTRAINT IF EXISTS work_orders_spk_number_key;
-ALTER TABLE IF EXISTS ONLY public.work_orders DROP CONSTRAINT IF EXISTS work_orders_pkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_tasks DROP CONSTRAINT IF EXISTS work_order_tasks_pkey;
-ALTER TABLE IF EXISTS ONLY public.work_order_items DROP CONSTRAINT IF EXISTS work_order_items_pkey;
-ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pkey;
-ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_email_key;
-ALTER TABLE IF EXISTS ONLY public.master_channel DROP CONSTRAINT IF EXISTS uq_master_channel_code;
-ALTER TABLE IF EXISTS ONLY public.transaction_categories DROP CONSTRAINT IF EXISTS transaction_categories_pkey;
-ALTER TABLE IF EXISTS ONLY public.transaction_categories DROP CONSTRAINT IF EXISTS transaction_categories_code_tenant_id_key;
-ALTER TABLE IF EXISTS ONLY public.task_history DROP CONSTRAINT IF EXISTS task_history_pkey;
-ALTER TABLE IF EXISTS ONLY public.stock_opname DROP CONSTRAINT IF EXISTS stock_opname_pkey;
-ALTER TABLE IF EXISTS ONLY public.stock_opname DROP CONSTRAINT IF EXISTS stock_opname_opname_number_tenant_id_key;
-ALTER TABLE IF EXISTS ONLY public.stock_opname_detail DROP CONSTRAINT IF EXISTS stock_opname_detail_pkey;
-ALTER TABLE IF EXISTS ONLY public.sales_payments DROP CONSTRAINT IF EXISTS sales_payments_pkey;
-ALTER TABLE IF EXISTS ONLY public.sales_invoices DROP CONSTRAINT IF EXISTS sales_invoices_pkey;
-ALTER TABLE IF EXISTS ONLY public.sales_invoices DROP CONSTRAINT IF EXISTS sales_invoices_invoice_number_tenant_id_key;
-ALTER TABLE IF EXISTS ONLY public.role_permissions DROP CONSTRAINT IF EXISTS role_permissions_role_id_permission_id_key;
-ALTER TABLE IF EXISTS ONLY public.role_permissions DROP CONSTRAINT IF EXISTS role_permissions_pkey;
-ALTER TABLE IF EXISTS ONLY public.role_menus DROP CONSTRAINT IF EXISTS role_menus_role_id_menu_id_key;
-ALTER TABLE IF EXISTS ONLY public.role_menus DROP CONSTRAINT IF EXISTS role_menus_pkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_orders DROP CONSTRAINT IF EXISTS purchase_orders_po_number_tenant_id_key;
-ALTER TABLE IF EXISTS ONLY public.purchase_orders DROP CONSTRAINT IF EXISTS purchase_orders_pkey;
-ALTER TABLE IF EXISTS ONLY public.purchase_order_items DROP CONSTRAINT IF EXISTS purchase_order_items_pkey;
-ALTER TABLE IF EXISTS ONLY public.production_tasks DROP CONSTRAINT IF EXISTS production_tasks_pkey;
-ALTER TABLE IF EXISTS ONLY public.product_images DROP CONSTRAINT IF EXISTS product_images_pkey;
-ALTER TABLE IF EXISTS ONLY public.petty_cash_requests DROP CONSTRAINT IF EXISTS pk_petty_cash_requests;
-ALTER TABLE IF EXISTS ONLY public.petty_cash DROP CONSTRAINT IF EXISTS pk_petty_cash;
-ALTER TABLE IF EXISTS ONLY public.master_channel DROP CONSTRAINT IF EXISTS pk_master_channel;
-ALTER TABLE IF EXISTS ONLY public.payments DROP CONSTRAINT IF EXISTS payments_pkey;
-ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS orders_pkey;
-ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS orders_order_number_key;
-ALTER TABLE IF EXISTS ONLY public.order_items DROP CONSTRAINT IF EXISTS order_items_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_zone DROP CONSTRAINT IF EXISTS master_zone_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_user_menu DROP CONSTRAINT IF EXISTS master_user_menu_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_tenant DROP CONSTRAINT IF EXISTS master_tenant_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_tenant DROP CONSTRAINT IF EXISTS master_tenant_domain_key;
-ALTER TABLE IF EXISTS ONLY public.master_supplier DROP CONSTRAINT IF EXISTS master_supplier_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_supplier DROP CONSTRAINT IF EXISTS master_supplier_code_tenant_id_key;
-ALTER TABLE IF EXISTS ONLY public.master_role DROP CONSTRAINT IF EXISTS master_role_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_region DROP CONSTRAINT IF EXISTS master_region_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_product DROP CONSTRAINT IF EXISTS master_product_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_product DROP CONSTRAINT IF EXISTS master_product_code_key;
-ALTER TABLE IF EXISTS ONLY public.master_product_category DROP CONSTRAINT IF EXISTS master_product_category_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_product_category DROP CONSTRAINT IF EXISTS master_product_category_code_key;
-ALTER TABLE IF EXISTS ONLY public.master_permission DROP CONSTRAINT IF EXISTS master_permission_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_permission DROP CONSTRAINT IF EXISTS master_permission_code_key;
-ALTER TABLE IF EXISTS ONLY public.master_office DROP CONSTRAINT IF EXISTS master_office_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_office DROP CONSTRAINT IF EXISTS master_office_email_key;
-ALTER TABLE IF EXISTS ONLY public.master_office DROP CONSTRAINT IF EXISTS master_office_code_key;
-ALTER TABLE IF EXISTS ONLY public.master_menu DROP CONSTRAINT IF EXISTS master_menu_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_item DROP CONSTRAINT IF EXISTS master_item_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_item DROP CONSTRAINT IF EXISTS master_item_code_tenant_id_key;
-ALTER TABLE IF EXISTS ONLY public.master_employee DROP CONSTRAINT IF EXISTS master_employee_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_employee DROP CONSTRAINT IF EXISTS master_employee_email_key;
-ALTER TABLE IF EXISTS ONLY public.master_division DROP CONSTRAINT IF EXISTS master_division_pkey;
-ALTER TABLE IF EXISTS ONLY public.master_customer DROP CONSTRAINT IF EXISTS master_customer_tenant_id_customer_number_key;
-ALTER TABLE IF EXISTS ONLY public.master_customer DROP CONSTRAINT IF EXISTS master_customer_pkey;
-ALTER TABLE IF EXISTS ONLY public.item_stock_movement DROP CONSTRAINT IF EXISTS item_stock_movement_pkey;
-ALTER TABLE IF EXISTS ONLY public.cash_flow DROP CONSTRAINT IF EXISTS cash_flow_pkey;
-ALTER TABLE IF EXISTS ONLY public.backup DROP CONSTRAINT IF EXISTS backup_pkey;
-ALTER TABLE IF EXISTS ONLY public.audit_trail DROP CONSTRAINT IF EXISTS audit_trail_pkey;
-ALTER TABLE IF EXISTS public.work_orders ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.work_order_tasks ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.work_order_items ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.transaction_categories ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.task_history ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.stock_opname_detail ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.stock_opname ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.sales_payments ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.sales_invoices ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.purchase_orders ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.purchase_order_items ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.production_tasks ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.product_images ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.petty_cash_requests ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.petty_cash ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.payments ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.orders ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.order_items ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.master_tenant ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.master_supplier ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.master_office ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.master_menu ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.master_item ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.master_channel ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.item_stock_movement ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.cash_flow ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.backup ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS public.audit_trail ALTER COLUMN id DROP DEFAULT;
-DROP SEQUENCE IF EXISTS public.work_orders_id_seq;
-DROP TABLE IF EXISTS public.work_orders;
-DROP SEQUENCE IF EXISTS public.work_order_tasks_id_seq;
-DROP TABLE IF EXISTS public.work_order_tasks;
-DROP SEQUENCE IF EXISTS public.work_order_items_id_seq;
-DROP TABLE IF EXISTS public.work_order_items;
-DROP TABLE IF EXISTS public.users;
-DROP SEQUENCE IF EXISTS public.transaction_categories_id_seq;
-DROP TABLE IF EXISTS public.transaction_categories;
-DROP SEQUENCE IF EXISTS public.task_history_id_seq;
-DROP TABLE IF EXISTS public.task_history;
-DROP SEQUENCE IF EXISTS public.stock_opname_id_seq;
-DROP SEQUENCE IF EXISTS public.stock_opname_detail_id_seq;
-DROP TABLE IF EXISTS public.stock_opname_detail;
-DROP TABLE IF EXISTS public.stock_opname;
-DROP SEQUENCE IF EXISTS public.sales_payments_id_seq;
-DROP TABLE IF EXISTS public.sales_payments;
-DROP SEQUENCE IF EXISTS public.sales_invoices_id_seq;
-DROP TABLE IF EXISTS public.sales_invoices;
-DROP TABLE IF EXISTS public.role_permissions;
-DROP SEQUENCE IF EXISTS public.role_permissions_id_seq;
-DROP TABLE IF EXISTS public.role_menus;
-DROP SEQUENCE IF EXISTS public.role_menus_id_seq;
-DROP SEQUENCE IF EXISTS public.purchase_orders_id_seq;
-DROP TABLE IF EXISTS public.purchase_orders;
-DROP SEQUENCE IF EXISTS public.purchase_order_items_id_seq;
-DROP TABLE IF EXISTS public.purchase_order_items;
-DROP SEQUENCE IF EXISTS public.production_tasks_id_seq;
-DROP TABLE IF EXISTS public.production_tasks;
-DROP SEQUENCE IF EXISTS public.product_images_id_seq;
-DROP TABLE IF EXISTS public.product_images;
-DROP SEQUENCE IF EXISTS public.petty_cash_requests_id_seq;
-DROP TABLE IF EXISTS public.petty_cash_requests;
-DROP SEQUENCE IF EXISTS public.petty_cash_id_seq;
-DROP TABLE IF EXISTS public.petty_cash;
-DROP SEQUENCE IF EXISTS public.payments_id_seq;
-DROP TABLE IF EXISTS public.payments;
-DROP SEQUENCE IF EXISTS public.orders_id_seq;
-DROP TABLE IF EXISTS public.orders;
-DROP SEQUENCE IF EXISTS public.order_items_id_seq;
-DROP TABLE IF EXISTS public.order_items;
-DROP TABLE IF EXISTS public.master_zone;
-DROP SEQUENCE IF EXISTS public.master_zone_id_seq;
-DROP TABLE IF EXISTS public.master_user_menu;
-DROP SEQUENCE IF EXISTS public.master_user_menu_id_seq;
-DROP SEQUENCE IF EXISTS public.master_tenant_id_seq;
-DROP TABLE IF EXISTS public.master_tenant;
-DROP SEQUENCE IF EXISTS public.master_supplier_id_seq;
-DROP TABLE IF EXISTS public.master_supplier;
-DROP TABLE IF EXISTS public.master_role;
-DROP SEQUENCE IF EXISTS public.master_role_id_seq;
-DROP TABLE IF EXISTS public.master_region;
-DROP SEQUENCE IF EXISTS public.master_region_id_seq;
-DROP TABLE IF EXISTS public.master_product_category;
-DROP SEQUENCE IF EXISTS public.master_product_category_id_seq;
-DROP TABLE IF EXISTS public.master_product;
-DROP SEQUENCE IF EXISTS public.master_product_id_seq;
-DROP TABLE IF EXISTS public.master_permission;
-DROP SEQUENCE IF EXISTS public.master_permission_id_seq;
-DROP SEQUENCE IF EXISTS public.master_office_id_seq;
-DROP TABLE IF EXISTS public.master_office;
-DROP SEQUENCE IF EXISTS public.master_menu_id_seq;
-DROP TABLE IF EXISTS public.master_menu;
-DROP SEQUENCE IF EXISTS public.master_item_id_seq;
-DROP TABLE IF EXISTS public.master_item;
-DROP TABLE IF EXISTS public.master_employee;
-DROP SEQUENCE IF EXISTS public.master_employee_id_seq;
-DROP TABLE IF EXISTS public.master_division;
-DROP SEQUENCE IF EXISTS public.master_division_id_seq;
-DROP TABLE IF EXISTS public.master_customer;
-DROP SEQUENCE IF EXISTS public.master_customer_id_seq;
-DROP SEQUENCE IF EXISTS public.master_channel_id_seq;
-DROP TABLE IF EXISTS public.master_channel;
-DROP SEQUENCE IF EXISTS public.item_stock_movement_id_seq;
-DROP TABLE IF EXISTS public.item_stock_movement;
-DROP SEQUENCE IF EXISTS public.cash_flow_id_seq;
-DROP TABLE IF EXISTS public.cash_flow;
-DROP SEQUENCE IF EXISTS public.backup_id_seq;
-DROP TABLE IF EXISTS public.backup;
-DROP SEQUENCE IF EXISTS public.audit_trail_id_seq;
-DROP TABLE IF EXISTS public.audit_trail;
-DROP FUNCTION IF EXISTS public.update_petty_cash_balance();
-DROP EXTENSION IF EXISTS "uuid-ossp";
 --
+-- TOC entry 2 (class 3079 OID 24576)
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -373,14 +27,17 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: -
+-- TOC entry 4125 (class 0 OID 0)
+-- Dependencies: 2
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
 --
--- Name: update_petty_cash_balance(); Type: FUNCTION; Schema: public; Owner: -
+-- TOC entry 317 (class 1255 OID 24587)
+-- Name: update_petty_cash_balance(); Type: FUNCTION; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE FUNCTION public.update_petty_cash_balance() RETURNS trigger
@@ -398,12 +55,15 @@ END;
 $$;
 
 
+ALTER FUNCTION public.update_petty_cash_balance() OWNER TO zentra_api_admin;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- Name: audit_trail; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 215 (class 1259 OID 24588)
+-- Name: audit_trail; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.audit_trail (
@@ -421,8 +81,11 @@ CREATE TABLE public.audit_trail (
 );
 
 
+ALTER TABLE public.audit_trail OWNER TO zentra_api_admin;
+
 --
--- Name: audit_trail_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 216 (class 1259 OID 24595)
+-- Name: audit_trail_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.audit_trail_id_seq
@@ -433,15 +96,20 @@ CREATE SEQUENCE public.audit_trail_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.audit_trail_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: audit_trail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4126 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: audit_trail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.audit_trail_id_seq OWNED BY public.audit_trail.id;
 
 
 --
--- Name: backup; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 217 (class 1259 OID 24596)
+-- Name: backup; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.backup (
@@ -456,8 +124,11 @@ CREATE TABLE public.backup (
 );
 
 
+ALTER TABLE public.backup OWNER TO zentra_api_admin;
+
 --
--- Name: backup_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 218 (class 1259 OID 24602)
+-- Name: backup_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.backup_id_seq
@@ -468,15 +139,20 @@ CREATE SEQUENCE public.backup_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.backup_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: backup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4127 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: backup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.backup_id_seq OWNED BY public.backup.id;
 
 
 --
--- Name: cash_flow; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 219 (class 1259 OID 24603)
+-- Name: cash_flow; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.cash_flow (
@@ -502,15 +178,20 @@ CREATE TABLE public.cash_flow (
 );
 
 
+ALTER TABLE public.cash_flow OWNER TO zentra_api_admin;
+
 --
--- Name: TABLE cash_flow; Type: COMMENT; Schema: public; Owner: -
+-- TOC entry 4128 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: TABLE cash_flow; Type: COMMENT; Schema: public; Owner: zentra_api_admin
 --
 
 COMMENT ON TABLE public.cash_flow IS 'Cash flow table';
 
 
 --
--- Name: cash_flow_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 220 (class 1259 OID 24613)
+-- Name: cash_flow_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.cash_flow_id_seq
@@ -522,15 +203,20 @@ CREATE SEQUENCE public.cash_flow_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.cash_flow_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: cash_flow_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4129 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: cash_flow_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.cash_flow_id_seq OWNED BY public.cash_flow.id;
 
 
 --
--- Name: item_stock_movement; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 221 (class 1259 OID 24614)
+-- Name: item_stock_movement; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.item_stock_movement (
@@ -551,8 +237,11 @@ CREATE TABLE public.item_stock_movement (
 );
 
 
+ALTER TABLE public.item_stock_movement OWNER TO zentra_api_admin;
+
 --
--- Name: item_stock_movement_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 222 (class 1259 OID 24622)
+-- Name: item_stock_movement_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.item_stock_movement_id_seq
@@ -564,15 +253,20 @@ CREATE SEQUENCE public.item_stock_movement_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.item_stock_movement_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: item_stock_movement_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4130 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: item_stock_movement_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.item_stock_movement_id_seq OWNED BY public.item_stock_movement.id;
 
 
 --
--- Name: master_channel; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 223 (class 1259 OID 24623)
+-- Name: master_channel; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_channel (
@@ -591,15 +285,20 @@ CREATE TABLE public.master_channel (
 );
 
 
+ALTER TABLE public.master_channel OWNER TO zentra_api_admin;
+
 --
--- Name: TABLE master_channel; Type: COMMENT; Schema: public; Owner: -
+-- TOC entry 4131 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: TABLE master_channel; Type: COMMENT; Schema: public; Owner: zentra_api_admin
 --
 
 COMMENT ON TABLE public.master_channel IS 'Stores different sales and distribution channels for omnichannel operations';
 
 
 --
--- Name: master_channel_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 224 (class 1259 OID 24632)
+-- Name: master_channel_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_channel_id_seq
@@ -611,15 +310,20 @@ CREATE SEQUENCE public.master_channel_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_channel_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_channel_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4132 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: master_channel_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.master_channel_id_seq OWNED BY public.master_channel.id;
 
 
 --
--- Name: master_customer_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 294 (class 1259 OID 32768)
+-- Name: master_customer_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_customer_id_seq
@@ -630,8 +334,11 @@ CREATE SEQUENCE public.master_customer_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_customer_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_customer; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 295 (class 1259 OID 32769)
+-- Name: master_customer; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_customer (
@@ -654,15 +361,20 @@ CREATE TABLE public.master_customer (
 );
 
 
+ALTER TABLE public.master_customer OWNER TO zentra_api_admin;
+
 --
--- Name: TABLE master_customer; Type: COMMENT; Schema: public; Owner: -
+-- TOC entry 4133 (class 0 OID 0)
+-- Dependencies: 295
+-- Name: TABLE master_customer; Type: COMMENT; Schema: public; Owner: zentra_api_admin
 --
 
 COMMENT ON TABLE public.master_customer IS 'Stores customer information for orders and transactions';
 
 
 --
--- Name: master_division_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 225 (class 1259 OID 24633)
+-- Name: master_division_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_division_id_seq
@@ -673,8 +385,11 @@ CREATE SEQUENCE public.master_division_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_division_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_division; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 226 (class 1259 OID 24634)
+-- Name: master_division; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_division (
@@ -689,8 +404,11 @@ CREATE TABLE public.master_division (
 );
 
 
+ALTER TABLE public.master_division OWNER TO zentra_api_admin;
+
 --
--- Name: master_employee_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 227 (class 1259 OID 24642)
+-- Name: master_employee_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_employee_id_seq
@@ -701,8 +419,11 @@ CREATE SEQUENCE public.master_employee_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_employee_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_employee; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 228 (class 1259 OID 24643)
+-- Name: master_employee; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_employee (
@@ -719,8 +440,11 @@ CREATE TABLE public.master_employee (
 );
 
 
+ALTER TABLE public.master_employee OWNER TO zentra_api_admin;
+
 --
--- Name: master_item; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 229 (class 1259 OID 24651)
+-- Name: master_item; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_item (
@@ -742,8 +466,11 @@ CREATE TABLE public.master_item (
 );
 
 
+ALTER TABLE public.master_item OWNER TO zentra_api_admin;
+
 --
--- Name: master_item_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 230 (class 1259 OID 24660)
+-- Name: master_item_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_item_id_seq
@@ -755,15 +482,20 @@ CREATE SEQUENCE public.master_item_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_item_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_item_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4134 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: master_item_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.master_item_id_seq OWNED BY public.master_item.id;
 
 
 --
--- Name: master_menu; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 231 (class 1259 OID 24661)
+-- Name: master_menu; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_menu (
@@ -781,8 +513,11 @@ CREATE TABLE public.master_menu (
 );
 
 
+ALTER TABLE public.master_menu OWNER TO zentra_api_admin;
+
 --
--- Name: master_menu_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 232 (class 1259 OID 24669)
+-- Name: master_menu_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_menu_id_seq
@@ -793,15 +528,20 @@ CREATE SEQUENCE public.master_menu_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_menu_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_menu_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4135 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: master_menu_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.master_menu_id_seq OWNED BY public.master_menu.id;
 
 
 --
--- Name: master_office; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 233 (class 1259 OID 24670)
+-- Name: master_office; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_office (
@@ -820,8 +560,11 @@ CREATE TABLE public.master_office (
 );
 
 
+ALTER TABLE public.master_office OWNER TO zentra_api_admin;
+
 --
--- Name: master_office_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 234 (class 1259 OID 24677)
+-- Name: master_office_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_office_id_seq
@@ -832,15 +575,20 @@ CREATE SEQUENCE public.master_office_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_office_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_office_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4136 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: master_office_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.master_office_id_seq OWNED BY public.master_office.id;
 
 
 --
--- Name: master_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 235 (class 1259 OID 24678)
+-- Name: master_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_permission_id_seq
@@ -851,8 +599,11 @@ CREATE SEQUENCE public.master_permission_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_permission_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_permission; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 236 (class 1259 OID 24679)
+-- Name: master_permission; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_permission (
@@ -869,8 +620,11 @@ CREATE TABLE public.master_permission (
 );
 
 
+ALTER TABLE public.master_permission OWNER TO zentra_api_admin;
+
 --
--- Name: master_product_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 237 (class 1259 OID 24687)
+-- Name: master_product_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_product_id_seq
@@ -881,8 +635,11 @@ CREATE SEQUENCE public.master_product_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_product_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_product; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 238 (class 1259 OID 24688)
+-- Name: master_product; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_product (
@@ -912,8 +669,11 @@ CREATE TABLE public.master_product (
 );
 
 
+ALTER TABLE public.master_product OWNER TO zentra_api_admin;
+
 --
--- Name: master_product_category_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 239 (class 1259 OID 24701)
+-- Name: master_product_category_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_product_category_id_seq
@@ -924,8 +684,11 @@ CREATE SEQUENCE public.master_product_category_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_product_category_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_product_category; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 240 (class 1259 OID 24702)
+-- Name: master_product_category; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_product_category (
@@ -942,8 +705,11 @@ CREATE TABLE public.master_product_category (
 );
 
 
+ALTER TABLE public.master_product_category OWNER TO zentra_api_admin;
+
 --
--- Name: master_region_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 241 (class 1259 OID 24711)
+-- Name: master_region_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_region_id_seq
@@ -954,8 +720,11 @@ CREATE SEQUENCE public.master_region_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_region_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_region; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 242 (class 1259 OID 24712)
+-- Name: master_region; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_region (
@@ -970,8 +739,11 @@ CREATE TABLE public.master_region (
 );
 
 
+ALTER TABLE public.master_region OWNER TO zentra_api_admin;
+
 --
--- Name: master_role_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 243 (class 1259 OID 24720)
+-- Name: master_role_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_role_id_seq
@@ -982,8 +754,11 @@ CREATE SEQUENCE public.master_role_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_role_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_role; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 244 (class 1259 OID 24721)
+-- Name: master_role; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_role (
@@ -998,8 +773,11 @@ CREATE TABLE public.master_role (
 );
 
 
+ALTER TABLE public.master_role OWNER TO zentra_api_admin;
+
 --
--- Name: master_supplier; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 245 (class 1259 OID 24729)
+-- Name: master_supplier; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_supplier (
@@ -1023,8 +801,11 @@ CREATE TABLE public.master_supplier (
 );
 
 
+ALTER TABLE public.master_supplier OWNER TO zentra_api_admin;
+
 --
--- Name: master_supplier_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 246 (class 1259 OID 24737)
+-- Name: master_supplier_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_supplier_id_seq
@@ -1036,15 +817,20 @@ CREATE SEQUENCE public.master_supplier_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_supplier_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_supplier_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4137 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: master_supplier_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.master_supplier_id_seq OWNED BY public.master_supplier.id;
 
 
 --
--- Name: master_tenant; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 247 (class 1259 OID 24738)
+-- Name: master_tenant; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_tenant (
@@ -1059,8 +845,11 @@ CREATE TABLE public.master_tenant (
 );
 
 
+ALTER TABLE public.master_tenant OWNER TO zentra_api_admin;
+
 --
--- Name: master_tenant_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 248 (class 1259 OID 24746)
+-- Name: master_tenant_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_tenant_id_seq
@@ -1071,15 +860,20 @@ CREATE SEQUENCE public.master_tenant_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_tenant_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_tenant_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4138 (class 0 OID 0)
+-- Dependencies: 248
+-- Name: master_tenant_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.master_tenant_id_seq OWNED BY public.master_tenant.id;
 
 
 --
--- Name: master_user_menu_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 249 (class 1259 OID 24747)
+-- Name: master_user_menu_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_user_menu_id_seq
@@ -1090,8 +884,11 @@ CREATE SEQUENCE public.master_user_menu_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_user_menu_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_user_menu; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 250 (class 1259 OID 24748)
+-- Name: master_user_menu; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_user_menu (
@@ -1105,8 +902,11 @@ CREATE TABLE public.master_user_menu (
 );
 
 
+ALTER TABLE public.master_user_menu OWNER TO zentra_api_admin;
+
 --
--- Name: master_zone_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 251 (class 1259 OID 24756)
+-- Name: master_zone_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.master_zone_id_seq
@@ -1117,8 +917,11 @@ CREATE SEQUENCE public.master_zone_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.master_zone_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: master_zone; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 252 (class 1259 OID 24757)
+-- Name: master_zone; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.master_zone (
@@ -1134,8 +937,11 @@ CREATE TABLE public.master_zone (
 );
 
 
+ALTER TABLE public.master_zone OWNER TO zentra_api_admin;
+
 --
--- Name: order_items; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 253 (class 1259 OID 24765)
+-- Name: order_items; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.order_items (
@@ -1163,8 +969,11 @@ CREATE TABLE public.order_items (
 );
 
 
+ALTER TABLE public.order_items OWNER TO zentra_api_admin;
+
 --
--- Name: order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 254 (class 1259 OID 24778)
+-- Name: order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.order_items_id_seq
@@ -1175,15 +984,20 @@ CREATE SEQUENCE public.order_items_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.order_items_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4139 (class 0 OID 0)
+-- Dependencies: 254
+-- Name: order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.order_items_id_seq OWNED BY public.order_items.id;
 
 
 --
--- Name: orders; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 255 (class 1259 OID 24779)
+-- Name: orders; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.orders (
@@ -1208,8 +1022,11 @@ CREATE TABLE public.orders (
 );
 
 
+ALTER TABLE public.orders OWNER TO zentra_api_admin;
+
 --
--- Name: orders_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 256 (class 1259 OID 24793)
+-- Name: orders_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.orders_id_seq
@@ -1220,15 +1037,20 @@ CREATE SEQUENCE public.orders_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.orders_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4140 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.orders_id_seq OWNED BY public.orders.id;
 
 
 --
--- Name: payments; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 257 (class 1259 OID 24794)
+-- Name: payments; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.payments (
@@ -1249,8 +1071,11 @@ CREATE TABLE public.payments (
 );
 
 
+ALTER TABLE public.payments OWNER TO zentra_api_admin;
+
 --
--- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 258 (class 1259 OID 24803)
+-- Name: payments_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.payments_id_seq
@@ -1261,15 +1086,20 @@ CREATE SEQUENCE public.payments_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.payments_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4141 (class 0 OID 0)
+-- Dependencies: 258
+-- Name: payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
--- Name: petty_cash; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 259 (class 1259 OID 24804)
+-- Name: petty_cash; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.petty_cash (
@@ -1296,15 +1126,20 @@ CREATE TABLE public.petty_cash (
 );
 
 
+ALTER TABLE public.petty_cash OWNER TO zentra_api_admin;
+
 --
--- Name: TABLE petty_cash; Type: COMMENT; Schema: public; Owner: -
+-- TOC entry 4142 (class 0 OID 0)
+-- Dependencies: 259
+-- Name: TABLE petty_cash; Type: COMMENT; Schema: public; Owner: zentra_api_admin
 --
 
 COMMENT ON TABLE public.petty_cash IS 'Petty cash management table with omnichannel support';
 
 
 --
--- Name: petty_cash_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 260 (class 1259 OID 24815)
+-- Name: petty_cash_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.petty_cash_id_seq
@@ -1316,15 +1151,20 @@ CREATE SEQUENCE public.petty_cash_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.petty_cash_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: petty_cash_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4143 (class 0 OID 0)
+-- Dependencies: 260
+-- Name: petty_cash_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.petty_cash_id_seq OWNED BY public.petty_cash.id;
 
 
 --
--- Name: petty_cash_requests; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 261 (class 1259 OID 24816)
+-- Name: petty_cash_requests; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.petty_cash_requests (
@@ -1363,15 +1203,20 @@ CREATE TABLE public.petty_cash_requests (
 );
 
 
+ALTER TABLE public.petty_cash_requests OWNER TO zentra_api_admin;
+
 --
--- Name: TABLE petty_cash_requests; Type: COMMENT; Schema: public; Owner: -
+-- TOC entry 4144 (class 0 OID 0)
+-- Dependencies: 261
+-- Name: TABLE petty_cash_requests; Type: COMMENT; Schema: public; Owner: zentra_api_admin
 --
 
 COMMENT ON TABLE public.petty_cash_requests IS 'Petty cash request table with enhanced tracking and channel support';
 
 
 --
--- Name: petty_cash_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 262 (class 1259 OID 24830)
+-- Name: petty_cash_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.petty_cash_requests_id_seq
@@ -1383,15 +1228,20 @@ CREATE SEQUENCE public.petty_cash_requests_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.petty_cash_requests_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: petty_cash_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4145 (class 0 OID 0)
+-- Dependencies: 262
+-- Name: petty_cash_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.petty_cash_requests_id_seq OWNED BY public.petty_cash_requests.id;
 
 
 --
--- Name: product_images; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 263 (class 1259 OID 24831)
+-- Name: product_images; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.product_images (
@@ -1408,8 +1258,11 @@ CREATE TABLE public.product_images (
 );
 
 
+ALTER TABLE public.product_images OWNER TO zentra_api_admin;
+
 --
--- Name: product_images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 264 (class 1259 OID 24840)
+-- Name: product_images_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.product_images_id_seq
@@ -1421,15 +1274,20 @@ CREATE SEQUENCE public.product_images_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.product_images_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: product_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4146 (class 0 OID 0)
+-- Dependencies: 264
+-- Name: product_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.product_images_id_seq OWNED BY public.product_images.id;
 
 
 --
--- Name: production_tasks; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 265 (class 1259 OID 24841)
+-- Name: production_tasks; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.production_tasks (
@@ -1451,8 +1309,11 @@ CREATE TABLE public.production_tasks (
 );
 
 
+ALTER TABLE public.production_tasks OWNER TO zentra_api_admin;
+
 --
--- Name: production_tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 266 (class 1259 OID 24850)
+-- Name: production_tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.production_tasks_id_seq
@@ -1463,15 +1324,20 @@ CREATE SEQUENCE public.production_tasks_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.production_tasks_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: production_tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4147 (class 0 OID 0)
+-- Dependencies: 266
+-- Name: production_tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.production_tasks_id_seq OWNED BY public.production_tasks.id;
 
 
 --
--- Name: purchase_order_items; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 267 (class 1259 OID 24851)
+-- Name: purchase_order_items; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.purchase_order_items (
@@ -1491,8 +1357,11 @@ CREATE TABLE public.purchase_order_items (
 );
 
 
+ALTER TABLE public.purchase_order_items OWNER TO zentra_api_admin;
+
 --
--- Name: purchase_order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 268 (class 1259 OID 24860)
+-- Name: purchase_order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.purchase_order_items_id_seq
@@ -1504,15 +1373,20 @@ CREATE SEQUENCE public.purchase_order_items_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.purchase_order_items_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: purchase_order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4148 (class 0 OID 0)
+-- Dependencies: 268
+-- Name: purchase_order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.purchase_order_items_id_seq OWNED BY public.purchase_order_items.id;
 
 
 --
--- Name: purchase_orders; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 269 (class 1259 OID 24861)
+-- Name: purchase_orders; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.purchase_orders (
@@ -1535,8 +1409,11 @@ CREATE TABLE public.purchase_orders (
 );
 
 
+ALTER TABLE public.purchase_orders OWNER TO zentra_api_admin;
+
 --
--- Name: purchase_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 270 (class 1259 OID 24871)
+-- Name: purchase_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.purchase_orders_id_seq
@@ -1548,15 +1425,20 @@ CREATE SEQUENCE public.purchase_orders_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.purchase_orders_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: purchase_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4149 (class 0 OID 0)
+-- Dependencies: 270
+-- Name: purchase_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.purchase_orders_id_seq OWNED BY public.purchase_orders.id;
 
 
 --
--- Name: role_menus_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 271 (class 1259 OID 24872)
+-- Name: role_menus_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.role_menus_id_seq
@@ -1567,8 +1449,11 @@ CREATE SEQUENCE public.role_menus_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.role_menus_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: role_menus; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 272 (class 1259 OID 24873)
+-- Name: role_menus; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.role_menus (
@@ -1581,8 +1466,11 @@ CREATE TABLE public.role_menus (
 );
 
 
+ALTER TABLE public.role_menus OWNER TO zentra_api_admin;
+
 --
--- Name: role_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 273 (class 1259 OID 24880)
+-- Name: role_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.role_permissions_id_seq
@@ -1593,8 +1481,11 @@ CREATE SEQUENCE public.role_permissions_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.role_permissions_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: role_permissions; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 274 (class 1259 OID 24881)
+-- Name: role_permissions; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.role_permissions (
@@ -1608,8 +1499,11 @@ CREATE TABLE public.role_permissions (
 );
 
 
+ALTER TABLE public.role_permissions OWNER TO zentra_api_admin;
+
 --
--- Name: sales_invoices; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 275 (class 1259 OID 24889)
+-- Name: sales_invoices; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.sales_invoices (
@@ -1633,8 +1527,11 @@ CREATE TABLE public.sales_invoices (
 );
 
 
+ALTER TABLE public.sales_invoices OWNER TO zentra_api_admin;
+
 --
--- Name: sales_invoices_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 276 (class 1259 OID 24900)
+-- Name: sales_invoices_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.sales_invoices_id_seq
@@ -1646,15 +1543,20 @@ CREATE SEQUENCE public.sales_invoices_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.sales_invoices_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: sales_invoices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4150 (class 0 OID 0)
+-- Dependencies: 276
+-- Name: sales_invoices_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.sales_invoices_id_seq OWNED BY public.sales_invoices.id;
 
 
 --
--- Name: sales_payments; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 277 (class 1259 OID 24901)
+-- Name: sales_payments; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.sales_payments (
@@ -1673,8 +1575,11 @@ CREATE TABLE public.sales_payments (
 );
 
 
+ALTER TABLE public.sales_payments OWNER TO zentra_api_admin;
+
 --
--- Name: sales_payments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 278 (class 1259 OID 24908)
+-- Name: sales_payments_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.sales_payments_id_seq
@@ -1686,15 +1591,20 @@ CREATE SEQUENCE public.sales_payments_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.sales_payments_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: sales_payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4151 (class 0 OID 0)
+-- Dependencies: 278
+-- Name: sales_payments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.sales_payments_id_seq OWNED BY public.sales_payments.id;
 
 
 --
--- Name: stock_opname; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 279 (class 1259 OID 24909)
+-- Name: stock_opname; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.stock_opname (
@@ -1712,8 +1622,11 @@ CREATE TABLE public.stock_opname (
 );
 
 
+ALTER TABLE public.stock_opname OWNER TO zentra_api_admin;
+
 --
--- Name: stock_opname_detail; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 280 (class 1259 OID 24918)
+-- Name: stock_opname_detail; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.stock_opname_detail (
@@ -1732,8 +1645,11 @@ CREATE TABLE public.stock_opname_detail (
 );
 
 
+ALTER TABLE public.stock_opname_detail OWNER TO zentra_api_admin;
+
 --
--- Name: stock_opname_detail_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 281 (class 1259 OID 24928)
+-- Name: stock_opname_detail_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.stock_opname_detail_id_seq
@@ -1745,15 +1661,20 @@ CREATE SEQUENCE public.stock_opname_detail_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.stock_opname_detail_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: stock_opname_detail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4152 (class 0 OID 0)
+-- Dependencies: 281
+-- Name: stock_opname_detail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.stock_opname_detail_id_seq OWNED BY public.stock_opname_detail.id;
 
 
 --
--- Name: stock_opname_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 282 (class 1259 OID 24929)
+-- Name: stock_opname_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.stock_opname_id_seq
@@ -1765,15 +1686,20 @@ CREATE SEQUENCE public.stock_opname_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.stock_opname_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: stock_opname_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4153 (class 0 OID 0)
+-- Dependencies: 282
+-- Name: stock_opname_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.stock_opname_id_seq OWNED BY public.stock_opname.id;
 
 
 --
--- Name: task_history; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 283 (class 1259 OID 24930)
+-- Name: task_history; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.task_history (
@@ -1790,8 +1716,11 @@ CREATE TABLE public.task_history (
 );
 
 
+ALTER TABLE public.task_history OWNER TO zentra_api_admin;
+
 --
--- Name: task_history_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 284 (class 1259 OID 24937)
+-- Name: task_history_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.task_history_id_seq
@@ -1802,15 +1731,20 @@ CREATE SEQUENCE public.task_history_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.task_history_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: task_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4154 (class 0 OID 0)
+-- Dependencies: 284
+-- Name: task_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.task_history_id_seq OWNED BY public.task_history.id;
 
 
 --
--- Name: transaction_categories; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 285 (class 1259 OID 24938)
+-- Name: transaction_categories; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.transaction_categories (
@@ -1829,8 +1763,11 @@ CREATE TABLE public.transaction_categories (
 );
 
 
+ALTER TABLE public.transaction_categories OWNER TO zentra_api_admin;
+
 --
--- Name: transaction_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 286 (class 1259 OID 24947)
+-- Name: transaction_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.transaction_categories_id_seq
@@ -1842,15 +1779,20 @@ CREATE SEQUENCE public.transaction_categories_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.transaction_categories_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: transaction_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4155 (class 0 OID 0)
+-- Dependencies: 286
+-- Name: transaction_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.transaction_categories_id_seq OWNED BY public.transaction_categories.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 287 (class 1259 OID 24948)
+-- Name: users; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.users (
@@ -1867,8 +1809,11 @@ CREATE TABLE public.users (
 );
 
 
+ALTER TABLE public.users OWNER TO zentra_api_admin;
+
 --
--- Name: work_order_items; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 288 (class 1259 OID 24956)
+-- Name: work_order_items; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.work_order_items (
@@ -1887,8 +1832,11 @@ CREATE TABLE public.work_order_items (
 );
 
 
+ALTER TABLE public.work_order_items OWNER TO zentra_api_admin;
+
 --
--- Name: work_order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 289 (class 1259 OID 24963)
+-- Name: work_order_items_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.work_order_items_id_seq
@@ -1900,15 +1848,20 @@ CREATE SEQUENCE public.work_order_items_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.work_order_items_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: work_order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4156 (class 0 OID 0)
+-- Dependencies: 289
+-- Name: work_order_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.work_order_items_id_seq OWNED BY public.work_order_items.id;
 
 
 --
--- Name: work_order_tasks; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 290 (class 1259 OID 24964)
+-- Name: work_order_tasks; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.work_order_tasks (
@@ -1930,8 +1883,11 @@ CREATE TABLE public.work_order_tasks (
 );
 
 
+ALTER TABLE public.work_order_tasks OWNER TO zentra_api_admin;
+
 --
--- Name: work_order_tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 291 (class 1259 OID 24973)
+-- Name: work_order_tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.work_order_tasks_id_seq
@@ -1943,15 +1899,20 @@ CREATE SEQUENCE public.work_order_tasks_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.work_order_tasks_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: work_order_tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4157 (class 0 OID 0)
+-- Dependencies: 291
+-- Name: work_order_tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.work_order_tasks_id_seq OWNED BY public.work_order_tasks.id;
 
 
 --
--- Name: work_orders; Type: TABLE; Schema: public; Owner: -
+-- TOC entry 292 (class 1259 OID 24974)
+-- Name: work_orders; Type: TABLE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TABLE public.work_orders (
@@ -1977,8 +1938,11 @@ CREATE TABLE public.work_orders (
 );
 
 
+ALTER TABLE public.work_orders OWNER TO zentra_api_admin;
+
 --
--- Name: work_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- TOC entry 293 (class 1259 OID 24983)
+-- Name: work_orders_id_seq; Type: SEQUENCE; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE SEQUENCE public.work_orders_id_seq
@@ -1990,211 +1954,245 @@ CREATE SEQUENCE public.work_orders_id_seq
     CACHE 1;
 
 
+ALTER TABLE public.work_orders_id_seq OWNER TO zentra_api_admin;
+
 --
--- Name: work_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- TOC entry 4158 (class 0 OID 0)
+-- Dependencies: 293
+-- Name: work_orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER SEQUENCE public.work_orders_id_seq OWNED BY public.work_orders.id;
 
 
 --
--- Name: audit_trail id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3407 (class 2604 OID 24984)
+-- Name: audit_trail id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.audit_trail ALTER COLUMN id SET DEFAULT nextval('public.audit_trail_id_seq'::regclass);
 
 
 --
--- Name: backup id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3410 (class 2604 OID 24985)
+-- Name: backup id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.backup ALTER COLUMN id SET DEFAULT nextval('public.backup_id_seq'::regclass);
 
 
 --
--- Name: cash_flow id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3412 (class 2604 OID 24986)
+-- Name: cash_flow id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.cash_flow ALTER COLUMN id SET DEFAULT nextval('public.cash_flow_id_seq'::regclass);
 
 
 --
--- Name: item_stock_movement id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3416 (class 2604 OID 24987)
+-- Name: item_stock_movement id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.item_stock_movement ALTER COLUMN id SET DEFAULT nextval('public.item_stock_movement_id_seq'::regclass);
 
 
 --
--- Name: master_channel id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3419 (class 2604 OID 24988)
+-- Name: master_channel id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_channel ALTER COLUMN id SET DEFAULT nextval('public.master_channel_id_seq'::regclass);
 
 
 --
--- Name: master_item id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3429 (class 2604 OID 24989)
+-- Name: master_item id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_item ALTER COLUMN id SET DEFAULT nextval('public.master_item_id_seq'::regclass);
 
 
 --
--- Name: master_menu id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3434 (class 2604 OID 24990)
+-- Name: master_menu id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_menu ALTER COLUMN id SET DEFAULT nextval('public.master_menu_id_seq'::regclass);
 
 
 --
--- Name: master_office id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3438 (class 2604 OID 24991)
+-- Name: master_office id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_office ALTER COLUMN id SET DEFAULT nextval('public.master_office_id_seq'::regclass);
 
 
 --
--- Name: master_supplier id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3460 (class 2604 OID 24992)
+-- Name: master_supplier id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_supplier ALTER COLUMN id SET DEFAULT nextval('public.master_supplier_id_seq'::regclass);
 
 
 --
--- Name: master_tenant id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3464 (class 2604 OID 24993)
+-- Name: master_tenant id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_tenant ALTER COLUMN id SET DEFAULT nextval('public.master_tenant_id_seq'::regclass);
 
 
 --
--- Name: order_items id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3474 (class 2604 OID 24994)
+-- Name: order_items id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.order_items ALTER COLUMN id SET DEFAULT nextval('public.order_items_id_seq'::regclass);
 
 
 --
--- Name: orders id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3481 (class 2604 OID 24995)
+-- Name: orders id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.orders ALTER COLUMN id SET DEFAULT nextval('public.orders_id_seq'::regclass);
 
 
 --
--- Name: payments id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3489 (class 2604 OID 24996)
+-- Name: payments id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
 
 
 --
--- Name: petty_cash id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3493 (class 2604 OID 24997)
+-- Name: petty_cash id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash ALTER COLUMN id SET DEFAULT nextval('public.petty_cash_id_seq'::regclass);
 
 
 --
--- Name: petty_cash_requests id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3498 (class 2604 OID 24998)
+-- Name: petty_cash_requests id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests ALTER COLUMN id SET DEFAULT nextval('public.petty_cash_requests_id_seq'::regclass);
 
 
 --
--- Name: product_images id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3504 (class 2604 OID 24999)
+-- Name: product_images id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.product_images ALTER COLUMN id SET DEFAULT nextval('public.product_images_id_seq'::regclass);
 
 
 --
--- Name: production_tasks id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3511 (class 2604 OID 25000)
+-- Name: production_tasks id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.production_tasks ALTER COLUMN id SET DEFAULT nextval('public.production_tasks_id_seq'::regclass);
 
 
 --
--- Name: purchase_order_items id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3515 (class 2604 OID 25001)
+-- Name: purchase_order_items id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_order_items ALTER COLUMN id SET DEFAULT nextval('public.purchase_order_items_id_seq'::regclass);
 
 
 --
--- Name: purchase_orders id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3519 (class 2604 OID 25002)
+-- Name: purchase_orders id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_orders ALTER COLUMN id SET DEFAULT nextval('public.purchase_orders_id_seq'::regclass);
 
 
 --
--- Name: sales_invoices id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3529 (class 2604 OID 25003)
+-- Name: sales_invoices id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_invoices ALTER COLUMN id SET DEFAULT nextval('public.sales_invoices_id_seq'::regclass);
 
 
 --
--- Name: sales_payments id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3535 (class 2604 OID 25004)
+-- Name: sales_payments id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_payments ALTER COLUMN id SET DEFAULT nextval('public.sales_payments_id_seq'::regclass);
 
 
 --
--- Name: stock_opname id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3538 (class 2604 OID 25005)
+-- Name: stock_opname id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname ALTER COLUMN id SET DEFAULT nextval('public.stock_opname_id_seq'::regclass);
 
 
 --
--- Name: stock_opname_detail id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3542 (class 2604 OID 25006)
+-- Name: stock_opname_detail id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname_detail ALTER COLUMN id SET DEFAULT nextval('public.stock_opname_detail_id_seq'::regclass);
 
 
 --
--- Name: task_history id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3548 (class 2604 OID 25007)
+-- Name: task_history id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.task_history ALTER COLUMN id SET DEFAULT nextval('public.task_history_id_seq'::regclass);
 
 
 --
--- Name: transaction_categories id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3551 (class 2604 OID 25008)
+-- Name: transaction_categories id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.transaction_categories ALTER COLUMN id SET DEFAULT nextval('public.transaction_categories_id_seq'::regclass);
 
 
 --
--- Name: work_order_items id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3558 (class 2604 OID 25009)
+-- Name: work_order_items id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_items ALTER COLUMN id SET DEFAULT nextval('public.work_order_items_id_seq'::regclass);
 
 
 --
--- Name: work_order_tasks id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3561 (class 2604 OID 25010)
+-- Name: work_order_tasks id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_tasks ALTER COLUMN id SET DEFAULT nextval('public.work_order_tasks_id_seq'::regclass);
 
 
 --
--- Name: work_orders id; Type: DEFAULT; Schema: public; Owner: -
+-- TOC entry 3565 (class 2604 OID 25011)
+-- Name: work_orders id; Type: DEFAULT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_orders ALTER COLUMN id SET DEFAULT nextval('public.work_orders_id_seq'::regclass);
 
 
 --
--- Data for Name: audit_trail; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4039 (class 0 OID 24588)
+-- Dependencies: 215
+-- Data for Name: audit_trail; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.audit_trail (id, entity_type, entity_id, action, old_values, new_values, tenant_id, created_by, created_at, updated_by, updated_at) FROM stdin;
@@ -2489,7 +2487,9 @@ COPY public.audit_trail (id, entity_type, entity_id, action, old_values, new_val
 
 
 --
--- Data for Name: backup; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4041 (class 0 OID 24596)
+-- Dependencies: 217
+-- Data for Name: backup; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.backup (id, file_name, size, created_at, created_by, tenant_id, updated_at, updated_by) FROM stdin;
@@ -2504,7 +2504,9 @@ COPY public.backup (id, file_name, size, created_at, created_by, tenant_id, upda
 
 
 --
--- Data for Name: cash_flow; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4043 (class 0 OID 24603)
+-- Dependencies: 219
+-- Data for Name: cash_flow; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.cash_flow (id, transaction_date, transaction_type, category_id, amount, description, reference_number, reference_type, reference_id, office_id, status, tenant_id, created_at, created_by, updated_at, updated_by, payment_id) FROM stdin;
@@ -2517,7 +2519,9 @@ COPY public.cash_flow (id, transaction_date, transaction_type, category_id, amou
 
 
 --
--- Data for Name: item_stock_movement; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4045 (class 0 OID 24614)
+-- Dependencies: 221
+-- Data for Name: item_stock_movement; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.item_stock_movement (id, item_id, movement_type, reference_type, reference_id, quantity, balance, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2531,7 +2535,9 @@ COPY public.item_stock_movement (id, item_id, movement_type, reference_type, ref
 
 
 --
--- Data for Name: master_channel; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4047 (class 0 OID 24623)
+-- Dependencies: 223
+-- Data for Name: master_channel; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_channel (id, code, name, type, description, is_active, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2558,7 +2564,9 @@ COPY public.master_channel (id, code, name, type, description, is_active, tenant
 
 
 --
--- Data for Name: master_customer; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4119 (class 0 OID 32769)
+-- Dependencies: 295
+-- Data for Name: master_customer; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_customer (id, customer_number, name, email, phone, address, city, postal_code, status, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2568,7 +2576,9 @@ COPY public.master_customer (id, customer_number, name, email, phone, address, c
 
 
 --
--- Data for Name: master_division; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4050 (class 0 OID 24634)
+-- Dependencies: 226
+-- Data for Name: master_division; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_division (id, name, description, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -2585,7 +2595,9 @@ COPY public.master_division (id, name, description, created_at, updated_at, tena
 
 
 --
--- Data for Name: master_employee; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4052 (class 0 OID 24643)
+-- Dependencies: 228
+-- Data for Name: master_employee; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_employee (id, name, email, phone, division_id, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -2620,7 +2632,9 @@ COPY public.master_employee (id, name, email, phone, division_id, created_at, up
 
 
 --
--- Data for Name: master_item; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4053 (class 0 OID 24651)
+-- Dependencies: 229
+-- Data for Name: master_item; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_item (id, code, name, description, unit, min_stock, max_stock, reorder_point, category, is_active, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2643,7 +2657,9 @@ COPY public.master_item (id, code, name, description, unit, min_stock, max_stock
 
 
 --
--- Data for Name: master_menu; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4055 (class 0 OID 24661)
+-- Dependencies: 231
+-- Data for Name: master_menu; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_menu (id, name, url, icon, parent_id, sort, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -2692,7 +2708,9 @@ COPY public.master_menu (id, name, url, icon, parent_id, sort, created_at, updat
 
 
 --
--- Data for Name: master_office; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4057 (class 0 OID 24670)
+-- Dependencies: 233
+-- Data for Name: master_office; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_office (id, name, code, address, phone, email, zone_id, created_at, updated_at, created_by, updated_by, tenant_id) FROM stdin;
@@ -2717,7 +2735,9 @@ COPY public.master_office (id, name, code, address, phone, email, zone_id, creat
 
 
 --
--- Data for Name: master_permission; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4060 (class 0 OID 24679)
+-- Dependencies: 236
+-- Data for Name: master_permission; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_permission (id, name, description, created_at, updated_at, tenant_id, created_by, updated_by, code, module) FROM stdin;
@@ -2755,7 +2775,9 @@ COPY public.master_permission (id, name, description, created_at, updated_at, te
 
 
 --
--- Data for Name: master_product; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4062 (class 0 OID 24688)
+-- Dependencies: 238
+-- Data for Name: master_product; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_product (id, name, code, category_id, description, material, size_available, color_options, customization_options, production_time, min_order_quantity, base_price, bulk_discount_rules, weight, is_active, stock_status, tenant_id, created_at, updated_at, created_by, updated_by) FROM stdin;
@@ -2771,7 +2793,9 @@ COPY public.master_product (id, name, code, category_id, description, material, 
 
 
 --
--- Data for Name: master_product_category; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4064 (class 0 OID 24702)
+-- Dependencies: 240
+-- Data for Name: master_product_category; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_product_category (id, name, code, description, is_active, tenant_id, created_at, updated_at, created_by, updated_by) FROM stdin;
@@ -2785,7 +2809,9 @@ COPY public.master_product_category (id, name, code, description, is_active, ten
 
 
 --
--- Data for Name: master_region; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4066 (class 0 OID 24712)
+-- Dependencies: 242
+-- Data for Name: master_region; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_region (id, name, description, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -2799,7 +2825,9 @@ COPY public.master_region (id, name, description, created_at, updated_at, tenant
 
 
 --
--- Data for Name: master_role; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4068 (class 0 OID 24721)
+-- Dependencies: 244
+-- Data for Name: master_role; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_role (id, name, description, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -2809,7 +2837,9 @@ COPY public.master_role (id, name, description, created_at, updated_at, tenant_i
 
 
 --
--- Data for Name: master_supplier; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4069 (class 0 OID 24729)
+-- Dependencies: 245
+-- Data for Name: master_supplier; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_supplier (id, code, name, contact_person, phone, email, address, tax_number, bank_name, bank_account_number, bank_account_name, is_active, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2821,7 +2851,9 @@ COPY public.master_supplier (id, code, name, contact_person, phone, email, addre
 
 
 --
--- Data for Name: master_tenant; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4071 (class 0 OID 24738)
+-- Dependencies: 247
+-- Data for Name: master_tenant; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_tenant (id, name, domain, status, created_at, updated_at, created_by, updated_by) FROM stdin;
@@ -2830,7 +2862,9 @@ COPY public.master_tenant (id, name, domain, status, created_at, updated_at, cre
 
 
 --
--- Data for Name: master_user_menu; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4074 (class 0 OID 24748)
+-- Dependencies: 250
+-- Data for Name: master_user_menu; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_user_menu (id, user_id, menu_id, created_at, updated_at, created_by, updated_by) FROM stdin;
@@ -2838,7 +2872,9 @@ COPY public.master_user_menu (id, user_id, menu_id, created_at, updated_at, crea
 
 
 --
--- Data for Name: master_zone; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4076 (class 0 OID 24757)
+-- Dependencies: 252
+-- Data for Name: master_zone; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.master_zone (id, name, region_id, description, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -2860,7 +2896,9 @@ COPY public.master_zone (id, name, region_id, description, created_at, updated_a
 
 
 --
--- Data for Name: order_items; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4077 (class 0 OID 24765)
+-- Dependencies: 253
+-- Data for Name: order_items; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.order_items (id, order_id, product_id, quantity, size, color, unit_price, original_subtotal, applied_discount_rule, discount_amount, final_subtotal, customization, current_task, production_status, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2882,7 +2920,9 @@ COPY public.order_items (id, order_id, product_id, quantity, size, color, unit_p
 
 
 --
--- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4079 (class 0 OID 24779)
+-- Dependencies: 255
+-- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.orders (id, order_number, office_id, subtotal, discount_amount, total_amount, status, payment_status, expected_delivery_date, notes, tenant_id, created_at, created_by, updated_at, updated_by, customer_id, label) FROM stdin;
@@ -2900,7 +2940,9 @@ COPY public.orders (id, order_number, office_id, subtotal, discount_amount, tota
 
 
 --
--- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4081 (class 0 OID 24794)
+-- Dependencies: 257
+-- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.payments (id, order_id, amount, payment_method, payment_date, reference_number, status, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2912,7 +2954,9 @@ COPY public.payments (id, order_id, amount, payment_method, payment_date, refere
 
 
 --
--- Data for Name: petty_cash; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4083 (class 0 OID 24804)
+-- Dependencies: 259
+-- Data for Name: petty_cash; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.petty_cash (id, office_id, period_start_date, period_end_date, initial_balance, current_balance, channel_id, division_id, budget_limit, budget_period, alert_threshold, status, balance_updated_at, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2923,7 +2967,9 @@ COPY public.petty_cash (id, office_id, period_start_date, period_end_date, initi
 
 
 --
--- Data for Name: petty_cash_requests; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4085 (class 0 OID 24816)
+-- Dependencies: 261
+-- Data for Name: petty_cash_requests; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.petty_cash_requests (id, petty_cash_id, request_number, office_id, employee_id, channel_id, division_id, amount, purpose, category_id, payment_method, reference_number, budget_code, receipt_urls, status, settlement_status, settlement_date, reimbursement_status, reimbursement_date, approved_by, approved_at, completed_at, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -2934,7 +2980,9 @@ COPY public.petty_cash_requests (id, petty_cash_id, request_number, office_id, e
 
 
 --
--- Data for Name: product_images; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4087 (class 0 OID 24831)
+-- Dependencies: 263
+-- Data for Name: product_images; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.product_images (id, product_id, image_url, sort_order, is_primary, created_at, created_by, updated_at, updated_by, tenant_id) FROM stdin;
@@ -2953,7 +3001,9 @@ COPY public.product_images (id, product_id, image_url, sort_order, is_primary, c
 
 
 --
--- Data for Name: production_tasks; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4089 (class 0 OID 24841)
+-- Dependencies: 265
+-- Data for Name: production_tasks; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.production_tasks (id, order_item_id, task_type, sequence_number, employee_id, status, started_at, completed_at, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3024,7 +3074,9 @@ COPY public.production_tasks (id, order_item_id, task_type, sequence_number, emp
 
 
 --
--- Data for Name: purchase_order_items; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4091 (class 0 OID 24851)
+-- Dependencies: 267
+-- Data for Name: purchase_order_items; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.purchase_order_items (id, purchase_order_id, item_id, quantity, unit_price, subtotal, received_quantity, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3035,7 +3087,9 @@ COPY public.purchase_order_items (id, purchase_order_id, item_id, quantity, unit
 
 
 --
--- Data for Name: purchase_orders; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4093 (class 0 OID 24861)
+-- Dependencies: 269
+-- Data for Name: purchase_orders; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.purchase_orders (id, po_number, supplier_id, order_date, delivery_date, subtotal, tax_amount, total_amount, status, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3045,7 +3099,9 @@ COPY public.purchase_orders (id, po_number, supplier_id, order_date, delivery_da
 
 
 --
--- Data for Name: role_menus; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4096 (class 0 OID 24873)
+-- Dependencies: 272
+-- Data for Name: role_menus; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.role_menus (id, role_id, menu_id, created_at, created_by, updated_by) FROM stdin;
@@ -3090,7 +3146,9 @@ COPY public.role_menus (id, role_id, menu_id, created_at, created_by, updated_by
 
 
 --
--- Data for Name: role_permissions; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4098 (class 0 OID 24881)
+-- Dependencies: 274
+-- Data for Name: role_permissions; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.role_permissions (id, role_id, permission_id, created_at, created_by, updated_by, updated_at) FROM stdin;
@@ -3129,7 +3187,9 @@ COPY public.role_permissions (id, role_id, permission_id, created_at, created_by
 
 
 --
--- Data for Name: sales_invoices; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4099 (class 0 OID 24889)
+-- Dependencies: 275
+-- Data for Name: sales_invoices; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.sales_invoices (id, invoice_number, order_id, invoice_date, due_date, subtotal, tax_amount, total_amount, paid_amount, status, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3138,7 +3198,9 @@ COPY public.sales_invoices (id, invoice_number, order_id, invoice_date, due_date
 
 
 --
--- Data for Name: sales_payments; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4101 (class 0 OID 24901)
+-- Dependencies: 277
+-- Data for Name: sales_payments; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.sales_payments (id, invoice_id, payment_date, amount, payment_method, reference_number, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3148,7 +3210,9 @@ COPY public.sales_payments (id, invoice_id, payment_date, amount, payment_method
 
 
 --
--- Data for Name: stock_opname; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4103 (class 0 OID 24909)
+-- Dependencies: 279
+-- Data for Name: stock_opname; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.stock_opname (id, opname_number, opname_date, status, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3158,7 +3222,9 @@ COPY public.stock_opname (id, opname_number, opname_date, status, notes, tenant_
 
 
 --
--- Data for Name: stock_opname_detail; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4104 (class 0 OID 24918)
+-- Dependencies: 280
+-- Data for Name: stock_opname_detail; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.stock_opname_detail (id, stock_opname_id, item_id, system_qty, actual_qty, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3172,7 +3238,9 @@ COPY public.stock_opname_detail (id, stock_opname_id, item_id, system_qty, actua
 
 
 --
--- Data for Name: task_history; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4107 (class 0 OID 24930)
+-- Dependencies: 283
+-- Data for Name: task_history; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.task_history (id, task_id, employee_id, status_change, comment, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3188,7 +3256,9 @@ COPY public.task_history (id, task_id, employee_id, status_change, comment, tena
 
 
 --
--- Data for Name: transaction_categories; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4109 (class 0 OID 24938)
+-- Dependencies: 285
+-- Data for Name: transaction_categories; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.transaction_categories (id, code, name, type, description, is_active, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3201,7 +3271,9 @@ COPY public.transaction_categories (id, code, name, type, description, is_active
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4111 (class 0 OID 24948)
+-- Dependencies: 287
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.users (id, username, email, password, role_id, created_at, updated_at, tenant_id, created_by, updated_by) FROM stdin;
@@ -3212,7 +3284,9 @@ a31debd8-ef47-4b2a-bb08-e7ca49fbbd88	admin2	admin2@vomo.com	$2a$10$rStpWqylI8QAF
 
 
 --
--- Data for Name: work_order_items; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4112 (class 0 OID 24956)
+-- Dependencies: 288
+-- Data for Name: work_order_items; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.work_order_items (id, work_order_id, item_id, description, quantity, unit_price, total_price, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3222,7 +3296,9 @@ COPY public.work_order_items (id, work_order_id, item_id, description, quantity,
 
 
 --
--- Data for Name: work_order_tasks; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4114 (class 0 OID 24964)
+-- Dependencies: 290
+-- Data for Name: work_order_tasks; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.work_order_tasks (id, work_order_id, task_name, description, assigned_to, start_date, end_date, status, notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3234,7 +3310,9 @@ COPY public.work_order_tasks (id, work_order_id, task_name, description, assigne
 
 
 --
--- Data for Name: work_orders; Type: TABLE DATA; Schema: public; Owner: -
+-- TOC entry 4116 (class 0 OID 24974)
+-- Dependencies: 292
+-- Data for Name: work_orders; Type: TABLE DATA; Schema: public; Owner: zentra_api_admin
 --
 
 COPY public.work_orders (id, spk_number, order_id, customer_name, work_type, description, start_date, end_date, status, assigned_to, estimated_cost, actual_cost, completion_notes, tenant_id, created_at, created_by, updated_at, updated_by) FROM stdin;
@@ -3243,287 +3321,368 @@ COPY public.work_orders (id, spk_number, order_id, customer_name, work_type, des
 
 
 --
--- Name: audit_trail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4159 (class 0 OID 0)
+-- Dependencies: 216
+-- Name: audit_trail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.audit_trail_id_seq', 287, true);
 
 
 --
--- Name: backup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4160 (class 0 OID 0)
+-- Dependencies: 218
+-- Name: backup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.backup_id_seq', 41, true);
 
 
 --
--- Name: cash_flow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4161 (class 0 OID 0)
+-- Dependencies: 220
+-- Name: cash_flow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.cash_flow_id_seq', 13, true);
 
 
 --
--- Name: item_stock_movement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4162 (class 0 OID 0)
+-- Dependencies: 222
+-- Name: item_stock_movement_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.item_stock_movement_id_seq', 6, true);
 
 
 --
--- Name: master_channel_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4163 (class 0 OID 0)
+-- Dependencies: 224
+-- Name: master_channel_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_channel_id_seq', 19, true);
 
 
 --
--- Name: master_customer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4164 (class 0 OID 0)
+-- Dependencies: 294
+-- Name: master_customer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_customer_id_seq', 2, true);
 
 
 --
--- Name: master_division_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4165 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: master_division_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_division_id_seq', 11, true);
 
 
 --
--- Name: master_employee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4166 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: master_employee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_employee_id_seq', 39, true);
 
 
 --
--- Name: master_item_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4167 (class 0 OID 0)
+-- Dependencies: 230
+-- Name: master_item_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_item_id_seq', 15, true);
 
 
 --
--- Name: master_menu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4168 (class 0 OID 0)
+-- Dependencies: 232
+-- Name: master_menu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_menu_id_seq', 49, true);
 
 
 --
--- Name: master_office_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4169 (class 0 OID 0)
+-- Dependencies: 234
+-- Name: master_office_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_office_id_seq', 34, true);
 
 
 --
--- Name: master_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4170 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: master_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_permission_id_seq', 41, true);
 
 
 --
--- Name: master_product_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4171 (class 0 OID 0)
+-- Dependencies: 239
+-- Name: master_product_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_product_category_id_seq', 9, true);
 
 
 --
--- Name: master_product_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4172 (class 0 OID 0)
+-- Dependencies: 237
+-- Name: master_product_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_product_id_seq', 12, true);
 
 
 --
--- Name: master_region_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4173 (class 0 OID 0)
+-- Dependencies: 241
+-- Name: master_region_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_region_id_seq', 18, true);
 
 
 --
--- Name: master_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4174 (class 0 OID 0)
+-- Dependencies: 243
+-- Name: master_role_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_role_id_seq', 7, true);
 
 
 --
--- Name: master_supplier_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4175 (class 0 OID 0)
+-- Dependencies: 246
+-- Name: master_supplier_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_supplier_id_seq', 4, true);
 
 
 --
--- Name: master_tenant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4176 (class 0 OID 0)
+-- Dependencies: 248
+-- Name: master_tenant_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_tenant_id_seq', 1, true);
 
 
 --
--- Name: master_user_menu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4177 (class 0 OID 0)
+-- Dependencies: 249
+-- Name: master_user_menu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_user_menu_id_seq', 1, false);
 
 
 --
--- Name: master_zone_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4178 (class 0 OID 0)
+-- Dependencies: 251
+-- Name: master_zone_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.master_zone_id_seq', 42, true);
 
 
 --
--- Name: order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4179 (class 0 OID 0)
+-- Dependencies: 254
+-- Name: order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.order_items_id_seq', 16, true);
 
 
 --
--- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4180 (class 0 OID 0)
+-- Dependencies: 256
+-- Name: orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.orders_id_seq', 15, true);
 
 
 --
--- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4181 (class 0 OID 0)
+-- Dependencies: 258
+-- Name: payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.payments_id_seq', 4, true);
 
 
 --
--- Name: petty_cash_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4182 (class 0 OID 0)
+-- Dependencies: 260
+-- Name: petty_cash_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.petty_cash_id_seq', 3, true);
 
 
 --
--- Name: petty_cash_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4183 (class 0 OID 0)
+-- Dependencies: 262
+-- Name: petty_cash_requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.petty_cash_requests_id_seq', 3, true);
 
 
 --
--- Name: product_images_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4184 (class 0 OID 0)
+-- Dependencies: 264
+-- Name: product_images_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.product_images_id_seq', 19, true);
 
 
 --
--- Name: production_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4185 (class 0 OID 0)
+-- Dependencies: 266
+-- Name: production_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.production_tasks_id_seq', 63, true);
 
 
 --
--- Name: purchase_order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4186 (class 0 OID 0)
+-- Dependencies: 268
+-- Name: purchase_order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.purchase_order_items_id_seq', 3, true);
 
 
 --
--- Name: purchase_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4187 (class 0 OID 0)
+-- Dependencies: 270
+-- Name: purchase_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.purchase_orders_id_seq', 2, true);
 
 
 --
--- Name: role_menus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4188 (class 0 OID 0)
+-- Dependencies: 271
+-- Name: role_menus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.role_menus_id_seq', 77, true);
 
 
 --
--- Name: role_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4189 (class 0 OID 0)
+-- Dependencies: 273
+-- Name: role_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.role_permissions_id_seq', 71, true);
 
 
 --
--- Name: sales_invoices_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4190 (class 0 OID 0)
+-- Dependencies: 276
+-- Name: sales_invoices_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.sales_invoices_id_seq', 1, true);
 
 
 --
--- Name: sales_payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4191 (class 0 OID 0)
+-- Dependencies: 278
+-- Name: sales_payments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.sales_payments_id_seq', 2, true);
 
 
 --
--- Name: stock_opname_detail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4192 (class 0 OID 0)
+-- Dependencies: 281
+-- Name: stock_opname_detail_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.stock_opname_detail_id_seq', 6, true);
 
 
 --
--- Name: stock_opname_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4193 (class 0 OID 0)
+-- Dependencies: 282
+-- Name: stock_opname_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.stock_opname_id_seq', 2, true);
 
 
 --
--- Name: task_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4194 (class 0 OID 0)
+-- Dependencies: 284
+-- Name: task_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.task_history_id_seq', 8, true);
 
 
 --
--- Name: transaction_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4195 (class 0 OID 0)
+-- Dependencies: 286
+-- Name: transaction_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.transaction_categories_id_seq', 7, true);
 
 
 --
--- Name: work_order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4196 (class 0 OID 0)
+-- Dependencies: 289
+-- Name: work_order_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.work_order_items_id_seq', 2, true);
 
 
 --
--- Name: work_order_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4197 (class 0 OID 0)
+-- Dependencies: 291
+-- Name: work_order_tasks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.work_order_tasks_id_seq', 4, true);
 
 
 --
--- Name: work_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- TOC entry 4198 (class 0 OID 0)
+-- Dependencies: 293
+-- Name: work_orders_id_seq; Type: SEQUENCE SET; Schema: public; Owner: zentra_api_admin
 --
 
 SELECT pg_catalog.setval('public.work_orders_id_seq', 1, true);
 
 
 --
--- Name: audit_trail audit_trail_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3599 (class 2606 OID 25013)
+-- Name: audit_trail audit_trail_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.audit_trail
@@ -3531,7 +3690,8 @@ ALTER TABLE ONLY public.audit_trail
 
 
 --
--- Name: backup backup_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3604 (class 2606 OID 25015)
+-- Name: backup backup_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.backup
@@ -3539,7 +3699,8 @@ ALTER TABLE ONLY public.backup
 
 
 --
--- Name: cash_flow cash_flow_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3608 (class 2606 OID 25017)
+-- Name: cash_flow cash_flow_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.cash_flow
@@ -3547,7 +3708,8 @@ ALTER TABLE ONLY public.cash_flow
 
 
 --
--- Name: item_stock_movement item_stock_movement_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3619 (class 2606 OID 25019)
+-- Name: item_stock_movement item_stock_movement_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.item_stock_movement
@@ -3555,7 +3717,8 @@ ALTER TABLE ONLY public.item_stock_movement
 
 
 --
--- Name: master_customer master_customer_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3812 (class 2606 OID 32780)
+-- Name: master_customer master_customer_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_customer
@@ -3563,7 +3726,8 @@ ALTER TABLE ONLY public.master_customer
 
 
 --
--- Name: master_customer master_customer_tenant_id_customer_number_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3814 (class 2606 OID 32782)
+-- Name: master_customer master_customer_tenant_id_customer_number_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_customer
@@ -3571,7 +3735,8 @@ ALTER TABLE ONLY public.master_customer
 
 
 --
--- Name: master_division master_division_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3626 (class 2606 OID 25021)
+-- Name: master_division master_division_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_division
@@ -3579,7 +3744,8 @@ ALTER TABLE ONLY public.master_division
 
 
 --
--- Name: master_employee master_employee_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3629 (class 2606 OID 25023)
+-- Name: master_employee master_employee_email_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_employee
@@ -3587,7 +3753,8 @@ ALTER TABLE ONLY public.master_employee
 
 
 --
--- Name: master_employee master_employee_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3631 (class 2606 OID 25025)
+-- Name: master_employee master_employee_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_employee
@@ -3595,7 +3762,8 @@ ALTER TABLE ONLY public.master_employee
 
 
 --
--- Name: master_item master_item_code_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3636 (class 2606 OID 25027)
+-- Name: master_item master_item_code_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_item
@@ -3603,7 +3771,8 @@ ALTER TABLE ONLY public.master_item
 
 
 --
--- Name: master_item master_item_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3638 (class 2606 OID 25029)
+-- Name: master_item master_item_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_item
@@ -3611,7 +3780,8 @@ ALTER TABLE ONLY public.master_item
 
 
 --
--- Name: master_menu master_menu_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3641 (class 2606 OID 25031)
+-- Name: master_menu master_menu_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_menu
@@ -3619,7 +3789,8 @@ ALTER TABLE ONLY public.master_menu
 
 
 --
--- Name: master_office master_office_code_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3643 (class 2606 OID 25033)
+-- Name: master_office master_office_code_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_office
@@ -3627,7 +3798,8 @@ ALTER TABLE ONLY public.master_office
 
 
 --
--- Name: master_office master_office_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3645 (class 2606 OID 25035)
+-- Name: master_office master_office_email_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_office
@@ -3635,7 +3807,8 @@ ALTER TABLE ONLY public.master_office
 
 
 --
--- Name: master_office master_office_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3647 (class 2606 OID 25037)
+-- Name: master_office master_office_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_office
@@ -3643,7 +3816,8 @@ ALTER TABLE ONLY public.master_office
 
 
 --
--- Name: master_permission master_permission_code_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3651 (class 2606 OID 25039)
+-- Name: master_permission master_permission_code_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_permission
@@ -3651,7 +3825,8 @@ ALTER TABLE ONLY public.master_permission
 
 
 --
--- Name: master_permission master_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3653 (class 2606 OID 25041)
+-- Name: master_permission master_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_permission
@@ -3659,7 +3834,8 @@ ALTER TABLE ONLY public.master_permission
 
 
 --
--- Name: master_product_category master_product_category_code_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3665 (class 2606 OID 25043)
+-- Name: master_product_category master_product_category_code_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product_category
@@ -3667,7 +3843,8 @@ ALTER TABLE ONLY public.master_product_category
 
 
 --
--- Name: master_product_category master_product_category_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3667 (class 2606 OID 25045)
+-- Name: master_product_category master_product_category_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product_category
@@ -3675,7 +3852,8 @@ ALTER TABLE ONLY public.master_product_category
 
 
 --
--- Name: master_product master_product_code_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3659 (class 2606 OID 25047)
+-- Name: master_product master_product_code_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product
@@ -3683,7 +3861,8 @@ ALTER TABLE ONLY public.master_product
 
 
 --
--- Name: master_product master_product_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3661 (class 2606 OID 25049)
+-- Name: master_product master_product_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product
@@ -3691,7 +3870,8 @@ ALTER TABLE ONLY public.master_product
 
 
 --
--- Name: master_region master_region_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3670 (class 2606 OID 25051)
+-- Name: master_region master_region_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_region
@@ -3699,7 +3879,8 @@ ALTER TABLE ONLY public.master_region
 
 
 --
--- Name: master_role master_role_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3673 (class 2606 OID 25053)
+-- Name: master_role master_role_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_role
@@ -3707,7 +3888,8 @@ ALTER TABLE ONLY public.master_role
 
 
 --
--- Name: master_supplier master_supplier_code_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3677 (class 2606 OID 25055)
+-- Name: master_supplier master_supplier_code_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_supplier
@@ -3715,7 +3897,8 @@ ALTER TABLE ONLY public.master_supplier
 
 
 --
--- Name: master_supplier master_supplier_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3679 (class 2606 OID 25057)
+-- Name: master_supplier master_supplier_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_supplier
@@ -3723,7 +3906,8 @@ ALTER TABLE ONLY public.master_supplier
 
 
 --
--- Name: master_tenant master_tenant_domain_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3681 (class 2606 OID 25059)
+-- Name: master_tenant master_tenant_domain_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_tenant
@@ -3731,7 +3915,8 @@ ALTER TABLE ONLY public.master_tenant
 
 
 --
--- Name: master_tenant master_tenant_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3683 (class 2606 OID 25061)
+-- Name: master_tenant master_tenant_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_tenant
@@ -3739,7 +3924,8 @@ ALTER TABLE ONLY public.master_tenant
 
 
 --
--- Name: master_user_menu master_user_menu_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3685 (class 2606 OID 25063)
+-- Name: master_user_menu master_user_menu_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_user_menu
@@ -3747,7 +3933,8 @@ ALTER TABLE ONLY public.master_user_menu
 
 
 --
--- Name: master_zone master_zone_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3688 (class 2606 OID 25065)
+-- Name: master_zone master_zone_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_zone
@@ -3755,7 +3942,8 @@ ALTER TABLE ONLY public.master_zone
 
 
 --
--- Name: order_items order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3695 (class 2606 OID 25067)
+-- Name: order_items order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.order_items
@@ -3763,7 +3951,8 @@ ALTER TABLE ONLY public.order_items
 
 
 --
--- Name: orders orders_order_number_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3701 (class 2606 OID 25069)
+-- Name: orders orders_order_number_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.orders
@@ -3771,7 +3960,8 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3703 (class 2606 OID 25071)
+-- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.orders
@@ -3779,7 +3969,8 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3708 (class 2606 OID 25073)
+-- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.payments
@@ -3787,7 +3978,8 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- Name: master_channel pk_master_channel; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3621 (class 2606 OID 25075)
+-- Name: master_channel pk_master_channel; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_channel
@@ -3795,7 +3987,8 @@ ALTER TABLE ONLY public.master_channel
 
 
 --
--- Name: petty_cash pk_petty_cash; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3713 (class 2606 OID 25077)
+-- Name: petty_cash pk_petty_cash; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash
@@ -3803,7 +3996,8 @@ ALTER TABLE ONLY public.petty_cash
 
 
 --
--- Name: petty_cash_requests pk_petty_cash_requests; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3720 (class 2606 OID 25079)
+-- Name: petty_cash_requests pk_petty_cash_requests; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -3811,7 +4005,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: product_images product_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3724 (class 2606 OID 25081)
+-- Name: product_images product_images_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.product_images
@@ -3819,7 +4014,8 @@ ALTER TABLE ONLY public.product_images
 
 
 --
--- Name: production_tasks production_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3731 (class 2606 OID 25083)
+-- Name: production_tasks production_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.production_tasks
@@ -3827,7 +4023,8 @@ ALTER TABLE ONLY public.production_tasks
 
 
 --
--- Name: purchase_order_items purchase_order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3736 (class 2606 OID 25085)
+-- Name: purchase_order_items purchase_order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_order_items
@@ -3835,7 +4032,8 @@ ALTER TABLE ONLY public.purchase_order_items
 
 
 --
--- Name: purchase_orders purchase_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3742 (class 2606 OID 25087)
+-- Name: purchase_orders purchase_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_orders
@@ -3843,7 +4041,8 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- Name: purchase_orders purchase_orders_po_number_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3744 (class 2606 OID 25089)
+-- Name: purchase_orders purchase_orders_po_number_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_orders
@@ -3851,7 +4050,8 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- Name: role_menus role_menus_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3746 (class 2606 OID 25091)
+-- Name: role_menus role_menus_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_menus
@@ -3859,7 +4059,8 @@ ALTER TABLE ONLY public.role_menus
 
 
 --
--- Name: role_menus role_menus_role_id_menu_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3748 (class 2606 OID 25093)
+-- Name: role_menus role_menus_role_id_menu_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_menus
@@ -3867,7 +4068,8 @@ ALTER TABLE ONLY public.role_menus
 
 
 --
--- Name: role_permissions role_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3750 (class 2606 OID 25095)
+-- Name: role_permissions role_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_permissions
@@ -3875,7 +4077,8 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- Name: role_permissions role_permissions_role_id_permission_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3752 (class 2606 OID 25097)
+-- Name: role_permissions role_permissions_role_id_permission_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_permissions
@@ -3883,7 +4086,8 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- Name: sales_invoices sales_invoices_invoice_number_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3758 (class 2606 OID 25099)
+-- Name: sales_invoices sales_invoices_invoice_number_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_invoices
@@ -3891,7 +4095,8 @@ ALTER TABLE ONLY public.sales_invoices
 
 
 --
--- Name: sales_invoices sales_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3760 (class 2606 OID 25101)
+-- Name: sales_invoices sales_invoices_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_invoices
@@ -3899,7 +4104,8 @@ ALTER TABLE ONLY public.sales_invoices
 
 
 --
--- Name: sales_payments sales_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3765 (class 2606 OID 25103)
+-- Name: sales_payments sales_payments_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_payments
@@ -3907,7 +4113,8 @@ ALTER TABLE ONLY public.sales_payments
 
 
 --
--- Name: stock_opname_detail stock_opname_detail_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3777 (class 2606 OID 25105)
+-- Name: stock_opname_detail stock_opname_detail_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname_detail
@@ -3915,7 +4122,8 @@ ALTER TABLE ONLY public.stock_opname_detail
 
 
 --
--- Name: stock_opname stock_opname_opname_number_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3770 (class 2606 OID 25107)
+-- Name: stock_opname stock_opname_opname_number_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname
@@ -3923,7 +4131,8 @@ ALTER TABLE ONLY public.stock_opname
 
 
 --
--- Name: stock_opname stock_opname_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3772 (class 2606 OID 25109)
+-- Name: stock_opname stock_opname_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname
@@ -3931,7 +4140,8 @@ ALTER TABLE ONLY public.stock_opname
 
 
 --
--- Name: task_history task_history_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3782 (class 2606 OID 25111)
+-- Name: task_history task_history_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.task_history
@@ -3939,7 +4149,8 @@ ALTER TABLE ONLY public.task_history
 
 
 --
--- Name: transaction_categories transaction_categories_code_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3784 (class 2606 OID 25113)
+-- Name: transaction_categories transaction_categories_code_tenant_id_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.transaction_categories
@@ -3947,7 +4158,8 @@ ALTER TABLE ONLY public.transaction_categories
 
 
 --
--- Name: transaction_categories transaction_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3786 (class 2606 OID 25115)
+-- Name: transaction_categories transaction_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.transaction_categories
@@ -3955,7 +4167,8 @@ ALTER TABLE ONLY public.transaction_categories
 
 
 --
--- Name: master_channel uq_master_channel_code; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3623 (class 2606 OID 25117)
+-- Name: master_channel uq_master_channel_code; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_channel
@@ -3963,7 +4176,8 @@ ALTER TABLE ONLY public.master_channel
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3789 (class 2606 OID 25119)
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.users
@@ -3971,7 +4185,8 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3791 (class 2606 OID 25121)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.users
@@ -3979,7 +4194,8 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: work_order_items work_order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3796 (class 2606 OID 25123)
+-- Name: work_order_items work_order_items_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_items
@@ -3987,7 +4203,8 @@ ALTER TABLE ONLY public.work_order_items
 
 
 --
--- Name: work_order_tasks work_order_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3802 (class 2606 OID 25125)
+-- Name: work_order_tasks work_order_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_tasks
@@ -3995,7 +4212,8 @@ ALTER TABLE ONLY public.work_order_tasks
 
 
 --
--- Name: work_orders work_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3808 (class 2606 OID 25127)
+-- Name: work_orders work_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_orders
@@ -4003,7 +4221,8 @@ ALTER TABLE ONLY public.work_orders
 
 
 --
--- Name: work_orders work_orders_spk_number_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3810 (class 2606 OID 25129)
+-- Name: work_orders work_orders_spk_number_key; Type: CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_orders
@@ -4011,679 +4230,776 @@ ALTER TABLE ONLY public.work_orders
 
 
 --
--- Name: idx_audit_trail_created_at; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3600 (class 1259 OID 25130)
+-- Name: idx_audit_trail_created_at; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_audit_trail_created_at ON public.audit_trail USING btree (created_at);
 
 
 --
--- Name: idx_audit_trail_entity; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3601 (class 1259 OID 25131)
+-- Name: idx_audit_trail_entity; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_audit_trail_entity ON public.audit_trail USING btree (entity_type, entity_id);
 
 
 --
--- Name: idx_audit_trail_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3602 (class 1259 OID 25132)
+-- Name: idx_audit_trail_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_audit_trail_tenant ON public.audit_trail USING btree (tenant_id);
 
 
 --
--- Name: idx_backup_created_at; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3605 (class 1259 OID 25133)
+-- Name: idx_backup_created_at; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_backup_created_at ON public.backup USING btree (created_at);
 
 
 --
--- Name: idx_backup_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3606 (class 1259 OID 25134)
+-- Name: idx_backup_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_backup_tenant ON public.backup USING btree (tenant_id);
 
 
 --
--- Name: idx_cash_flow_category; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3609 (class 1259 OID 25135)
+-- Name: idx_cash_flow_category; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_cash_flow_category ON public.cash_flow USING btree (category_id);
 
 
 --
--- Name: idx_cash_flow_date; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3610 (class 1259 OID 25136)
+-- Name: idx_cash_flow_date; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_cash_flow_date ON public.cash_flow USING btree (transaction_date);
 
 
 --
--- Name: idx_cash_flow_payment; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3611 (class 1259 OID 40962)
+-- Name: idx_cash_flow_payment; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_cash_flow_payment ON public.cash_flow USING btree (payment_id);
 
 
 --
--- Name: idx_cash_flow_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3612 (class 1259 OID 25138)
+-- Name: idx_cash_flow_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_cash_flow_tenant ON public.cash_flow USING btree (tenant_id);
 
 
 --
--- Name: idx_cash_flow_type; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3613 (class 1259 OID 25139)
+-- Name: idx_cash_flow_type; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_cash_flow_type ON public.cash_flow USING btree (transaction_type);
 
 
 --
--- Name: idx_division_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3624 (class 1259 OID 25140)
+-- Name: idx_division_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_division_tenant ON public.master_division USING btree (tenant_id);
 
 
 --
--- Name: idx_employee_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3627 (class 1259 OID 25141)
+-- Name: idx_employee_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_employee_tenant ON public.master_employee USING btree (tenant_id);
 
 
 --
--- Name: idx_item_stock_movement_item; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3614 (class 1259 OID 25142)
+-- Name: idx_item_stock_movement_item; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_item_stock_movement_item ON public.item_stock_movement USING btree (item_id);
 
 
 --
--- Name: idx_item_stock_movement_reference; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3615 (class 1259 OID 25143)
+-- Name: idx_item_stock_movement_reference; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_item_stock_movement_reference ON public.item_stock_movement USING btree (reference_type, reference_id);
 
 
 --
--- Name: idx_item_stock_movement_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3616 (class 1259 OID 25144)
+-- Name: idx_item_stock_movement_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_item_stock_movement_tenant ON public.item_stock_movement USING btree (tenant_id);
 
 
 --
--- Name: idx_item_stock_movement_type; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3617 (class 1259 OID 25145)
+-- Name: idx_item_stock_movement_type; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_item_stock_movement_type ON public.item_stock_movement USING btree (movement_type);
 
 
 --
--- Name: idx_master_item_category; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3632 (class 1259 OID 25146)
+-- Name: idx_master_item_category; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_master_item_category ON public.master_item USING btree (category);
 
 
 --
--- Name: idx_master_item_code; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3633 (class 1259 OID 25147)
+-- Name: idx_master_item_code; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_master_item_code ON public.master_item USING btree (code);
 
 
 --
--- Name: idx_master_item_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3634 (class 1259 OID 25148)
+-- Name: idx_master_item_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_master_item_tenant ON public.master_item USING btree (tenant_id);
 
 
 --
--- Name: idx_master_supplier_code; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3674 (class 1259 OID 25149)
+-- Name: idx_master_supplier_code; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_master_supplier_code ON public.master_supplier USING btree (code);
 
 
 --
--- Name: idx_master_supplier_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3675 (class 1259 OID 25150)
+-- Name: idx_master_supplier_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_master_supplier_tenant ON public.master_supplier USING btree (tenant_id);
 
 
 --
--- Name: idx_menu_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3639 (class 1259 OID 25151)
+-- Name: idx_menu_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_menu_tenant ON public.master_menu USING btree (tenant_id);
 
 
 --
--- Name: idx_order_items_current_task; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3689 (class 1259 OID 25152)
+-- Name: idx_order_items_current_task; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_order_items_current_task ON public.order_items USING btree (current_task);
 
 
 --
--- Name: idx_order_items_order; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3690 (class 1259 OID 25153)
+-- Name: idx_order_items_order; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_order_items_order ON public.order_items USING btree (order_id);
 
 
 --
--- Name: idx_order_items_product; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3691 (class 1259 OID 25154)
+-- Name: idx_order_items_product; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_order_items_product ON public.order_items USING btree (product_id);
 
 
 --
--- Name: idx_order_items_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3692 (class 1259 OID 25155)
+-- Name: idx_order_items_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_order_items_status ON public.order_items USING btree (production_status);
 
 
 --
--- Name: idx_order_items_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3693 (class 1259 OID 25156)
+-- Name: idx_order_items_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_order_items_tenant ON public.order_items USING btree (tenant_id);
 
 
 --
--- Name: idx_orders_number; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3696 (class 1259 OID 25158)
+-- Name: idx_orders_number; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_orders_number ON public.orders USING btree (order_number);
 
 
 --
--- Name: idx_orders_payment_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3697 (class 1259 OID 25159)
+-- Name: idx_orders_payment_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_orders_payment_status ON public.orders USING btree (payment_status);
 
 
 --
--- Name: idx_orders_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3698 (class 1259 OID 25160)
+-- Name: idx_orders_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_orders_status ON public.orders USING btree (status);
 
 
 --
--- Name: idx_orders_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3699 (class 1259 OID 25161)
+-- Name: idx_orders_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_orders_tenant ON public.orders USING btree (tenant_id);
 
 
 --
--- Name: idx_payments_order; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3704 (class 1259 OID 25162)
+-- Name: idx_payments_order; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_payments_order ON public.payments USING btree (order_id);
 
 
 --
--- Name: idx_payments_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3705 (class 1259 OID 25163)
+-- Name: idx_payments_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_payments_status ON public.payments USING btree (status);
 
 
 --
--- Name: idx_payments_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3706 (class 1259 OID 25164)
+-- Name: idx_payments_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_payments_tenant ON public.payments USING btree (tenant_id);
 
 
 --
--- Name: idx_permission_code; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3648 (class 1259 OID 25165)
+-- Name: idx_permission_code; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_permission_code ON public.master_permission USING btree (code);
 
 
 --
--- Name: idx_permission_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3649 (class 1259 OID 25166)
+-- Name: idx_permission_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_permission_tenant ON public.master_permission USING btree (tenant_id);
 
 
 --
--- Name: idx_petty_cash_channel; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3709 (class 1259 OID 25167)
+-- Name: idx_petty_cash_channel; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_channel ON public.petty_cash USING btree (channel_id);
 
 
 --
--- Name: idx_petty_cash_division; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3710 (class 1259 OID 25168)
+-- Name: idx_petty_cash_division; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_division ON public.petty_cash USING btree (division_id);
 
 
 --
--- Name: idx_petty_cash_office; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3711 (class 1259 OID 25169)
+-- Name: idx_petty_cash_office; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_office ON public.petty_cash USING btree (office_id);
 
 
 --
--- Name: idx_petty_cash_requests_channel; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3714 (class 1259 OID 25170)
+-- Name: idx_petty_cash_requests_channel; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_requests_channel ON public.petty_cash_requests USING btree (channel_id);
 
 
 --
--- Name: idx_petty_cash_requests_division; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3715 (class 1259 OID 25171)
+-- Name: idx_petty_cash_requests_division; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_requests_division ON public.petty_cash_requests USING btree (division_id);
 
 
 --
--- Name: idx_petty_cash_requests_employee; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3716 (class 1259 OID 25172)
+-- Name: idx_petty_cash_requests_employee; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_requests_employee ON public.petty_cash_requests USING btree (employee_id);
 
 
 --
--- Name: idx_petty_cash_requests_office; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3717 (class 1259 OID 25173)
+-- Name: idx_petty_cash_requests_office; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_requests_office ON public.petty_cash_requests USING btree (office_id);
 
 
 --
--- Name: idx_petty_cash_requests_petty_cash; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3718 (class 1259 OID 25174)
+-- Name: idx_petty_cash_requests_petty_cash; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_petty_cash_requests_petty_cash ON public.petty_cash_requests USING btree (petty_cash_id);
 
 
 --
--- Name: idx_product_category; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3654 (class 1259 OID 25175)
+-- Name: idx_product_category; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_category ON public.master_product USING btree (category_id);
 
 
 --
--- Name: idx_product_category_code; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3662 (class 1259 OID 25176)
+-- Name: idx_product_category_code; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_category_code ON public.master_product_category USING btree (code);
 
 
 --
--- Name: idx_product_category_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3663 (class 1259 OID 25177)
+-- Name: idx_product_category_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_category_tenant ON public.master_product_category USING btree (tenant_id);
 
 
 --
--- Name: idx_product_code; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3655 (class 1259 OID 25178)
+-- Name: idx_product_code; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_code ON public.master_product USING btree (code);
 
 
 --
--- Name: idx_product_images_product_id; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3721 (class 1259 OID 25179)
+-- Name: idx_product_images_product_id; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_images_product_id ON public.product_images USING btree (product_id);
 
 
 --
--- Name: idx_product_images_tenant_id; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3722 (class 1259 OID 25180)
+-- Name: idx_product_images_tenant_id; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_images_tenant_id ON public.product_images USING btree (tenant_id);
 
 
 --
--- Name: idx_product_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3656 (class 1259 OID 25181)
+-- Name: idx_product_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_status ON public.master_product USING btree (stock_status);
 
 
 --
--- Name: idx_product_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3657 (class 1259 OID 25182)
+-- Name: idx_product_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_product_tenant ON public.master_product USING btree (tenant_id);
 
 
 --
--- Name: idx_production_tasks_employee; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3725 (class 1259 OID 25183)
+-- Name: idx_production_tasks_employee; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_production_tasks_employee ON public.production_tasks USING btree (employee_id);
 
 
 --
--- Name: idx_production_tasks_order_item; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3726 (class 1259 OID 25184)
+-- Name: idx_production_tasks_order_item; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_production_tasks_order_item ON public.production_tasks USING btree (order_item_id);
 
 
 --
--- Name: idx_production_tasks_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3727 (class 1259 OID 25185)
+-- Name: idx_production_tasks_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_production_tasks_status ON public.production_tasks USING btree (status);
 
 
 --
--- Name: idx_production_tasks_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3728 (class 1259 OID 25186)
+-- Name: idx_production_tasks_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_production_tasks_tenant ON public.production_tasks USING btree (tenant_id);
 
 
 --
--- Name: idx_production_tasks_type; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3729 (class 1259 OID 25187)
+-- Name: idx_production_tasks_type; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_production_tasks_type ON public.production_tasks USING btree (task_type);
 
 
 --
--- Name: idx_purchase_order_items_item; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3732 (class 1259 OID 25188)
+-- Name: idx_purchase_order_items_item; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_order_items_item ON public.purchase_order_items USING btree (item_id);
 
 
 --
--- Name: idx_purchase_order_items_po; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3733 (class 1259 OID 25189)
+-- Name: idx_purchase_order_items_po; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_order_items_po ON public.purchase_order_items USING btree (purchase_order_id);
 
 
 --
--- Name: idx_purchase_order_items_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3734 (class 1259 OID 25190)
+-- Name: idx_purchase_order_items_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_order_items_tenant ON public.purchase_order_items USING btree (tenant_id);
 
 
 --
--- Name: idx_purchase_orders_number; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3737 (class 1259 OID 25191)
+-- Name: idx_purchase_orders_number; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_orders_number ON public.purchase_orders USING btree (po_number);
 
 
 --
--- Name: idx_purchase_orders_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3738 (class 1259 OID 25192)
+-- Name: idx_purchase_orders_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_orders_status ON public.purchase_orders USING btree (status);
 
 
 --
--- Name: idx_purchase_orders_supplier; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3739 (class 1259 OID 25193)
+-- Name: idx_purchase_orders_supplier; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_orders_supplier ON public.purchase_orders USING btree (supplier_id);
 
 
 --
--- Name: idx_purchase_orders_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3740 (class 1259 OID 25194)
+-- Name: idx_purchase_orders_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_purchase_orders_tenant ON public.purchase_orders USING btree (tenant_id);
 
 
 --
--- Name: idx_region_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3668 (class 1259 OID 25195)
+-- Name: idx_region_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_region_tenant ON public.master_region USING btree (tenant_id);
 
 
 --
--- Name: idx_role_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3671 (class 1259 OID 25196)
+-- Name: idx_role_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_role_tenant ON public.master_role USING btree (tenant_id);
 
 
 --
--- Name: idx_sales_invoices_number; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3753 (class 1259 OID 25197)
+-- Name: idx_sales_invoices_number; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_invoices_number ON public.sales_invoices USING btree (invoice_number);
 
 
 --
--- Name: idx_sales_invoices_order; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3754 (class 1259 OID 25198)
+-- Name: idx_sales_invoices_order; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_invoices_order ON public.sales_invoices USING btree (order_id);
 
 
 --
--- Name: idx_sales_invoices_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3755 (class 1259 OID 25199)
+-- Name: idx_sales_invoices_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_invoices_status ON public.sales_invoices USING btree (status);
 
 
 --
--- Name: idx_sales_invoices_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3756 (class 1259 OID 25200)
+-- Name: idx_sales_invoices_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_invoices_tenant ON public.sales_invoices USING btree (tenant_id);
 
 
 --
--- Name: idx_sales_payments_date; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3761 (class 1259 OID 25201)
+-- Name: idx_sales_payments_date; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_payments_date ON public.sales_payments USING btree (payment_date);
 
 
 --
--- Name: idx_sales_payments_invoice; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3762 (class 1259 OID 25202)
+-- Name: idx_sales_payments_invoice; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_payments_invoice ON public.sales_payments USING btree (invoice_id);
 
 
 --
--- Name: idx_sales_payments_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3763 (class 1259 OID 25203)
+-- Name: idx_sales_payments_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_sales_payments_tenant ON public.sales_payments USING btree (tenant_id);
 
 
 --
--- Name: idx_stock_opname_date; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3766 (class 1259 OID 25204)
+-- Name: idx_stock_opname_date; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_stock_opname_date ON public.stock_opname USING btree (opname_date);
 
 
 --
--- Name: idx_stock_opname_detail_item; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3773 (class 1259 OID 25205)
+-- Name: idx_stock_opname_detail_item; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_stock_opname_detail_item ON public.stock_opname_detail USING btree (item_id);
 
 
 --
--- Name: idx_stock_opname_detail_opname; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3774 (class 1259 OID 25206)
+-- Name: idx_stock_opname_detail_opname; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_stock_opname_detail_opname ON public.stock_opname_detail USING btree (stock_opname_id);
 
 
 --
--- Name: idx_stock_opname_detail_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3775 (class 1259 OID 25207)
+-- Name: idx_stock_opname_detail_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_stock_opname_detail_tenant ON public.stock_opname_detail USING btree (tenant_id);
 
 
 --
--- Name: idx_stock_opname_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3767 (class 1259 OID 25208)
+-- Name: idx_stock_opname_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_stock_opname_status ON public.stock_opname USING btree (status);
 
 
 --
--- Name: idx_stock_opname_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3768 (class 1259 OID 25209)
+-- Name: idx_stock_opname_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_stock_opname_tenant ON public.stock_opname USING btree (tenant_id);
 
 
 --
--- Name: idx_task_history_employee; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3778 (class 1259 OID 25210)
+-- Name: idx_task_history_employee; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_task_history_employee ON public.task_history USING btree (employee_id);
 
 
 --
--- Name: idx_task_history_task; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3779 (class 1259 OID 25211)
+-- Name: idx_task_history_task; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_task_history_task ON public.task_history USING btree (task_id);
 
 
 --
--- Name: idx_task_history_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3780 (class 1259 OID 25212)
+-- Name: idx_task_history_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_task_history_tenant ON public.task_history USING btree (tenant_id);
 
 
 --
--- Name: idx_users_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3787 (class 1259 OID 25213)
+-- Name: idx_users_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_users_tenant ON public.users USING btree (tenant_id);
 
 
 --
--- Name: idx_work_order_items_item; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3792 (class 1259 OID 25214)
+-- Name: idx_work_order_items_item; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_items_item ON public.work_order_items USING btree (item_id);
 
 
 --
--- Name: idx_work_order_items_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3793 (class 1259 OID 25215)
+-- Name: idx_work_order_items_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_items_tenant ON public.work_order_items USING btree (tenant_id);
 
 
 --
--- Name: idx_work_order_items_work_order; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3794 (class 1259 OID 25216)
+-- Name: idx_work_order_items_work_order; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_items_work_order ON public.work_order_items USING btree (work_order_id);
 
 
 --
--- Name: idx_work_order_tasks_assigned_to; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3797 (class 1259 OID 25217)
+-- Name: idx_work_order_tasks_assigned_to; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_tasks_assigned_to ON public.work_order_tasks USING btree (assigned_to);
 
 
 --
--- Name: idx_work_order_tasks_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3798 (class 1259 OID 25218)
+-- Name: idx_work_order_tasks_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_tasks_status ON public.work_order_tasks USING btree (status);
 
 
 --
--- Name: idx_work_order_tasks_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3799 (class 1259 OID 25219)
+-- Name: idx_work_order_tasks_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_tasks_tenant ON public.work_order_tasks USING btree (tenant_id);
 
 
 --
--- Name: idx_work_order_tasks_work_order; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3800 (class 1259 OID 25220)
+-- Name: idx_work_order_tasks_work_order; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_order_tasks_work_order ON public.work_order_tasks USING btree (work_order_id);
 
 
 --
--- Name: idx_work_orders_assigned_to; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3803 (class 1259 OID 25221)
+-- Name: idx_work_orders_assigned_to; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_orders_assigned_to ON public.work_orders USING btree (assigned_to);
 
 
 --
--- Name: idx_work_orders_order_id; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3804 (class 1259 OID 25222)
+-- Name: idx_work_orders_order_id; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_orders_order_id ON public.work_orders USING btree (order_id);
 
 
 --
--- Name: idx_work_orders_status; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3805 (class 1259 OID 25223)
+-- Name: idx_work_orders_status; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_orders_status ON public.work_orders USING btree (status);
 
 
 --
--- Name: idx_work_orders_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3806 (class 1259 OID 25224)
+-- Name: idx_work_orders_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_work_orders_tenant ON public.work_orders USING btree (tenant_id);
 
 
 --
--- Name: idx_zone_tenant; Type: INDEX; Schema: public; Owner: -
+-- TOC entry 3686 (class 1259 OID 25225)
+-- Name: idx_zone_tenant; Type: INDEX; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE INDEX idx_zone_tenant ON public.master_zone USING btree (tenant_id);
 
 
 --
--- Name: petty_cash_requests tr_update_petty_cash_balance; Type: TRIGGER; Schema: public; Owner: -
+-- TOC entry 3896 (class 2620 OID 25226)
+-- Name: petty_cash_requests tr_update_petty_cash_balance; Type: TRIGGER; Schema: public; Owner: zentra_api_admin
 --
 
 CREATE TRIGGER tr_update_petty_cash_balance AFTER UPDATE ON public.petty_cash_requests FOR EACH ROW EXECUTE FUNCTION public.update_petty_cash_balance();
 
 
 --
--- Name: audit_trail audit_trail_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3815 (class 2606 OID 25227)
+-- Name: audit_trail audit_trail_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.audit_trail
@@ -4691,7 +5007,8 @@ ALTER TABLE ONLY public.audit_trail
 
 
 --
--- Name: backup backup_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3816 (class 2606 OID 25232)
+-- Name: backup backup_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.backup
@@ -4699,7 +5016,8 @@ ALTER TABLE ONLY public.backup
 
 
 --
--- Name: cash_flow cash_flow_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3817 (class 2606 OID 25237)
+-- Name: cash_flow cash_flow_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.cash_flow
@@ -4707,7 +5025,8 @@ ALTER TABLE ONLY public.cash_flow
 
 
 --
--- Name: cash_flow cash_flow_office_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3818 (class 2606 OID 25242)
+-- Name: cash_flow cash_flow_office_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.cash_flow
@@ -4715,7 +5034,8 @@ ALTER TABLE ONLY public.cash_flow
 
 
 --
--- Name: cash_flow cash_flow_payment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3819 (class 2606 OID 40963)
+-- Name: cash_flow cash_flow_payment_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.cash_flow
@@ -4723,7 +5043,8 @@ ALTER TABLE ONLY public.cash_flow
 
 
 --
--- Name: cash_flow cash_flow_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3820 (class 2606 OID 25252)
+-- Name: cash_flow cash_flow_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.cash_flow
@@ -4731,7 +5052,8 @@ ALTER TABLE ONLY public.cash_flow
 
 
 --
--- Name: petty_cash fk_petty_cash_channel; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3849 (class 2606 OID 25257)
+-- Name: petty_cash fk_petty_cash_channel; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash
@@ -4739,7 +5061,8 @@ ALTER TABLE ONLY public.petty_cash
 
 
 --
--- Name: petty_cash fk_petty_cash_division; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3850 (class 2606 OID 25262)
+-- Name: petty_cash fk_petty_cash_division; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash
@@ -4747,7 +5070,8 @@ ALTER TABLE ONLY public.petty_cash
 
 
 --
--- Name: petty_cash fk_petty_cash_office; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3851 (class 2606 OID 25267)
+-- Name: petty_cash fk_petty_cash_office; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash
@@ -4755,7 +5079,8 @@ ALTER TABLE ONLY public.petty_cash
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_category; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3853 (class 2606 OID 25272)
+-- Name: petty_cash_requests fk_petty_cash_requests_category; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4763,7 +5088,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_channel; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3854 (class 2606 OID 25277)
+-- Name: petty_cash_requests fk_petty_cash_requests_channel; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4771,7 +5097,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_division; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3855 (class 2606 OID 25282)
+-- Name: petty_cash_requests fk_petty_cash_requests_division; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4779,7 +5106,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_employee; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3856 (class 2606 OID 25287)
+-- Name: petty_cash_requests fk_petty_cash_requests_employee; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4787,7 +5115,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_office; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3857 (class 2606 OID 25292)
+-- Name: petty_cash_requests fk_petty_cash_requests_office; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4795,7 +5124,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_petty_cash; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3858 (class 2606 OID 25297)
+-- Name: petty_cash_requests fk_petty_cash_requests_petty_cash; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4803,7 +5133,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash_requests fk_petty_cash_requests_tenant; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3859 (class 2606 OID 25302)
+-- Name: petty_cash_requests fk_petty_cash_requests_tenant; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash_requests
@@ -4811,7 +5142,8 @@ ALTER TABLE ONLY public.petty_cash_requests
 
 
 --
--- Name: petty_cash fk_petty_cash_tenant; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3852 (class 2606 OID 25307)
+-- Name: petty_cash fk_petty_cash_tenant; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.petty_cash
@@ -4819,7 +5151,8 @@ ALTER TABLE ONLY public.petty_cash
 
 
 --
--- Name: item_stock_movement item_stock_movement_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3821 (class 2606 OID 25312)
+-- Name: item_stock_movement item_stock_movement_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.item_stock_movement
@@ -4827,7 +5160,8 @@ ALTER TABLE ONLY public.item_stock_movement
 
 
 --
--- Name: item_stock_movement item_stock_movement_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3822 (class 2606 OID 25317)
+-- Name: item_stock_movement item_stock_movement_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.item_stock_movement
@@ -4835,7 +5169,8 @@ ALTER TABLE ONLY public.item_stock_movement
 
 
 --
--- Name: master_customer master_customer_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3895 (class 2606 OID 32783)
+-- Name: master_customer master_customer_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_customer
@@ -4843,7 +5178,8 @@ ALTER TABLE ONLY public.master_customer
 
 
 --
--- Name: master_division master_division_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3823 (class 2606 OID 25322)
+-- Name: master_division master_division_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_division
@@ -4851,7 +5187,8 @@ ALTER TABLE ONLY public.master_division
 
 
 --
--- Name: master_employee master_employee_division_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3824 (class 2606 OID 25327)
+-- Name: master_employee master_employee_division_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_employee
@@ -4859,7 +5196,8 @@ ALTER TABLE ONLY public.master_employee
 
 
 --
--- Name: master_employee master_employee_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3825 (class 2606 OID 25332)
+-- Name: master_employee master_employee_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_employee
@@ -4867,7 +5205,8 @@ ALTER TABLE ONLY public.master_employee
 
 
 --
--- Name: master_item master_item_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3826 (class 2606 OID 25337)
+-- Name: master_item master_item_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_item
@@ -4875,7 +5214,8 @@ ALTER TABLE ONLY public.master_item
 
 
 --
--- Name: master_menu master_menu_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3827 (class 2606 OID 25342)
+-- Name: master_menu master_menu_parent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_menu
@@ -4883,7 +5223,8 @@ ALTER TABLE ONLY public.master_menu
 
 
 --
--- Name: master_menu master_menu_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3828 (class 2606 OID 25347)
+-- Name: master_menu master_menu_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_menu
@@ -4891,7 +5232,8 @@ ALTER TABLE ONLY public.master_menu
 
 
 --
--- Name: master_office master_office_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3829 (class 2606 OID 25352)
+-- Name: master_office master_office_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_office
@@ -4899,7 +5241,8 @@ ALTER TABLE ONLY public.master_office
 
 
 --
--- Name: master_office master_office_zone_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3830 (class 2606 OID 25357)
+-- Name: master_office master_office_zone_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_office
@@ -4907,7 +5250,8 @@ ALTER TABLE ONLY public.master_office
 
 
 --
--- Name: master_permission master_permission_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3831 (class 2606 OID 25362)
+-- Name: master_permission master_permission_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_permission
@@ -4915,7 +5259,8 @@ ALTER TABLE ONLY public.master_permission
 
 
 --
--- Name: master_product master_product_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3832 (class 2606 OID 25367)
+-- Name: master_product master_product_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product
@@ -4923,7 +5268,8 @@ ALTER TABLE ONLY public.master_product
 
 
 --
--- Name: master_product_category master_product_category_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3834 (class 2606 OID 25372)
+-- Name: master_product_category master_product_category_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product_category
@@ -4931,7 +5277,8 @@ ALTER TABLE ONLY public.master_product_category
 
 
 --
--- Name: master_product master_product_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3833 (class 2606 OID 25377)
+-- Name: master_product master_product_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_product
@@ -4939,7 +5286,8 @@ ALTER TABLE ONLY public.master_product
 
 
 --
--- Name: master_region master_region_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3835 (class 2606 OID 25382)
+-- Name: master_region master_region_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_region
@@ -4947,7 +5295,8 @@ ALTER TABLE ONLY public.master_region
 
 
 --
--- Name: master_role master_role_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3836 (class 2606 OID 25387)
+-- Name: master_role master_role_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_role
@@ -4955,7 +5304,8 @@ ALTER TABLE ONLY public.master_role
 
 
 --
--- Name: master_supplier master_supplier_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3837 (class 2606 OID 25392)
+-- Name: master_supplier master_supplier_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_supplier
@@ -4963,7 +5313,8 @@ ALTER TABLE ONLY public.master_supplier
 
 
 --
--- Name: master_user_menu master_user_menu_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3838 (class 2606 OID 25397)
+-- Name: master_user_menu master_user_menu_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_user_menu
@@ -4971,7 +5322,8 @@ ALTER TABLE ONLY public.master_user_menu
 
 
 --
--- Name: master_zone master_zone_region_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3839 (class 2606 OID 25402)
+-- Name: master_zone master_zone_region_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_zone
@@ -4979,7 +5331,8 @@ ALTER TABLE ONLY public.master_zone
 
 
 --
--- Name: master_zone master_zone_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3840 (class 2606 OID 25407)
+-- Name: master_zone master_zone_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.master_zone
@@ -4987,7 +5340,8 @@ ALTER TABLE ONLY public.master_zone
 
 
 --
--- Name: order_items order_items_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3841 (class 2606 OID 25412)
+-- Name: order_items order_items_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.order_items
@@ -4995,7 +5349,8 @@ ALTER TABLE ONLY public.order_items
 
 
 --
--- Name: order_items order_items_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3842 (class 2606 OID 25417)
+-- Name: order_items order_items_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.order_items
@@ -5003,7 +5358,8 @@ ALTER TABLE ONLY public.order_items
 
 
 --
--- Name: order_items order_items_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3843 (class 2606 OID 25422)
+-- Name: order_items order_items_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.order_items
@@ -5011,7 +5367,8 @@ ALTER TABLE ONLY public.order_items
 
 
 --
--- Name: orders orders_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3844 (class 2606 OID 32788)
+-- Name: orders orders_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.orders
@@ -5019,7 +5376,8 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- Name: orders orders_office_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3845 (class 2606 OID 25427)
+-- Name: orders orders_office_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.orders
@@ -5027,7 +5385,8 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- Name: orders orders_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3846 (class 2606 OID 25432)
+-- Name: orders orders_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.orders
@@ -5035,7 +5394,8 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- Name: payments payments_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3847 (class 2606 OID 25437)
+-- Name: payments payments_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.payments
@@ -5043,7 +5403,8 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- Name: payments payments_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3848 (class 2606 OID 25442)
+-- Name: payments payments_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.payments
@@ -5051,7 +5412,8 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- Name: product_images product_images_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3860 (class 2606 OID 25447)
+-- Name: product_images product_images_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.product_images
@@ -5059,7 +5421,8 @@ ALTER TABLE ONLY public.product_images
 
 
 --
--- Name: production_tasks production_tasks_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3861 (class 2606 OID 25452)
+-- Name: production_tasks production_tasks_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.production_tasks
@@ -5067,7 +5430,8 @@ ALTER TABLE ONLY public.production_tasks
 
 
 --
--- Name: production_tasks production_tasks_order_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3862 (class 2606 OID 25457)
+-- Name: production_tasks production_tasks_order_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.production_tasks
@@ -5075,7 +5439,8 @@ ALTER TABLE ONLY public.production_tasks
 
 
 --
--- Name: production_tasks production_tasks_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3863 (class 2606 OID 25462)
+-- Name: production_tasks production_tasks_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.production_tasks
@@ -5083,7 +5448,8 @@ ALTER TABLE ONLY public.production_tasks
 
 
 --
--- Name: purchase_order_items purchase_order_items_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3864 (class 2606 OID 25467)
+-- Name: purchase_order_items purchase_order_items_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_order_items
@@ -5091,7 +5457,8 @@ ALTER TABLE ONLY public.purchase_order_items
 
 
 --
--- Name: purchase_order_items purchase_order_items_purchase_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3865 (class 2606 OID 25472)
+-- Name: purchase_order_items purchase_order_items_purchase_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_order_items
@@ -5099,7 +5466,8 @@ ALTER TABLE ONLY public.purchase_order_items
 
 
 --
--- Name: purchase_order_items purchase_order_items_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3866 (class 2606 OID 25477)
+-- Name: purchase_order_items purchase_order_items_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_order_items
@@ -5107,7 +5475,8 @@ ALTER TABLE ONLY public.purchase_order_items
 
 
 --
--- Name: purchase_orders purchase_orders_supplier_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3867 (class 2606 OID 25482)
+-- Name: purchase_orders purchase_orders_supplier_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_orders
@@ -5115,7 +5484,8 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- Name: purchase_orders purchase_orders_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3868 (class 2606 OID 25487)
+-- Name: purchase_orders purchase_orders_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.purchase_orders
@@ -5123,7 +5493,8 @@ ALTER TABLE ONLY public.purchase_orders
 
 
 --
--- Name: role_menus role_menus_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3869 (class 2606 OID 25492)
+-- Name: role_menus role_menus_menu_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_menus
@@ -5131,7 +5502,8 @@ ALTER TABLE ONLY public.role_menus
 
 
 --
--- Name: role_menus role_menus_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3870 (class 2606 OID 25497)
+-- Name: role_menus role_menus_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_menus
@@ -5139,7 +5511,8 @@ ALTER TABLE ONLY public.role_menus
 
 
 --
--- Name: role_permissions role_permissions_permission_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3871 (class 2606 OID 25502)
+-- Name: role_permissions role_permissions_permission_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_permissions
@@ -5147,7 +5520,8 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- Name: role_permissions role_permissions_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3872 (class 2606 OID 25507)
+-- Name: role_permissions role_permissions_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.role_permissions
@@ -5155,7 +5529,8 @@ ALTER TABLE ONLY public.role_permissions
 
 
 --
--- Name: sales_invoices sales_invoices_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3873 (class 2606 OID 25512)
+-- Name: sales_invoices sales_invoices_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_invoices
@@ -5163,7 +5538,8 @@ ALTER TABLE ONLY public.sales_invoices
 
 
 --
--- Name: sales_invoices sales_invoices_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3874 (class 2606 OID 25517)
+-- Name: sales_invoices sales_invoices_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_invoices
@@ -5171,7 +5547,8 @@ ALTER TABLE ONLY public.sales_invoices
 
 
 --
--- Name: sales_payments sales_payments_invoice_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3875 (class 2606 OID 25522)
+-- Name: sales_payments sales_payments_invoice_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_payments
@@ -5179,7 +5556,8 @@ ALTER TABLE ONLY public.sales_payments
 
 
 --
--- Name: sales_payments sales_payments_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3876 (class 2606 OID 25527)
+-- Name: sales_payments sales_payments_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.sales_payments
@@ -5187,7 +5565,8 @@ ALTER TABLE ONLY public.sales_payments
 
 
 --
--- Name: stock_opname_detail stock_opname_detail_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3878 (class 2606 OID 25532)
+-- Name: stock_opname_detail stock_opname_detail_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname_detail
@@ -5195,7 +5574,8 @@ ALTER TABLE ONLY public.stock_opname_detail
 
 
 --
--- Name: stock_opname_detail stock_opname_detail_stock_opname_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3879 (class 2606 OID 25537)
+-- Name: stock_opname_detail stock_opname_detail_stock_opname_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname_detail
@@ -5203,7 +5583,8 @@ ALTER TABLE ONLY public.stock_opname_detail
 
 
 --
--- Name: stock_opname_detail stock_opname_detail_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3880 (class 2606 OID 25542)
+-- Name: stock_opname_detail stock_opname_detail_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname_detail
@@ -5211,7 +5592,8 @@ ALTER TABLE ONLY public.stock_opname_detail
 
 
 --
--- Name: stock_opname stock_opname_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3877 (class 2606 OID 25547)
+-- Name: stock_opname stock_opname_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.stock_opname
@@ -5219,7 +5601,8 @@ ALTER TABLE ONLY public.stock_opname
 
 
 --
--- Name: task_history task_history_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3881 (class 2606 OID 25552)
+-- Name: task_history task_history_employee_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.task_history
@@ -5227,7 +5610,8 @@ ALTER TABLE ONLY public.task_history
 
 
 --
--- Name: task_history task_history_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3882 (class 2606 OID 25557)
+-- Name: task_history task_history_task_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.task_history
@@ -5235,7 +5619,8 @@ ALTER TABLE ONLY public.task_history
 
 
 --
--- Name: task_history task_history_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3883 (class 2606 OID 25562)
+-- Name: task_history task_history_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.task_history
@@ -5243,7 +5628,8 @@ ALTER TABLE ONLY public.task_history
 
 
 --
--- Name: transaction_categories transaction_categories_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3884 (class 2606 OID 25567)
+-- Name: transaction_categories transaction_categories_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.transaction_categories
@@ -5251,7 +5637,8 @@ ALTER TABLE ONLY public.transaction_categories
 
 
 --
--- Name: users users_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3885 (class 2606 OID 25572)
+-- Name: users users_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.users
@@ -5259,7 +5646,8 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: work_order_items work_order_items_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3886 (class 2606 OID 25577)
+-- Name: work_order_items work_order_items_item_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_items
@@ -5267,7 +5655,8 @@ ALTER TABLE ONLY public.work_order_items
 
 
 --
--- Name: work_order_items work_order_items_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3887 (class 2606 OID 25582)
+-- Name: work_order_items work_order_items_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_items
@@ -5275,7 +5664,8 @@ ALTER TABLE ONLY public.work_order_items
 
 
 --
--- Name: work_order_items work_order_items_work_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3888 (class 2606 OID 25587)
+-- Name: work_order_items work_order_items_work_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_items
@@ -5283,7 +5673,8 @@ ALTER TABLE ONLY public.work_order_items
 
 
 --
--- Name: work_order_tasks work_order_tasks_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3889 (class 2606 OID 25592)
+-- Name: work_order_tasks work_order_tasks_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_tasks
@@ -5291,7 +5682,8 @@ ALTER TABLE ONLY public.work_order_tasks
 
 
 --
--- Name: work_order_tasks work_order_tasks_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3890 (class 2606 OID 25597)
+-- Name: work_order_tasks work_order_tasks_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_tasks
@@ -5299,7 +5691,8 @@ ALTER TABLE ONLY public.work_order_tasks
 
 
 --
--- Name: work_order_tasks work_order_tasks_work_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3891 (class 2606 OID 25602)
+-- Name: work_order_tasks work_order_tasks_work_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_order_tasks
@@ -5307,7 +5700,8 @@ ALTER TABLE ONLY public.work_order_tasks
 
 
 --
--- Name: work_orders work_orders_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3892 (class 2606 OID 25607)
+-- Name: work_orders work_orders_assigned_to_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_orders
@@ -5315,7 +5709,8 @@ ALTER TABLE ONLY public.work_orders
 
 
 --
--- Name: work_orders work_orders_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3893 (class 2606 OID 25612)
+-- Name: work_orders work_orders_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_orders
@@ -5323,12 +5718,15 @@ ALTER TABLE ONLY public.work_orders
 
 
 --
--- Name: work_orders work_orders_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- TOC entry 3894 (class 2606 OID 25617)
+-- Name: work_orders work_orders_tenant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: zentra_api_admin
 --
 
 ALTER TABLE ONLY public.work_orders
     ADD CONSTRAINT work_orders_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES public.master_tenant(id);
 
+
+-- Completed on 2025-05-24 10:13:54 UTC
 
 --
 -- PostgreSQL database dump complete

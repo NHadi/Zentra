@@ -190,6 +190,9 @@
                         case 'petty-cash-summary':
                             await this.loadPettyCashSummary();
                             break;
+                        case 'task-calendar':
+                            await this.loadTaskCalendar();
+                            break;
                         default:
                             try {
                                 await this.loadDefaultContent('/' + path);
@@ -2024,6 +2027,63 @@
                     } catch (error) {
                         console.error('Failed to load petty cash summary component:', error);
                         $('#main-content').html('<div class="alert alert-danger">Failed to load petty cash summary component</div>');
+                        reject(error);
+                    }
+                });
+            });
+        },
+
+        loadTaskCalendar: async function() {
+            // Only dispose if we're loading a new instance
+            if (window.taskCalendarPageInstance) {
+                window.taskCalendarPageInstance.dispose();
+                window.taskCalendarPageInstance = null;
+            }
+
+            return new Promise((resolve, reject) => {
+                $('#main-content').load('components/task-calendar.html', async () => {
+                    try {
+                        // Wait for DevExtreme to load
+                        await new Promise(resolve => {
+                            const checkDevExtreme = () => {
+                                if (typeof DevExpress !== 'undefined') {
+                                    resolve();
+                                } else {
+                                    setTimeout(checkDevExtreme, 100);
+                                }
+                            };
+                            checkDevExtreme();
+                        });
+
+                        // Remove any existing script
+                        const existingScript = document.querySelector('script[data-page="task-calendar"]');
+                        if (existingScript) {
+                            existingScript.remove();
+                        }
+
+                        // Create a script element with type="module" to load the task-calendar.js module
+                        const script = document.createElement('script');
+                        script.type = 'module';
+                        script.src = './assets/js/pages/task-calendar.js';
+                        script.setAttribute('data-page', 'task-calendar');
+                        
+                        // Handle script load/error
+                        script.onload = () => {
+                            // Initialize the task calendar page instance
+                            if (!window.taskCalendarPageInstance) {
+                                window.taskCalendarPageInstance = new window.TaskCalendarPage();
+                            }
+                            resolve();
+                        };
+                        script.onerror = (error) => {
+                            console.error('Failed to load task calendar module:', error);
+                            reject(error);
+                        };
+                        
+                        document.body.appendChild(script);
+                    } catch (error) {
+                        console.error('Failed to load task calendar component:', error);
+                        $('#main-content').html('<div class="alert alert-danger">Failed to load task calendar component</div>');
                         reject(error);
                     }
                 });
