@@ -3,7 +3,7 @@
 // Function to detect environment from hostname
 function detectEnvironment() {
     const hostname = window.location.hostname;
-    console.log('[Config] Detecting environment from hostname:', hostname);
+    //console.log('[Config] Detecting environment from hostname:', hostname);
     
     // Check for staging environment first
     if (hostname.includes('staging.')) {
@@ -50,7 +50,7 @@ function detectEnvironment() {
 // Get configuration based on environment
 function getConfig() {
     const environment = detectEnvironment();
-    console.log('[Config] Using environment:', environment);
+    //console.log('[Config] Using environment:', environment);
     
     const configs = {
         local: {

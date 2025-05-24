@@ -23,18 +23,18 @@
 
     // Get configuration from window object
     function getConfig() {
-        console.log('[API] Getting API configuration...');
-        console.log('[API] Window.APP_CONFIG:', window.APP_CONFIG);
+        // console.log('[API] Getting API configuration...');
+        // console.log('[API] Window.APP_CONFIG:', window.APP_CONFIG);
         
         // Check for server-injected configuration
         if (window.APP_CONFIG) {
-            console.log('[API] Using server-injected config:', window.APP_CONFIG);
+            // console.log('[API] Using server-injected config:', window.APP_CONFIG);
             return window.APP_CONFIG;
         }
 
         // If no server config, detect environment and use defaults
         const environment = detectEnvironment();
-        console.log('[API] No server config found, using environment:', environment);
+        // console.log('[API] No server config found, using environment:', environment);
         
         // Default configurations for each environment
         const configs = {
@@ -65,39 +65,39 @@
         };
 
         const selectedConfig = configs[environment];
-        console.log('[API] Selected configuration:', selectedConfig);
+        // console.log('[API] Selected configuration:', selectedConfig);
         return selectedConfig;
     }
 
     // Initialize configuration
     function initializeConfig() {
-        console.log('[API] Initializing configuration...');
+        // console.log('[API] Initializing configuration...');
         config = getConfig();
         configReady = true;
-        console.log('[API] Configuration initialized:', config);
+        // console.log('[API] Configuration initialized:', config);
         notifyConfigReady();
     }
 
     // Helper function to detect environment from URL
     function detectEnvironment() {
         const hostname = window.location.hostname;
-        console.log('[API] Detecting environment from hostname:', hostname);
+        // console.log('[API] Detecting environment from hostname:', hostname);
         
         // Check for staging environment first
         if (hostname.includes('staging.')) {
-            console.log('[API] Detected staging environment');
+            // console.log('[API] Detected staging environment');
             return 'staging';
         }
         
         // Check for development environment
         if (hostname.includes('dev.')) {
-            console.log('[API] Detected development environment');
+            // console.log('[API] Detected development environment');
             return 'development';
         }
         
         // Check if running locally
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            console.log('[API] Detected local environment');
+            // console.log('[API] Detected local environment');
             return 'local';
         }
         
@@ -105,52 +105,52 @@
         if (hostname === 'bisnisqu.badamigroups.com' || 
             hostname === 'eshop.badamigroups.com' || 
             hostname === 'zentra.badamigroups.com') {
-            console.log('[API] Detected production environment');
+            // console.log('[API] Detected production environment');
             return 'production';
         }
         
         // Default to local if running from file or unknown host
         if (hostname === '' || hostname === 'file' || hostname.startsWith('192.168.')) {
-            console.log('[API] Defaulting to local environment');
+            // console.log('[API] Defaulting to local environment');
             return 'local';
         }
         
         // If no match found, try to detect from window.APP_CONFIG
         if (window.APP_CONFIG && window.APP_CONFIG.ENVIRONMENT) {
-            console.log('[API] Using environment from window.APP_CONFIG:', window.APP_CONFIG.ENVIRONMENT);
+            // console.log('[API] Using environment from window.APP_CONFIG:', window.APP_CONFIG.ENVIRONMENT);
             return window.APP_CONFIG.ENVIRONMENT;
         }
         
-        console.log('[API] No environment match found, defaulting to local');
+        // console.log('[API] No environment match found, defaulting to local');
         return 'local';
     }
 
     // Get API URL from configuration
     async function getApiUrl() {
         if (!configReady) {
-            console.log('[API] Waiting for configuration to be ready...');
+            // console.log('[API] Waiting for configuration to be ready...');
             await waitForConfig();
         }
         const baseUrl = config.API_URL;
         const apiUrl = `${baseUrl.replace(/\/$/, '')}/api`;
-        console.log('[API] Generated API URL:', apiUrl);
+        // console.log('[API] Generated API URL:', apiUrl);
         return apiUrl;
     }
 
     async function getEnvironment() {
         if (!configReady) {
-            console.log('[API] Waiting for configuration to be ready...');
+            // console.log('[API] Waiting for configuration to be ready...');
             await waitForConfig();
         }
         const env = config.ENVIRONMENT;
-        console.log('[API] Current environment:', env);
+        // console.log('[API] Current environment:', env);
         return env;
     }
 
     // Get headers for authenticated requests
     async function getHeaders() {
         if (!configReady) {
-            console.log('[API] Waiting for configuration to be ready...');
+            // console.log('[API] Waiting for configuration to be ready...');
             await waitForConfig();
         }
         const token = localStorage.getItem('token');
@@ -162,23 +162,23 @@
             'X-Environment': await getEnvironment(),
             'Origin': window.location.origin
         };
-        console.log('[API] Generated headers:', headers);
+        // console.log('[API] Generated headers:', headers);
         return headers;
     }
 
     // Generic fetch wrapper with credentials
     async function fetchWithCredentials(url, options = {}) {
         if (!configReady) {
-            console.log('[API] Waiting for configuration to be ready...');
+            // console.log('[API] Waiting for configuration to be ready...');
             await waitForConfig();
         }
         
         const apiUrl = await getApiUrl();
         const fullUrl = url.startsWith('http') ? url : `${apiUrl}${url.startsWith('/') ? url : `/${url}`}`;
         
-        console.log('[API] Making request to:', fullUrl);
-        console.log('[API] Request options:', options);
-        console.log('[API] Request headers:', await getHeaders());
+        // console.log('[API] Making request to:', fullUrl);
+        // console.log('[API] Request options:', options);
+        // console.log('[API] Request headers:', await getHeaders());
         
         try {
             const response = await fetch(fullUrl, {
@@ -190,8 +190,8 @@
                 }
             });
             
-            console.log('[API] Response status:', response.status);
-            console.log('[API] Response headers:', Object.fromEntries(response.headers.entries()));
+            // console.log('[API] Response status:', response.status);
+            // console.log('[API] Response headers:', Object.fromEntries(response.headers.entries()));
             
             return response;
         } catch (error) {
@@ -211,7 +211,7 @@
     async function login(email, password) {
         try {
             const apiUrl = await getApiUrl();
-            console.log('[API] Attempting login with API URL:', apiUrl);
+            // console.log('[API] Attempting login with API URL:', apiUrl);
             
             const response = await fetch(`${apiUrl}/auth/login`, {
                 method: 'POST',
@@ -229,7 +229,7 @@
             }
             
             const data = await response.json();
-            console.log('[API] Login response:', data);
+            // console.log('[API] Login response:', data); 
             
             if (!data.token) {
                 throw new Error('No token received from server');
@@ -243,7 +243,7 @@
                 const tokenPayload = JSON.parse(atob(data.token.split('.')[1]));
                 localStorage.setItem('tenant_id', tokenPayload.tenant_id);
             } catch (e) {
-                console.warn('[API] Could not extract tenant_id from token:', e);
+                // console.warn('[API] Could not extract tenant_id from token:', e);
             }
             
             // Store user and menu data
@@ -252,7 +252,7 @@
             
             return data;
         } catch (error) {
-            console.error('[API] Login error:', error);
+            // console.error('[API] Login error:', error);
             throw error;
         }
     }
@@ -269,7 +269,7 @@
             
             return await response.json();
         } catch (error) {
-            console.error('Get users error:', error);
+            // console.error('Get users error:', error);
             throw error;
         }
     }
@@ -288,7 +288,7 @@
             
             return await response.json();
         } catch (error) {
-            console.error('Create user error:', error);
+            // console.error('Create user error:', error);
             throw error;
         }
     }
@@ -305,7 +305,7 @@
             
             return await response.json();
         } catch (error) {
-            console.error('Get menus error:', error);
+            // console.error('Get menus error:', error);
             throw error;
         }
     }
@@ -324,7 +324,7 @@
             
             return await response.json();
         } catch (error) {
-            console.error('Get audit data error:', error);
+            // console.error('Get audit data error:', error);
             throw error;
         }
     }
@@ -405,7 +405,7 @@
     };
 
     // Log the API initialization
-    console.log('[API] zentra API initialized');
+    // console.log('[API] zentra API initialized');
     
     // Dispatch an event when initialization is complete
     window.dispatchEvent(new Event('zentraApiReady'));

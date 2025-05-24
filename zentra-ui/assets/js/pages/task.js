@@ -660,6 +660,7 @@ export class TaskPage {
         const dueDate = new Date(task.order_item?.order?.expected_delivery_date);
         const isOverdue = dueDate < new Date() && task.status !== 'completed';
         const isPriority = dueDate <= new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const orderLabel = task.order_item?.order?.label;
         
         card.html(`
             <div class="task-card-content">
@@ -692,18 +693,18 @@ export class TaskPage {
                         <div class="task-type">
                             <i class="fas ${this.getTaskTypeIcon(task.task_type)}"></i>
                             <span>${task.task_type.toUpperCase()}</span>
-                    </div>
-                    <div class="task-meta">
+                        </div>
+                        <div class="task-meta">
                             <span class="meta-item" title="Order Reference">
-                            <i class="fas fa-shopping-cart"></i>
+                                <i class="fas fa-shopping-cart"></i>
                                 #${task.order_item.order.order_number}
                             </span>
                             <span class="meta-item" title="Product">
                                 <i class="fas fa-tshirt"></i>
                                 ${task.order_item.product_name}
-                        </span>
-                        ${task.order_item?.order?.label ? `<span class="meta-item order-label-badge" title="Order Label"><i class="fas fa-tag"></i> ${task.order_item.order.label}</span>` : ''}
-                    </div>
+                            </span>
+                            ${orderLabel ? `<span class="meta-item order-label-badge" title="Order Label"><i class="fas fa-tag"></i> ${orderLabel}</span>` : ''}
+                        </div>
                     </div>
                     <div class="task-details">
                         <div class="detail-row">
@@ -2158,7 +2159,8 @@ export class TaskPage {
                     task.order_item?.color,
                     task.employee_name,
                     `${task.order_item?.quantity} pcs`,
-                    task.status
+                    task.status,
+                    task.order_item?.order?.label 
                 ];
                 
                 return searchableFields.some(field => 

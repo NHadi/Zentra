@@ -79,6 +79,7 @@ type EnhancedTaskResponse struct {
 		FinalSubtotal    float64 `json:"final_subtotal"`
 		Order            struct {
 			ID                   int     `json:"id"`
+			Label                string  `json:"label"`
 			OrderNumber          string  `json:"order_number"`
 			CustomerName         string  `json:"customer_name"`
 			CustomerEmail        string  `json:"customer_email"`
@@ -137,6 +138,7 @@ func ToEnhancedTaskResponse(t *task.Task, orderItem *order.OrderItem, ord *order
 
 		if ord != nil {
 			response.OrderItem.Order.ID = ord.ID
+			response.OrderItem.Order.Label = ord.Label
 			response.OrderItem.Order.OrderNumber = ord.OrderNumber
 			if ord.Customer != nil {
 				response.OrderItem.Order.CustomerName = ord.Customer.Name
